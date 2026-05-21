@@ -1,0 +1,170 @@
+import type { DB } from '../connection';
+import type { ChannelStat, Goal, NewRawResponse, RawResponse } from '@pca/shared';
+
+interface GoalRow {
+  id: number;
+  name: string;
+  type: string;
+  is_b2b: number;
+  is_archived: number;
+  synced_at: string;
+}
+
+interface RawRow {
+  id: number;
+  endpoint: string;
+  query_hash: string;
+  date_from: string;
+  date_to: string;
+  payload: string;
+  fetched_at: string;
+}
+
+interface ChannelRow {
+  date: string;
+  channel: string;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  visits: number;
+  users: number;
+  bounce_rate: number;
+  avg_duration: number;
+  goal_reaches: number;
+  conversion_rate: number;
+}
+
+function toGoal(r: GoalRow): Goal {
+  return {
+    id: r.id,
+    name: r.name,
+    type: r.type,
+    isB2b: r.is_b2b === 1,
+    isArchived: r.is_archived === 1,
+    syncedAt: r.synced_at,
+  };
+}
+
+function toChannelStat(r: ChannelRow): ChannelStat {
+  return {
+    date: r.date,
+    channel: r.channel,
+    utmSource: r.utm_source,
+    utmMedium: r.utm_medium,
+    utmCampaign: r.utm_campaign,
+    visits: r.visits,
+    users: r.users,
+    bounceRate: r.bounce_rate,
+    avgDuration: r.avg_duration,
+    goalReaches: r.goal_reaches,
+    conversionRate: r.conversion_rate,
+  };
+}
+
+/** Repository for Metrika-derived data: goals, raw API responses, channel stats. */
+export class MetricsRepo {
+  constructor(private readonly db: DB) {}
+
+  upsertGoals(goals: readonly Goal[]): void {
+    const stmt = this.db.prepare(
+      `INSERT OR REPLACE INTO goals (id, name, type, is_b2b, is_archived, synced_at)
+       VALUES (@id, @name, @type, @is_b2b, @is_archived, @synced_at)`,
+    );
+    const tx = this.db.transaction((rows: readonly Goal[]) => {
+      for (const g of rows) {
+        stmt.run({
+          id: g.id,
+          name: g.name,
+          type: g.type,
+          is_b2b: g.isB2b ? 1 : 0,
+          is_archived: g.isArchived ? 1 : 0,
+          synced_at: g.syncedAt,
+        });
+      }
+    });
+    tx(goals);
+  }
+
+  listGoals(includeArchived = false): Goal[] {
+    const sql = includeArchived
+      ? 'SELECT * FROM goals ORDER BY id'
+      : 'SELECT * FROM goals WHERE is_archived = 0 ORDER BY id';
+    return (this.db.prepare(sql).all() as GoalRow[]).map(toGoal);
+  }
+
+  /** Idempotent cache write keyed by (query_hash, date_from, date_to). Returns the row id. */
+  saveRawResponse(r: NewRawResponse): number {
+    const row = this.db
+      .prepare(
+        `INSERT INTO raw_responses (endpoint, query_hash, date_from, date_to, payload, fetched_at)
+         VALUES (@endpoint, @query_hash, @date_from, @date_to, @payload, @fetched_at)
+         ON CONFLICT(query_hash, date_from, date_to) DO UPDATE SET
+           endpoint = excluded.endpoint,
+           payload = excluded.payload,
+           fetched_at = excluded.fetched_at
+         RETURNING id`,
+      )
+      .get({
+        endpoint: r.endpoint,
+        query_hash: r.queryHash,
+        date_from: r.dateFrom,
+        date_to: r.dateTo,
+        payload: JSON.stringify(r.payload),
+        fetched_at: r.fetchedAt,
+      }) as { id: number };
+    return row.id;
+  }
+
+  getRawResponse(id: number): RawResponse | undefined {
+    const r = this.db.prepare('SELECT * FROM raw_responses WHERE id = ?').get(id) as
+      | RawRow
+      | undefined;
+    if (!r) return undefined;
+    return {
+      id: r.id,
+      endpoint: r.endpoint,
+      queryHash: r.query_hash,
+      dateFrom: r.date_from,
+      dateTo: r.date_to,
+      payload: JSON.parse(r.payload),
+      fetchedAt: r.fetched_at,
+    };
+  }
+
+  upsertChannelStats(rows: readonly ChannelStat[]): void {
+    const stmt = this.db.prepare(
+      `INSERT OR REPLACE INTO channel_stats
+         (date, channel, utm_source, utm_medium, utm_campaign, visits, users,
+          bounce_rate, avg_duration, goal_reaches, conversion_rate)
+       VALUES (@date, @channel, @utm_source, @utm_medium, @utm_campaign, @visits, @users,
+          @bounce_rate, @avg_duration, @goal_reaches, @conversion_rate)`,
+    );
+    const tx = this.db.transaction((items: readonly ChannelStat[]) => {
+      for (const c of items) {
+        stmt.run({
+          date: c.date,
+          channel: c.channel,
+          utm_source: c.utmSource,
+          utm_medium: c.utmMedium,
+          utm_campaign: c.utmCampaign,
+          visits: c.visits,
+          users: c.users,
+          bounce_rate: c.bounceRate,
+          avg_duration: c.avgDuration,
+          goal_reaches: c.goalReaches,
+          conversion_rate: c.conversionRate,
+        });
+      }
+    });
+    tx(rows);
+  }
+
+  listChannelStats(range?: { from: string; to: string }): ChannelStat[] {
+    const rows = range
+      ? (this.db
+          .prepare('SELECT * FROM channel_stats WHERE date >= ? AND date <= ? ORDER BY date')
+          .all(range.from, range.to) as ChannelRow[])
+      : (this.db.prepare('SELECT * FROM channel_stats ORDER BY date').all() as ChannelRow[]);
+    return rows.map(toChannelStat);
+  }
+}

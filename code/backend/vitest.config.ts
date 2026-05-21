@@ -8,8 +8,8 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.ts'],
-      // server.ts = bootstrap entry (listen/exit); excluded from coverage by design.
-      exclude: ['src/server.ts', '**/*.test.ts'],
+      // Bootstrap/entry files (listen/exit, CLI) are excluded from coverage by design.
+      exclude: ['src/server.ts', 'src/db/cli-migrate.ts', '**/*.test.ts'],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },
   },

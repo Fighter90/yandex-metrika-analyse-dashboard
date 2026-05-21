@@ -1,5 +1,12 @@
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import { z } from 'zod';
+
+// Resolve the repo root from this file (code/backend/src) so .env and the SQLite file
+// are found regardless of the working directory a script is invoked from.
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
+loadEnv({ path: join(REPO_ROOT, '.env') });
 
 /**
  * Single source of truth for runtime configuration.
@@ -16,6 +23,7 @@ const EnvSchema = z.object({
   API_PORT: z.coerce.number().int().default(4000),
   ARCHIVED_GOAL_ID_THRESHOLD: z.coerce.number().int().default(77),
   LOW_UTM_COVERAGE_RATIO: z.coerce.number().default(0.7),
+  DB_PATH: z.string().default(join(REPO_ROOT, 'data', 'productcamp.sqlite')),
 });
 
 export const config = EnvSchema.parse(process.env);
