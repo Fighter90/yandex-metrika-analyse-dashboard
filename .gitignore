@@ -5,6 +5,11 @@ node_modules/
 dist/
 coverage/
 
+# playwright
+test-results/
+playwright-report/
+.playwright/
+
 # env / secrets
 .env
 .env.local
