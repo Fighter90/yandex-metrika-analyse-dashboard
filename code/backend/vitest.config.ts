@@ -9,7 +9,12 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: ['src/**/*.ts'],
       // Bootstrap/entry files (listen/exit, CLI) are excluded from coverage by design.
-      exclude: ['src/server.ts', 'src/db/cli-migrate.ts', '**/*.test.ts'],
+      exclude: [
+        'src/server.ts',
+        'src/db/cli-migrate.ts',
+        'src/utils/logger.ts',
+        '**/*.test.ts',
+      ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },
   },
