@@ -26,7 +26,7 @@ jobs:
             -czf "productcamp-analytics-${GITHUB_REF_NAME}.tar.gz" \
             code docs .claude run.sh package.json pnpm-workspace.yaml pnpm-lock.yaml \
             tsconfig.base.json eslint.config.js .env.example README.md README.en.md CLAUDE.md
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: productcamp-analytics-*.tar.gz
           generate_release_notes: true
