@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+coverage/
+
+# env / secrets
+.env
+.env.local
+
+# data (gitignored per spec — keep only .gitkeep markers)
+/data/*
+!/data/reports/
+/data/reports/*
+!/data/reports/.gitkeep
+!/data/decisions/
+/data/decisions/*
+!/data/decisions/.gitkeep
+
+# logs / os
+*.log
+.DS_Store
