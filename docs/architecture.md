@@ -40,7 +40,7 @@ flowchart TD
 | Аналитика  | `code/backend/src/analytics/` _(итерации 6+)_ | ICE, traffic-light, KPI, forecast                    |
 | Отчёты     | `code/backend/src/report/` _(итерации 8–10)_  | `docx`, Puppeteer, immutable snapshot                |
 | Фронтенд   | `code/frontend/`                              | React 18, Vite, Tailwind, ECharts, TanStack, Zustand |
-| Общее      | `code/shared/`                                | типы, `ICE_CONFIG`, Voronkova-валидация              |
+| Общее      | `code/shared/`                                | типы, `ICE_CONFIG`, валидация гипотез                |
 
 ## Поток данных (Double Diamond)
 

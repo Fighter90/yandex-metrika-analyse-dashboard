@@ -35,7 +35,7 @@ function valid(overrides: Partial<NewHypothesis> = {}): NewHypothesis {
 }
 
 describe('validateHypothesis', () => {
-  it('accepts a complete Voronkova hypothesis', () => {
+  it('accepts a complete hypothesis', () => {
     const res = validateHypothesis(valid());
     expect(res.ok).toBe(true);
     expect(res.errors).toEqual([]);

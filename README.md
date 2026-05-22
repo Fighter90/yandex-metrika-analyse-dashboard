@@ -119,9 +119,7 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 - **Светофор** (🟢/🟡/🔴) с конкретными порогами + дедлайн проверки.
 - **Decision Log** замыкает цикл: проверка → запись DL-{N} → авто-обновление статуса гипотезы.
 
-Методология адаптирована из
-[**Voronik1801 / Podlodka_crew_AI_Product**](https://github.com/Voronik1801/Podlodka_crew_AI_Product)
-(с атрибуцией в каждом файле `.claude/skills/`).
+Методология описана в `docs/methodology-hypotheses.md`.
 
 ## Что делает проект (по логике кода)
 
@@ -273,5 +271,3 @@ KPI-математику) проходят через **спеку** до код
 ## License · Authors · Credits
 
 - Авторы: команда трека «Конверсии и лидген» ProductCamp.
-- Методология (формат гипотез, ICE=product, светофор, Decision Log): **Дарья Воронкова**,
-  [Voronik1801 / Podlodka_crew_AI_Product](https://github.com/Voronik1801/Podlodka_crew_AI_Product).

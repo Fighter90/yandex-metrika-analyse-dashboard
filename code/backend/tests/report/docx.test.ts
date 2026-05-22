@@ -85,7 +85,7 @@ describe('reportSections re-export', () => {
     expect(headings).toContain('Приоритизация гипотез (по ICE)');
     expect(headings.some((h) => h.startsWith('DL-001'))).toBe(true);
     const methodology = sections.find((s) => s.heading === 'Методология');
-    expect(methodology?.lines.join(' ')).toContain('Voronik1801');
+    expect(methodology?.lines.join(' ')).toContain('Double Diamond');
   });
 });
 

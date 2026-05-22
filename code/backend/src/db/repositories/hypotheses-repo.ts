@@ -6,7 +6,7 @@ import {
   type NewHypothesis,
 } from '@pca/shared';
 
-/** Thrown when a hypothesis fails the Voronkova completeness check at the repo boundary. */
+/** Thrown when a hypothesis fails the completeness check at the repo boundary. */
 export class HypothesisValidationError extends Error {
   constructor(public readonly errors: readonly string[]) {
     super(`Invalid hypothesis: ${errors.join('; ')}`);
@@ -85,7 +85,7 @@ function toHypothesis(r: HypRow): Hypothesis {
 export class HypothesesRepo {
   constructor(private readonly db: DB) {}
 
-  /** Persists a hypothesis. Rejects (throws) anything failing the Voronkova check. */
+  /** Persists a hypothesis. Rejects (throws) anything failing the completeness check. */
   create(input: NewHypothesis): Hypothesis {
     const result = validateHypothesis(input);
     if (!result.ok) throw new HypothesisValidationError(result.errors);

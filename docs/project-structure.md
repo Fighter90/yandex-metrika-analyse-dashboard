@@ -14,7 +14,7 @@
 1. **Парсит** Яндекс.Метрику (счётчик `<COUNTER_ID>`) по OAuth и кэширует данные в SQLite
    (offline + воспроизводимость, история по дням).
 2. **Показывает дашборд**: каналы, воронка визит→заявка→оплата, weak spots, B2B.
-3. **Ведёт гипотезы** по методологии Воронковой (Double Diamond + ICE = I×C×E) и фиксирует
+3. **Ведёт гипотезы** по методологии проверки гипотез (Double Diamond + ICE = I×C×E) и фиксирует
    решения в Decision Log.
 4. **Генерирует DOCX/PDF-отчёт** из неизменяемого snapshot — детерминированно, без выдуманных цифр.
 
@@ -27,7 +27,7 @@
 ├── code/
 │   ├── backend/      # Fastify API, Metrika-клиент, SQLite, аналитика, отчёты
 │   ├── frontend/     # React + Vite дашборд
-│   └── shared/       # общие типы, ICE_CONFIG, Voronkova-валидация (@pca/shared)
+│   └── shared/       # общие типы, ICE_CONFIG, валидация гипотез (@pca/shared)
 ├── .claude/skills/   # skill-промпты методологии (см. ниже)
 ├── .github/          # workflows, шаблоны, CODEOWNERS, dependabot (см. ниже)
 ├── docs/             # эта документация + ADR (decisions/) + спеки (specs/) + EN-зеркала (en/)
@@ -40,9 +40,7 @@
 
 ## Папка `.claude/`
 
-`.claude/skills/` — четыре skill-промпта, адаптированные из
-[Voronik1801 / Podlodka_crew_AI_Product](https://github.com/Voronik1801/Podlodka_crew_AI_Product)
-(атрибуция в шапке каждого файла). Claude Code подгружает их по требованию.
+`.claude/skills/` — четыре skill-промпта. Claude Code подгружает их по требованию.
 
 | Файл                                | Назначение                                                                                           |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -52,7 +50,7 @@
 | `skills/decision-log/SKILL.md`      | шаблон DL-NNN и промпт генерации черновика                                                           |
 
 Методология из `.claude/skills/` не меняется без отметки в
-`docs/methodology-hypothesis-voronik.md` с reasoning.
+`docs/methodology-hypotheses.md` с reasoning.
 
 ## Папка `.github/`
 
@@ -73,7 +71,7 @@
 - `dependabot.yml` — еженедельные обновления npm + github-actions; **мажорные игнорируются**
   (стек закреплён: Fastify 4, React 18 — мажоры требуют ADR).
 - `PULL_REQUEST_TEMPLATE.md` — чек-лист (тесты/типы/линт/доки/ADR/скриншоты/методология).
-- `ISSUE_TEMPLATE/bug.md`, `ISSUE_TEMPLATE/hypothesis.md` — последний по шаблону Воронковой.
+- `ISSUE_TEMPLATE/bug.md`, `ISSUE_TEMPLATE/hypothesis.md` — последний по структурированному формату гипотезы.
 
 ## Корневые конфиги
 

@@ -1,4 +1,4 @@
--- Hypotheses in the Voronkova format.
+-- Hypotheses in the structured format.
 CREATE TABLE hypotheses (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   diamond_phase TEXT NOT NULL CHECK(diamond_phase IN ('define','develop')),

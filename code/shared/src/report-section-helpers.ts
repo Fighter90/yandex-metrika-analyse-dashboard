@@ -49,8 +49,8 @@ export const BUCKET_LABEL: Record<IceBucket, string> = {
 
 export const KIND_LABEL = { problem: 'проблема', solution: 'решение' } as const;
 
-/** Full Voronkova statement: «{subject} {action} {solution}, если {condition}». */
-export function voronkovaStatement(h: Hypothesis): string {
+/** Full hypothesis statement: «{subject} {action} {solution}, если {condition}». */
+export function hypothesisStatement(h: Hypothesis): string {
   return `«${h.subject} ${h.action} ${h.solution}, если ${h.condition}»`;
 }
 
@@ -100,5 +100,5 @@ export function channelTotals(channels: ReportSnapshot['channels']): ChannelTota
 /** One-line ICE summary used in the prioritization table. */
 export function priorityLine(h: Hypothesis, rank: number): string {
   const bucket = BUCKET_LABEL[iceBucket(h.iceScore)];
-  return `${rank}. [ICE ${h.iceScore} · ${bucket}] ${KIND_LABEL[h.kind]}: ${voronkovaStatement(h)} — статус: ${STATUS_LABEL[h.status]}, дедлайн ${h.deadlineAt}`;
+  return `${rank}. [ICE ${h.iceScore} · ${bucket}] ${KIND_LABEL[h.kind]}: ${hypothesisStatement(h)} — статус: ${STATUS_LABEL[h.status]}, дедлайн ${h.deadlineAt}`;
 }

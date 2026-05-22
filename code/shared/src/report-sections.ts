@@ -3,7 +3,7 @@
  * on-screen preview all render from this single source — so the report is reproducible (no
  * Date.now, no live data, no LLM in the render path) and identical across formats.
  *
- * The output is intentionally verbose: every hypothesis is rendered in full (Voronkova statement,
+ * The output is intentionally verbose: every hypothesis is rendered in full (hypothesis statement,
  * all hidden assumptions by category, every validation method, the ICE breakdown with each
  * rationale, the traffic-light thresholds, deadline and status), plus a prioritization section and
  * an expanded Decision Log. With a populated dataset this yields a detailed multi-page document.
@@ -25,7 +25,7 @@ import {
   pct,
   priorityLine,
   utmLine,
-  voronkovaStatement,
+  hypothesisStatement,
 } from './report-section-helpers';
 
 export interface ReportSection {
@@ -33,11 +33,11 @@ export interface ReportSection {
   readonly lines: string[];
 }
 
-/** A full per-hypothesis section: every Voronkova field spelled out for the report reader. */
+/** A full per-hypothesis section: every hypothesis field spelled out for the report reader. */
 function hypothesisDetail(h: Hypothesis, ordinal: number): ReportSection {
   const phase = h.diamondPhase === 'define' ? 'Define (проблема)' : 'Develop (решение)';
   const lines: string[] = [
-    `Формулировка (Воронкова): ${voronkovaStatement(h)}`,
+    `Формулировка: ${hypothesisStatement(h)}`,
     `Тип: ${KIND_LABEL[h.kind]} · фаза Double Diamond: ${phase} · статус: ${STATUS_LABEL[h.status]}`,
   ];
   if (h.description) lines.push(`Описание: ${h.description}`);
@@ -153,7 +153,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
         '',
         'Главный разрыв: заявка ≠ оплата. Формальные цели Метрики (заявки) и фактические оплаты',
         'разведены везде в отчёте и не суммируются. Цель отчёта — показать, какой трафик приносит',
-        'реальные оплаты, и приоритизировать гипотезы роста по методологии Воронковой.',
+        'реальные оплаты, и приоритизировать гипотезы роста по методологии проверки гипотез.',
         '',
         `Гипотез в работе: ${problems.length} проблемных + ${solutions.length} решенческих.`,
         `Закрытых проверок (Decision Log): ${s.decisions.length}.`,
@@ -165,7 +165,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
         'Цикл Double Diamond: Define (проблемные гипотезы) → Develop (решенческие гипотезы) →',
         'Deliver (Decision Log с проверяемым исходом).',
         '',
-        'Формат гипотезы (Воронкова): «{ЦА} {действие} {решение}, если {условие}». Каждая гипотеза',
+        'Формат гипотезы: «{ЦА} {действие} {решение}, если {условие}». Каждая гипотеза',
         'обязана иметь ≥3 скрытых допущения (поведение/рынок/технологии), ≥2 метода проверки,',
         'светофор-критерии 🟢/🟡/🔴 с порогами и дедлайн.',
         '',
@@ -175,7 +175,6 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
         '',
         'Анти-галлюцинация: ни одной цифры без следа в raw_responses; в render-пути нет LLM и',
         'Date.now(); AI-нарратив (если есть) сгенерирован один раз и сохранён в снапшоте.',
-        'Методология адаптирована из https://github.com/Voronik1801/Podlodka_crew_AI_Product',
       ],
     },
     {

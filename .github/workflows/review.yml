@@ -35,7 +35,7 @@ jobs:
             real issues with file:line. Check specifically:
             - Anti-hallucination: every number traceable to raw_responses; no Date.now() in the
               report render path; no LLM calls in production report path.
-            - Voronkova methodology enforced: hypothesis format {subject/action/solution/condition},
+            - Hypothesis methodology enforced: hypothesis format {subject/action/solution/condition},
               >=3 hidden assumptions across behavior/market/tech, >=2 validation methods,
               traffic-light criteria + deadline, ICE = I*C*E (product, not mean).
             - TypeScript strict (no `any` without // FIXME), tests present, 100% coverage on changed logic.

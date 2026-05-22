@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { installMocks } from './fixtures';
 
-/** Fill every field the shared Voronkova validation requires to enable save. */
+/** Fill every field the shared hypothesis validation requires to enable save. */
 async function fillValidHypothesis(page: import('@playwright/test').Page): Promise<void> {
   await page.getByLabel('Subject (ЦА)').fill('Слушатели подкаста');
   await page.getByLabel('Action').fill('оставляют заявку, но не платят');
@@ -21,7 +21,7 @@ async function fillValidHypothesis(page: import('@playwright/test').Page): Promi
   await page.getByLabel('🔴 Red').fill('Рост <10%');
 }
 
-test.describe('Hypotheses — Voronkova editor', () => {
+test.describe('Hypotheses — structured editor', () => {
   test('blocks save and shows validation errors while the form is empty', async ({ page }) => {
     await installMocks(page);
     await page.goto('/hypotheses');
@@ -30,7 +30,7 @@ test.describe('Hypotheses — Voronkova editor', () => {
     await expect(page.getByText('Гипотез пока нет.')).toBeVisible();
   });
 
-  test('enables save once the full Voronkova format is filled, then creates the row', async ({
+  test('enables save once the full hypothesis format is filled, then creates the row', async ({
     page,
   }) => {
     await installMocks(page);

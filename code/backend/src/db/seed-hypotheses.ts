@@ -1,7 +1,7 @@
 import type { NewDecision, NewHypothesis } from '@pca/shared';
 
 /**
- * Deterministic demo hypotheses + decisions in full Voronkova format, so `./run.sh` shows a
+ * Deterministic demo hypotheses + decisions in full structured format, so `./run.sh` shows a
  * genuinely detailed multi-page report without an OAuth token or manual data entry. Each passes
  * validateHypothesis (≥3 assumptions across behavior/market/tech, ≥2 distinct method types,
  * rationales, traffic-light, deadline). Decisions reference hypotheses by 1-based index into the

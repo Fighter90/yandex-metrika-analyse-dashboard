@@ -1,7 +1,6 @@
 # Skill — Hypothesis Check (ProductCamp adaptation)
 
 > Структурирует сырую гипотезу + считает ICE.
-> Адаптировано из https://github.com/Voronik1801/Podlodka_crew_AI_Product/blob/main/skill-hypothesis-check.md
 
 ---
 
@@ -102,6 +101,6 @@
 
 Если хотя бы один пункт не покрыт — гипотеза не готова. UI инструмента это блокирует автоматически.
 
-## Атрибуция
+## Примечание
 
-Методология (формат гипотезы, hidden assumptions, validation methods, светофор, ICE с rationale) — Дарья Воронкова, https://github.com/Voronik1801/Podlodka_crew_AI_Product
+Методология: формат гипотезы, hidden assumptions, validation methods, светофор, ICE с rationale — описана в `docs/methodology-hypotheses.md`.

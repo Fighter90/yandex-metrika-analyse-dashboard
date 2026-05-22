@@ -9,7 +9,7 @@ export function freshDb(): DB {
   return db;
 }
 
-/** A complete, valid Voronkova hypothesis input; override fields per test. */
+/** A complete, valid hypothesis input; override fields per test. */
 export function validHypothesis(overrides: Partial<NewHypothesis> = {}): NewHypothesis {
   return {
     diamondPhase: 'define',
