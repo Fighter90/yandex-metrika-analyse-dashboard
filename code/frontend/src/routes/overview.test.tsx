@@ -1,13 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import type { ChannelStat } from '@pca/shared';
-import { renderWithProviders } from '../test/utils';
-
-vi.mock('../lib/api', () => ({ api: { channels: vi.fn() } }));
-import { api } from '../lib/api';
-import { Overview } from './overview';
-
-const channels = api.channels as unknown as ReturnType<typeof vi.fn>;
+import { OverviewView } from './overview';
 
 const sample: ChannelStat = {
   date: '2025-01-01',
@@ -23,25 +17,21 @@ const sample: ChannelStat = {
   conversionRate: 0.05,
 };
 
-beforeEach(() => channels.mockReset());
-
-describe('Overview', () => {
-  it('shows a loading state', () => {
-    channels.mockReturnValue(new Promise<ChannelStat[]>(() => {}));
-    renderWithProviders(<Overview />);
+describe('OverviewView', () => {
+  it('renders the loading state', () => {
+    render(<OverviewView status="pending" stats={[]} />);
     expect(screen.getByText('Загрузка…')).toBeInTheDocument();
   });
 
-  it('shows an error state', async () => {
-    channels.mockRejectedValue(new Error('boom'));
-    renderWithProviders(<Overview />);
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
+  it('renders the error state', () => {
+    render(<OverviewView status="error" stats={[]} />);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  it('renders the KPI strip and charts on success', async () => {
-    channels.mockResolvedValue([sample]);
-    renderWithProviders(<Overview />);
-    expect(await screen.findByText(/Заявок/)).toBeInTheDocument();
+  it('renders the KPI strip and charts on success', () => {
+    render(<OverviewView status="success" stats={[sample]} />);
+    expect(screen.getByText('Цель (платных билетов)')).toBeInTheDocument();
+    expect(screen.getByText(/Заявок/)).toBeInTheDocument();
     expect(screen.getAllByTestId('echart')).toHaveLength(2);
   });
 });

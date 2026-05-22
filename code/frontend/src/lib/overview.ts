@@ -33,10 +33,12 @@ export function channelMixOption(stats: ChannelStat[]): object {
 export function dailyReachesOption(stats: ChannelStat[]): object {
   const byDate = new Map<string, number>();
   for (const s of stats) byDate.set(s.date, (byDate.get(s.date) ?? 0) + s.goalReaches);
-  const dates = [...byDate.keys()].sort();
+  // Default lexicographic sort on ISO dates (no comparator branch); keys are Map keys, so the
+  // lookup is always defined.
+  const keys = [...byDate.keys()].sort();
   return {
-    xAxis: { type: 'category', data: dates },
+    xAxis: { type: 'category', data: keys },
     yAxis: { type: 'value' },
-    series: [{ type: 'line', smooth: true, data: dates.map((d) => byDate.get(d) ?? 0) }],
+    series: [{ type: 'line', smooth: true, data: keys.map((k) => byDate.get(k) as number) }],
   };
 }

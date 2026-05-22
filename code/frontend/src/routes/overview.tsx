@@ -1,27 +1,30 @@
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { ChannelStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt } from '../lib/format';
 import { channelMixOption, dailyReachesOption, summarizeChannels } from '../lib/overview';
 import { EChart } from '../components/charts/EChart';
 
-export function Overview(): JSX.Element {
-  const { from, to } = useFilters();
-  const q = useQuery({
-    queryKey: ['channels', from, to],
-    queryFn: () => api.channels({ from, to }),
-  });
+export type QueryStatus = 'pending' | 'error' | 'success';
 
-  if (q.status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
-  if (q.status === 'error')
+/** Pure presentational Overview — testable across all states without the data layer. */
+export function OverviewView({
+  status,
+  stats,
+}: {
+  status: QueryStatus;
+  stats: ChannelStat[];
+}): JSX.Element {
+  if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
+  if (status === 'error')
     return (
       <p role="alert" className="text-red-600">
         Не удалось загрузить данные. Запустите sync и проверьте backend.
       </p>
     );
 
-  const stats = q.data;
   const kpi = summarizeChannels(stats);
   return (
     <section className="space-y-6">
@@ -38,6 +41,16 @@ export function Overview(): JSX.Element {
       </Card>
     </section>
   );
+}
+
+/** Data wrapper: binds the channel query to the presentational view. */
+export function Overview(): JSX.Element {
+  const { from, to } = useFilters();
+  const q = useQuery({
+    queryKey: ['channels', from, to],
+    queryFn: () => api.channels({ from, to }),
+  });
+  return <OverviewView status={q.status} stats={q.data ?? []} />;
 }
 
 function Kpi({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {
