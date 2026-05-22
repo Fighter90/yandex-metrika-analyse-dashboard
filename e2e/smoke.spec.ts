@@ -74,6 +74,11 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.getByRole('link', { name: 'Traffic' }).click();
   await expect(page.getByText('Каналы — визиты')).toBeVisible();
 
+  // Navigate to the Funnel page and confirm the «заявка ≠ оплата» stages render.
+  await page.getByRole('link', { name: 'Funnel' }).click();
+  await expect(page.getByText('Воронка конверсии')).toBeVisible();
+  await expect(page.getByText('Оплачено B2B')).toBeVisible();
+
   // Navigate to the B2B page and confirm the CRUD form is present.
   await page.getByRole('link', { name: 'B2B' }).click();
   await expect(page.getByRole('button', { name: 'Добавить' })).toBeVisible();
