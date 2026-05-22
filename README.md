@@ -42,11 +42,25 @@ cp .env.example .env        # затем впишите YANDEX_OAUTH_TOKEN (см
 
 Нужен токен со scope `metrika:read`. Документация Яндекс ID: https://yandex.ru/dev/id/doc/ru/.
 
-1. Приложение уже зарегистрировано (ClientID лежит в вашем локальном `.env`).
-2. Откройте в браузере (подставив ClientID):
+### Способ 1 (рекомендуется) — встроенный помощник `pnpm auth`
+
+Реализует authorization-code flow (использует ClientID + Client secret из `.env`):
+
+```bash
+pnpm auth        # из корня репозитория
+```
+
+1. Помощник печатает ссылку авторизации (`response_type=code`). Откройте её в браузере и подтвердите доступ.
+2. Скопируйте **код подтверждения** со страницы Яндекса и вставьте обратно в терминал.
+3. Помощник обменяет код на токен (`POST https://oauth.yandex.ru/token`) и **сам впишет**
+   `YANDEX_OAUTH_TOKEN` в `.env`. Дальше: `pnpm sync`.
+
+### Способ 2 (вручную) — implicit flow
+
+1. Откройте в браузере (подставив ClientID):
    `https://oauth.yandex.ru/authorize?response_type=token&client_id=<YANDEX_CLIENT_ID>`
-3. Подтвердите доступ. Токен вернётся в адресной строке после `#access_token=...`.
-4. Скопируйте его в `.env` → `YANDEX_OAUTH_TOKEN=...`.
+2. Подтвердите доступ. Токен вернётся в адресной строке после `#access_token=...`.
+3. Скопируйте его в `.env` → `YANDEX_OAUTH_TOKEN=...`.
 
 Токен и client secret хранятся **только** в `.env` (он в `.gitignore`). Никогда не коммитьте их.
 
