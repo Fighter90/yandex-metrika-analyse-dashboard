@@ -71,7 +71,7 @@
   navigation-journey. 24 теста / 8 спеков, зелёные в CI.
 - Итерация 33 — **детальный отчёт (≥25 страниц A4)**: `reportSections` вынесен в `@pca/shared` —
   единый источник контента для DOCX, PDF и экрана. Каждая гипотеза рендерится полностью (формат
-  Воронковой, все скрытые допущения по категориям, методы проверки, разбор ICE с обоснованиями,
+  гипотезы, все скрытые допущения по категориям, методы проверки, разбор ICE с обоснованиями,
   светофор-критерии, дедлайн, статус), добавлены секции «Воронка визит→заявка→оплата», «Анализ по
   каналам», «Приоритизация по ICE», «Дорожная карта», «Глоссарий» и расширенный Decision Log. Каждая
   секция начинается с новой страницы (page-break) → демо-отчёт из сид-данных рендерится в **28 страниц
@@ -235,7 +235,7 @@
   принимает `format: docx | pdf`, файл пишется как `data/reports/{id}.{format}`; кнопка **Export PDF**
   на странице Report. 100% покрытие (рендерер браузера исключён из coverage как IO); e2e: build → export.
 - Итерация 9 — генерация **DOCX**: детерминированный контент отчёта (`reportSections`: cover,
-  executive summary, methodology с атрибуцией Воронковой, define/develop гипотезы, deliver/Decision Log,
+  executive summary, methodology, define/develop гипотезы, deliver/Decision Log,
   data appendix), рендер через `docx` (`buildDocx`), роут `POST /api/report/generate` (формат docx) и
   кнопка **Export DOCX** на странице Report. 100% покрытие; e2e: build snapshot → export. Байт-идентичность
   аппроксимирована детерминизмом контента (zip-таймстемпы — known limitation).
@@ -252,7 +252,7 @@
   создании бэкенд атомарно обновляет статус связанной гипотезы; клиент инвалидирует и решения, и
   гипотезы. `api.createDecision`. 100% покрытие, e2e-навигация + блокировка кнопки.
 - Итерация 6 (старт) — страница **Hypotheses**: список гипотез по ICE (бейдж приоритета + дней до
-  дедлайна) и структурный редактор по Воронковой (subject/action/solution/condition, ≥3 допущения по
+  дедлайна) и структурированный редактор гипотез (subject/action/solution/condition, ≥3 допущения по
   категориям, ≥2 метода, ICE-инпуты с rationale + live-превью, светофор, дедлайн). Сохранение
   заблокировано, пока `validateHypothesis` не пройдёт; `POST /api/hypotheses` (бэкенд тоже валидирует
   → 422). 100% покрытие, e2e-навигация + проверка блокировки кнопки.
@@ -276,7 +276,7 @@
 ### Added
 
 - Итерация 3 — Backend API: `/api/metrics/*` (channels с фильтром по датам, goals с тоглом
-  архивных, raw/:id), `/api/hypotheses` (CRUD; невалидная по Воронковой → 422; patch статуса),
+  архивных, raw/:id), `/api/hypotheses` (CRUD; невалидная → 422; patch статуса),
   `/api/decisions` (создание авто-обновляет статус гипотезы; без evidence → 422), `/api/b2b` (CRUD).
   Репозитории инжектятся в Fastify (тестируемо на in-memory SQLite). Swagger на `/docs`.
   109 тестов, 100% покрытие. (Fastify 4 → @fastify/swagger 8 / swagger-ui 2.)
@@ -286,13 +286,13 @@
   периодов >7 дней, `SyncService` (raw_responses + channel_stats, история по дням), `POST /api/sync`,
   CLI `pnpm --filter @pca/backend sync` (мягко пропускает без токена). 94 теста, 100% покрытие.
 - Итерация 1 — слой данных: SQLite (`better-sqlite3`), миграции 001–005, runner с трекингом,
-  repository pattern (metrics/hypotheses/decisions/b2b/snapshot), общие типы и Voronkova-валидация
+  repository pattern (metrics/hypotheses/decisions/b2b/snapshot), общие типы и валидация гипотез
   в `@pca/shared`. Гипотеза без ≥3 допущений/≥2 методов отклоняется на уровне репозитория;
   создание Decision Log атомарно обновляет статус гипотезы. CLI `pnpm --filter @pca/backend migrate`.
   100% покрытие (56 unit/integration тестов). ADR-002/007 (SQLite, история по дням).
 - Итерация 0 — скелет монорепо (`@pca/backend` Fastify `/api/health`, `@pca/frontend`
   React+Vite+Tailwind, `@pca/shared` ICE_CONFIG), TS strict, ESLint/Prettier, `run.sh`, CI.
-- Skill-файлы методологии Воронковой в `.claude/skills/` (с атрибуцией) + заполненный `CLAUDE.md`.
+- Skill-файлы методологии в `.claude/skills/` + заполненный `CLAUDE.md`.
 - Документация: README, `docs/` (runbook, user-guide, metrika-api-cheatsheet, testing-strategy), ADR 001/006/007.
 - Пирамида тестов с порогом покрытия 100% (Vitest unit/integration/component + Playwright e2e).
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.

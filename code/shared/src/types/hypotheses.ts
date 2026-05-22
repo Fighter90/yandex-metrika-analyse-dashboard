@@ -1,4 +1,4 @@
-/** Voronkova-format hypothesis types, shared across backend and frontend. */
+/** Structured hypothesis types, shared across backend and frontend. */
 
 export type DiamondPhase = 'define' | 'develop';
 export type HypothesisKind = 'problem' | 'solution';

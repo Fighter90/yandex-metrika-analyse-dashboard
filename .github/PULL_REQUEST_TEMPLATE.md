@@ -11,5 +11,5 @@
 - [ ] Документация обновлена (RU + EN при необходимости)
 - [ ] Новых зависимостей нет / есть ADR в `docs/decisions/`
 - [ ] Скриншоты для UI-изменений
-- [ ] Изменения в методологии гипотез согласованы с `docs/methodology-hypothesis-voronik.md`
+- [ ] Изменения в методологии гипотез согласованы с `docs/methodology-hypotheses.md`
 - [ ] Conventional commit в заголовке (`feat:`, `fix:`, `docs:` …)

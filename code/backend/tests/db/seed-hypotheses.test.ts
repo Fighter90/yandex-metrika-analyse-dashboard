@@ -13,7 +13,7 @@ describe('buildSeedHypotheses', () => {
     expect(hs.filter((h) => h.kind === 'solution').length).toBeGreaterThanOrEqual(3);
   });
 
-  it('every seed hypothesis passes the Voronkova validation (loadable via the repo)', () => {
+  it('every seed hypothesis passes the completeness validation (loadable via the repo)', () => {
     for (const h of buildSeedHypotheses()) {
       const result = validateHypothesis(h);
       expect(result.errors).toEqual([]);

@@ -1,6 +1,5 @@
-# Методология гипотез (Воронкова)
+# Методология гипотез
 
-> Адаптировано из [Voronik1801 / Podlodka_crew_AI_Product](https://github.com/Voronik1801/Podlodka_crew_AI_Product).
 > **Любое изменение методологии фиксируется здесь** с обоснованием (см. антипаттерн в README §15).
 > Реализация — `code/shared/src/validation.ts`; skill — `.claude/skills/hypothesis-check/SKILL.md`.
 

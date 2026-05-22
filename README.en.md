@@ -8,14 +8,14 @@
 
 A locally-run analytics tool for ProductCamp's **"Conversions & lead-gen"** track.
 It connects to Yandex Metrika (counter set in `.env`) over OAuth, caches data in SQLite,
-serves an interactive dashboard, and helps run product hypotheses using the Voronkova
+serves an interactive dashboard, and helps run product hypotheses using the hypothesis
 methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation.
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
 > ✅ **Status: working product (releases v0.1.0–v0.10.0).** Available: the Metrika parser (live OAuth
 > sync + demo data), an 11-page dashboard (Overview, Traffic, Audience, Behavior, Trends, Funnel,
-> B2B, Hypotheses, Decisions, Report, Sources), Voronkova hypotheses + Decision Log, deterministic
+> B2B, Hypotheses, Decisions, Report, Sources), structured hypotheses + Decision Log, deterministic
 > DOCX/PDF with an optional **AI analysis** (Anthropic), one-command deploy, 100% test coverage and
 > full CI/CD. Verified against live data of the ProductCamp counter.
 
@@ -122,7 +122,7 @@ content (anti-hallucination + reproducibility).
 **What the report contains** (`reportSections`):
 
 - Cover (period, snapshot id, target), **Executive Summary** (B2C applications, B2B paid, gap —
-  "application ≠ payment"), **Methodology** (Double Diamond + Voronkova, attributed);
+  "application ≠ payment"), **Methodology** (Double Diamond + hypothesis methodology);
 - **Define — Problem Hypotheses** and **Develop — Solution Hypotheses** (with ICE and deadlines);
 - **Deliver — Decision Log** (DL-{N} with outcomes);
 - **Top breakdowns**: UTM, geo+device, entry pages, exit pages (top 5 by visits);
@@ -179,9 +179,9 @@ Zustand · `docx` · puppeteer-core · date-fns(-tz) · Vitest + Playwright · E
 
 Adding a dependency outside this list requires an ADR in `docs/decisions/`.
 
-## Methodology (Double Diamond + Voronkova)
+## Methodology (Double Diamond)
 
-Double Diamond at the top level; the Voronkova methodology inside the Define/Develop phases:
+Double Diamond at the top level; the hypothesis methodology inside the Define/Develop phases:
 
 - **Hypothesis format:** "{subject} {action} {solution}, if {condition}".
 - **≥3 hidden assumptions** across behavior / market / tech.
@@ -191,8 +191,7 @@ Double Diamond at the top level; the Voronkova methodology inside the Define/Dev
 - **Traffic light** (🟢/🟡/🔴) with concrete thresholds + a verification deadline.
 - **Decision Log** closes the loop: verification → DL-{N} entry → auto-updates hypothesis status.
 
-Adapted from [**Voronik1801 / Podlodka_crew_AI_Product**](https://github.com/Voronik1801/Podlodka_crew_AI_Product)
-(attributed in each `.claude/skills/` file).
+Full methodology description: `docs/methodology-hypotheses.md`.
 
 ## Testing
 
@@ -249,7 +248,7 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 - [x] Metrika client (OAuth, Zod, rate limiter, retry) + `POST /api/sync`, CLIs `pnpm auth`/`sync`/`seed`.
 - [x] Backend API (metrics/hypotheses/decisions/b2b/report) + Swagger `/docs`.
 - [x] Dashboard: Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses, Decisions, Report, Sources.
-- [x] Voronkova hypotheses (format + validation + ICE-product) and Decision Log with status auto-update.
+- [x] Structured hypotheses (format + validation + ICE-product) and Decision Log with status auto-update.
 - [x] Snapshot + Report Preview + deterministic DOCX/PDF + optional AI analysis (Anthropic).
 - [x] Charts (grouped tooltips, value labels on bars), empty states, one-command deploy.
 - [x] Verified against live Metrika data; security audit + hardened `.gitignore`.
@@ -265,5 +264,3 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 ## License · Authors · Credits
 
 - Authors: the ProductCamp "Conversions & lead-gen" track team.
-- Methodology (hypothesis format, ICE=product, traffic light, Decision Log): **Daria Voronkova**,
-  [Voronik1801 / Podlodka_crew_AI_Product](https://github.com/Voronik1801/Podlodka_crew_AI_Product).

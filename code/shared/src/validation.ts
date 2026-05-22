@@ -18,7 +18,7 @@ function inIceRange(n: number): boolean {
 }
 
 /**
- * Voronkova completeness check. A hypothesis is invalid (and must not be persisted)
+ * Hypothesis completeness check. A hypothesis is invalid (and must not be persisted)
  * unless: all format fields + rationales present, >=3 hidden assumptions spanning all
  * categories, >=2 distinct validation methods, ICE factors in range, positive deadline.
  */

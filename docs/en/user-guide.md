@@ -36,7 +36,7 @@ B2C / B2C+B2B / B2B toggle, show-archived-goals toggle, "Sync now" button.
 | **Funnel**     | «application ≠ payment» funnel: Visits → B2C applications → B2B tickets (pipeline) → B2B paid, stage-by-stage conversion                               |
 | **Report**     | build an immutable snapshot, optional AI analysis, export DOCX/PDF                                                                                     |
 | **B2B**        | deals CRUD table, pipeline by stage                                                                                                                    |
-| **Hypotheses** | Double Diamond + Voronkova hypothesis editor (below)                                                                                                   |
+| **Hypotheses** | Double Diamond + structured hypothesis editor (below)                                                                                                  |
 | **Decisions**  | Decision Log: DL-{N} cards, timeline, filter by outcome                                                                                                |
 | **Sources**    | "Where does this number come from?" — look up a raw Metrika response by `raw_response_id`                                                              |
 
@@ -47,7 +47,7 @@ and the `raw_response_id` in SQLite. No invented numbers.
 
 ## 4. Working with hypotheses
 
-A hypothesis is saved only in the full Voronkova format. The UI blocks saving until there are:
+A hypothesis is saved only in the full structured format. The UI blocks saving until there are:
 
 1. **Format:** Subject (audience) · Action · Solution · Condition ("…, if …").
 2. **≥3 hidden assumptions** covering **behavior / market / tech**.
@@ -83,7 +83,7 @@ Executive Summary (application ≠ payment), Methodology, Visit→application→
 analysis, ICE prioritization, Define (a full card per problem hypothesis), Develop (a full card per
 solution hypothesis), Deliver/Decision Log (findings, evidence, outcome, next step), AI analysis (if
 generated), top breakdowns (UTM, geo+device, entry/exit pages), Roadmap, Glossary, Data Appendix.
-Every hypothesis is spelled out in full: Voronkova statement, hidden assumptions by category,
+Every hypothesis is spelled out in full: hypothesis statement, hidden assumptions by category,
 validation methods, the ICE breakdown with a rationale per factor, traffic-light criteria, deadline
 and status — with a detailed justification per item.
 
@@ -97,4 +97,4 @@ Chrome via `PUPPETEER_EXECUTABLE_PATH`; DOCX needs nothing extra.
 - Every number traces back to `raw_responses` — if it doesn't, that's a bug.
 - B2B is part of the 300 KPI and is managed manually on the B2B page.
 - Methodology under `.claude/skills/` must not change without a note in
-  `docs/methodology-hypothesis-voronik.md`.
+  `docs/methodology-hypotheses.md`.

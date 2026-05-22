@@ -30,7 +30,7 @@ describe('ICE_CONFIG', () => {
   });
 });
 
-describe('methodology vocabulary (Voronkova)', () => {
+describe('methodology vocabulary', () => {
   it('covers behavior/market/tech assumption categories', () => {
     expect([...ASSUMPTION_CATEGORIES]).toEqual(['behavior', 'market', 'tech']);
   });

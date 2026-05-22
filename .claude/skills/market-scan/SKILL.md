@@ -1,7 +1,6 @@
 # Skill — Market Scan (ProductCamp adaptation)
 
 > Превращает «погугли мне рынок» в структурированный запрос с источниками.
-> Адаптировано из https://github.com/Voronik1801/Podlodka_crew_AI_Product/blob/main/skill-market-scan.md
 
 ---
 
@@ -97,6 +96,6 @@
 - Региональные данные (особенно RU/CIS, особенно по нишевым конференциям) бедные — закладывай 30–60 мин ручного поиска поверх AI.
 - Цены конференций часто меняются (early-bird закончился, late-bird поднялся) — проверяй на сайтах напрямую.
 
-## Атрибуция
+## Примечание
 
-Skill адаптирован из https://github.com/Voronik1801/Podlodka_crew_AI_Product/blob/main/skill-market-scan.md (Дарья Воронкова). Темы и проверочные вопросы — авторские, под ProductCamp.
+Темы и проверочные вопросы адаптированы под ProductCamp Analytics.

@@ -1,7 +1,6 @@
 # Skill — Decision Log (ProductCamp adaptation)
 
 > Принцип: «Если решение не записано — его не было».
-> Адаптировано из https://github.com/Voronik1801/Podlodka_crew_AI_Product/blob/main/skill-decision-log.md
 
 ---
 
@@ -121,6 +120,6 @@
 
 В отчёте (DOCX/PDF) секция Deliver автоматически содержит все DL за период с полным форматом.
 
-## Атрибуция
+## Примечание
 
-Skill адаптирован из https://github.com/Voronik1801/Podlodka_crew_AI_Product/blob/main/skill-decision-log.md (Дарья Воронкова). Привязка к hypotheses_id, автоматизация через `pnpm new-decision` и интеграция в отчёт — адаптация под ProductCamp Analytics.
+Привязка к hypotheses_id, автоматизация через `pnpm new-decision` и интеграция в отчёт — адаптация под ProductCamp Analytics.

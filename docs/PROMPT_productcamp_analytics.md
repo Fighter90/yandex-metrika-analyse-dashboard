@@ -234,7 +234,7 @@ productcamp-analytics/
 │   ├── metrika-api-cheatsheet.md
 │   ├── data-model.md
 │   ├── methodology-double-diamond.md
-│   ├── methodology-hypothesis-voronik.md  # описание методологии + ссылка на оригинал
+│   ├── methodology-hypotheses.md          # описание методологии
 │   ├── methodology-ice.md                 # I × C × E, anchor examples
 │   ├── anti-hallucination.md
 │   ├── runbook.md
@@ -739,7 +739,7 @@ type ReportSnapshot = {
 
 1. **Cover** — название, период, KPI 300, дата генерации.
 2. **Executive Summary** — 5–7 буллетов: где мы, прогноз, top-3 действия.
-3. **Methodology** — Double Diamond + методология Воронковой (ICE=product, формат гипотезы, допущения, методы, светофор, дедлайны, Decision Log). Атрибуция: «Адаптировано из https://github.com/Voronik1801/Podlodka_crew_AI_Product».
+3. **Methodology** — Double Diamond + методология проверки гипотез (ICE=product, формат гипотезы, допущения, методы, светофор, дедлайны, Decision Log).
 4. **Discover** — данные, аномалии, weak spots.
 5. **Define** — для каждой problem-hypothesis:
    - Формат: «{subject} {action} {solution}, если {condition}»
@@ -833,12 +833,12 @@ wait $DEV_PID
 4. Как получить YANDEX_OAUTH_TOKEN.
 5. Архитектура (mermaid из `docs/architecture.md`).
 6. Технологический стек.
-7. **Методология** — описание Double Diamond + методологии Воронковой со ссылкой на оригинал https://github.com/Voronik1801/Podlodka_crew_AI_Product (с атрибуцией). Краткая выжимка про ICE=product, шаблон гипотезы, светофор, Decision Log.
+7. **Методология** — описание Double Diamond + методологии проверки гипотез. Краткая выжимка про ICE=product, шаблон гипотезы, светофор, Decision Log.
 8. Структура проекта (file tree с комментариями).
 9. CLI-команды.
 10. CI/CD.
 11. Roadmap / Known limitations.
-12. License + Authors + Credits (Воронкова — методология).
+12. License + Authors + Credits.
 
 ### 12.2. CLAUDE.md — контекст продукта
 
@@ -861,7 +861,7 @@ wait $DEV_PID
 - `market-scan/SKILL.md` — рыночный анализ конкурирующих конференций.
 - `decision-log/SKILL.md` — шаблон DL и промпт для генерации черновика.
 
-Эти файлы — копии (или адаптации) из https://github.com/Voronik1801/Podlodka_crew_AI_Product с атрибуцией в каждом файле. **Не выдумывать своё** — использовать ровно как есть, с домен-специфичными примерами в конце.
+Эти файлы содержат адаптированную методологию под ProductCamp-домен. Использовать ровно как есть, с домен-специфичными примерами в конце.
 
 ### 12.4. GitHub Actions
 
@@ -903,7 +903,7 @@ jobs:
 - [ ] Документация обновлена
 - [ ] Новых зависимостей нет / есть ADR
 - [ ] Скриншоты для UI-изменений
-- [ ] Изменения в методологии гипотез согласованы с `docs/methodology-hypothesis-voronik.md`
+- [ ] Изменения в методологии гипотез согласованы с `docs/methodology-hypotheses.md`
 
 ### 12.6. ISSUE_TEMPLATE/hypothesis.md
 
@@ -1055,35 +1055,25 @@ labels: hypothesis
 - ❌ Что-то кроме Fastify+TS без ADR.
 - ❌ Recharts вместо ECharts.
 - ❌ Хранить токен где-либо кроме `.env`.
-- ❌ Гипотезы без полного шаблона Воронковой — UI должен блокировать сохранение.
+- ❌ Гипотезы без полного структурированного формата — UI должен блокировать сохранение.
 - ❌ Decision Log без цитат/данных — поле required.
 - ❌ ICE как среднее без явного ADR с обоснованием отступления от product.
 - ❌ Дашборд без debug-панели «откуда эта цифра».
 - ❌ Отчёт без `Data Appendix` с хэшами.
 - ❌ Игнорировать B2B (входит в KPI 300).
 - ❌ Считать заявки как продажи. Везде явное разделение «заявка / оплата».
-- ❌ Изменять методологию из `.claude/skills/` без отметки в `docs/methodology-hypothesis-voronik.md` с reasoning.
+- ❌ Изменять методологию из `.claude/skills/` без отметки в `docs/methodology-hypotheses.md` с reasoning.
 
 ---
 
 ## 16. Финальная команда для агента
 
-> Прочитай этот документ + 5 файлов из `skills/`. Подтверди понимание (3–5 буллетов: что строим, какой стек, главные риски, как методология Воронковой ложится в Double Diamond). Затем начинай с **Итерации 0**, после каждой итерации — коммит и краткий отчёт (3–5 строк). Если упираешься в неясность — pragmatic default + ADR в `docs/decisions/`.
+> Прочитай этот документ + 5 файлов из `skills/`. Подтверди понимание (3–5 буллетов: что строим, какой стек, главные риски, как методология проверки гипотез ложится в Double Diamond). Затем начинай с **Итерации 0**, после каждой итерации — коммит и краткий отчёт (3–5 строк). Если упираешься в неясность — pragmatic default + ADR в `docs/decisions/`.
 
 ---
 
-## 17. Атрибуция
+## 17. Методология
 
-Методология структурирования гипотез, ICE = I × C × E (product), формат гипотезы «{subject} {action} {solution}, если {condition}», требования к скрытым допущениям (≥3) и способам проверки (≥2), светофор-критерии (green/yellow/red), Decision Log — адаптировано из:
+Методология структурирования гипотез, ICE = I × C × E (product), формат гипотезы «{subject} {action} {solution}, если {condition}», требования к скрытым допущениям (≥3) и способам проверки (≥2), светофор-критерии (green/yellow/red), Decision Log.
 
-**Voronik1801 / Podlodka_crew_AI_Product**
-https://github.com/Voronik1801/Podlodka_crew_AI_Product
-
-Файлы из репозитория (помещены в `.claude/skills/`):
-- `CLAUDE_template.md` → `CLAUDE.md`
-- `skill-hypothesis-check.md` → `.claude/skills/hypothesis-check/SKILL.md`
-- `skill-synthetic-custdev.md` → `.claude/skills/synthetic-custdev/SKILL.md`
-- `skill-market-scan.md` → `.claude/skills/market-scan/SKILL.md`
-- `skill-decision-log.md` → `.claude/skills/decision-log/SKILL.md`
-
-В каждом адаптированном файле — ссылка на оригинал в шапке.
+См. `docs/methodology-hypotheses.md`.

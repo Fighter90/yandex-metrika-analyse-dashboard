@@ -6,7 +6,7 @@ import type {
   ValidationMethodType,
 } from '@pca/shared';
 
-/** Flat form state for the Voronkova hypothesis editor. */
+/** Flat form state for the structured hypothesis editor. */
 export interface HypothesisForm {
   diamondPhase: DiamondPhase;
   kind: HypothesisKind;

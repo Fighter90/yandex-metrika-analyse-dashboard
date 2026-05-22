@@ -90,7 +90,7 @@ function Field({
   );
 }
 
-/** Voronkova structured editor. Save is gated by the shared validateHypothesis. */
+/** Structured hypothesis editor. Save is gated by the shared validateHypothesis. */
 export function HypothesisEditor({
   onCreate,
 }: {

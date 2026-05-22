@@ -109,9 +109,9 @@ describe('reportSections — structure', () => {
     expect(reportSections(baseSnapshot)).toEqual(reportSections(baseSnapshot));
   });
 
-  it('renders methodology attribution and ICE explanation', () => {
+  it('renders methodology and ICE explanation', () => {
     const lines = findSection(baseSnapshot, (h) => h === 'Методология').join(' ');
-    expect(lines).toContain('Voronik1801');
+    expect(lines).toContain('Double Diamond');
     expect(lines).toContain('Impact × Confidence × Ease');
   });
 
@@ -165,7 +165,7 @@ describe('reportSections — structure', () => {
 });
 
 describe('reportSections — full hypothesis detail', () => {
-  it('spells out Voronkova fields, ICE breakdown, assumptions, methods and traffic-light', () => {
+  it('spells out hypothesis fields, ICE breakdown, assumptions, methods and traffic-light', () => {
     const lines = findSection(baseSnapshot, (h) => h === '1. Гипотеза').join('\n');
     expect(lines).toContain('«слушатель не покупает билет, если нет лендинга»');
     expect(lines).toContain('I × C × E = 8 × 6 × 7 = 336');

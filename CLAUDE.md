@@ -1,7 +1,6 @@
 # CLAUDE.md — ProductCamp Conversion Analytics Tool
 
 > Этот файл — контекст продукта для AI-агентов. Положен в корень репозитория.
-> Шаблон адаптирован из https://github.com/Voronik1801/Podlodka_crew_AI_Product (`CLAUDE_template.md`).
 
 ---
 
@@ -21,7 +20,7 @@
    сырые ответы в SQLite (`raw_responses`) для offline и воспроизводимости.
 2. **Dashboard** — локальный дашборд (frontend `:5173`, API `:4000`): разбивка по каналам,
    воронка визит → заявка → оплата, weak spots, B2B. Каждая цифра прослеживается до `raw_responses`.
-3. **Hypotheses** — на данных дашборда формулируются гипотезы по методологии Воронковой
+3. **Hypotheses** — на данных дашборда формулируются гипотезы по методологии проверки гипотез
    (формат + ≥3 допущения + ≥2 метода + ICE=product + светофор + дедлайн); решения
    фиксируются в Decision Log.
 4. **Report** — из неизменяемого `ReportSnapshot` строятся **DOCX и PDF** с гипотезами,
@@ -42,7 +41,7 @@
 
 ## Гипотеза, которую сейчас проверяем (для самого инструмента)
 
-> **Формат Воронковой:** «{ЦА} {готова сделать / готова заплатить за / переключится на} {решение}, если {условие}».
+> **Формат гипотезы:** «{ЦА} {готова сделать / готова заплатить за / переключится на} {решение}, если {условие}».
 
 **Текущая гипотеза:**
 Команда трека «Конверсии и лидген» **готова перейти с ручных выгрузок Excel на этот инструмент**, если он за один `./run.sh` показывает разбивку платных билетов по каналам с UTM и позволяет привязать к каждой проблеме конкретные данные Метрики.
@@ -78,7 +77,7 @@
 
 - **Anti-hallucination above all:** ни одной цифры в отчёте, которая не прослеживается до `raw_responses` в SQLite.
 - **Один источник правды для отчётов:** PDF и DOCX рендерятся из одного immutable `ReportSnapshot`. Никаких расхождений.
-- **Гипотеза без формата Воронковой — не гипотеза.** UI блокирует сохранение без 3 допущений, 2 методов проверки, светофор-критериев и дедлайна.
+- **Гипотеза без формата гипотезы — не гипотеза.** UI блокирует сохранение без 3 допущений, 2 методов проверки, светофор-критериев и дедлайна.
 - **ICE = I × C × E (product, не среднее).** Сознательное решение, обоснование в ADR `docs/decisions/005-ice-product-vs-mean.md`.
 - **Decision Log замыкает цикл.** Решение без записи в `decisions` считается не принятым.
 - **Воспроизводимость > красота.** Лучше скромный, но детерминированный отчёт, чем «иногда красивее».
@@ -118,12 +117,12 @@
 
 - `code/backend` — Fastify API, Metrika-клиент, SQLite (миграции + repository pattern), аналитика, отчёты.
 - `code/frontend` — React 18 + Vite дашборд.
-- `code/shared` (`@pca/shared`) — типы, `ICE_CONFIG`, Voronkova-валидация (общие для backend и UI).
+- `code/shared` (`@pca/shared`) — типы, `ICE_CONFIG`, валидация гипотез (общие для backend и UI).
 - `.claude/skills/` — 4 skill-промпта методологии: `hypothesis-check`, `synthetic-custdev`,
-  `market-scan`, `decision-log` (адаптированы из репозитория Воронковой, с атрибуцией).
+  `market-scan`, `decision-log`.
 - `.github/` — пайплайны (`ci`, `security`, `e2e`, `pr-lint`, `review`, `release`), `CODEOWNERS`,
   `dependabot.yml`, шаблоны PR/Issue.
-- `docs/` — архитектура, модель данных, методология (DD/Воронкова/ICE), anti-hallucination,
+- `docs/` — архитектура, модель данных, методология (DD/ICE), anti-hallucination,
   runbook, user-guide, ADR (`decisions/`), спецификации фич (`specs/` — Spec-Driven Development),
   EN-зеркала (`en/`).
 - `data/` — SQLite + отчёты + экспорт DL (gitignored, кроме `.gitkeep`).
@@ -133,10 +132,10 @@
 
 ## Как работать в этом репозитории (для AI-агентов)
 
-- **Методология обязательна.** Гипотеза — строго формат Воронковой
-  (`docs/methodology-hypothesis-voronik.md`), ICE = произведение (`docs/methodology-ice.md`),
+- **Методология обязательна.** Гипотеза — строго формат гипотезы
+  (`docs/methodology-hypotheses.md`), ICE = произведение (`docs/methodology-ice.md`),
   цикл Double Diamond (`docs/methodology-double-diamond.md`). Менять методологию из
-  `.claude/skills/` — только с записью в `methodology-hypothesis-voronik.md` и reasoning.
+  `.claude/skills/` — только с записью в `methodology-hypotheses.md` и reasoning.
 - **Anti-hallucination** (`docs/anti-hallucination.md`): любое число → `raw_responses`; никакого
   `Date.now()`/LLM в render-пути отчёта; заявка ≠ оплата; B2B входит в KPI 300.
 - **100% покрытие** (`docs/testing-strategy.md`): каждая фича — с тестами; CI гоняет
@@ -163,7 +162,7 @@
 
 ## Skill-промпты в этом репозитории
 
-Лежат в `.claude/skills/`. Адаптированы из https://github.com/Voronik1801/Podlodka_crew_AI_Product:
+Лежат в `.claude/skills/`:
 
 - `hypothesis-check/SKILL.md` — структурирование problem/solution гипотез + ICE.
 - `synthetic-custdev/SKILL.md` — симуляция представителей ЦА для проверки гипотез.

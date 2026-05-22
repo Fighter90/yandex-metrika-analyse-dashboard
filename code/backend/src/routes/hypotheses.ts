@@ -11,7 +11,7 @@ const StatusBody = z.object({
   status: z.enum(['draft', 'in_progress', 'green', 'yellow', 'red', 'expired']),
 });
 
-/** Hypotheses CRUD. Creation enforces the Voronkova format (invalid → 422). */
+/** Hypotheses CRUD. Creation enforces the structured hypothesis format (invalid → 422). */
 export async function hypothesesRoutes(
   app: FastifyInstance,
   opts: HypothesesRouteOptions,
