@@ -44,9 +44,7 @@ describe('geoDeviceBreakdown', () => {
 
   it('includes goal metrics when goalId is set', async () => {
     const client = fakeClient({
-      data: [
-        { dimensions: [{ name: 'Россия' }, { name: 'desktop' }], metrics: [100, 90, 7, 0.07] },
-      ],
+      data: [{ dimensions: [{ name: 'Россия' }, { name: 'desktop' }], metrics: [100, 90, 7, 7] }],
     });
     const { stats } = await geoDeviceBreakdown(client, {
       counterId: 1,

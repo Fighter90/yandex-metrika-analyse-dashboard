@@ -3,6 +3,7 @@ import { UTM_NONE } from '@pca/shared';
 import type { MetrikaClient } from '../client';
 import { ENDPOINTS } from '../endpoints';
 import { StatDataResponseSchema, type StatDataResponse } from '../schemas';
+import { ratio } from './ratio';
 
 export interface UtmQueryOptions {
   readonly counterId: number;
@@ -30,7 +31,7 @@ function mapRow(row: Row, opts: UtmQueryOptions): UtmStat {
     visits: m[0] ?? 0,
     users: m[1] ?? 0,
     goalReaches: hasGoal ? (m[2] ?? 0) : 0,
-    conversionRate: hasGoal ? (m[3] ?? 0) : 0,
+    conversionRate: hasGoal ? ratio(m[3]) : 0,
   };
 }
 

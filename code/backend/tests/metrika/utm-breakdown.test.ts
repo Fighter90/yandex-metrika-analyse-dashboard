@@ -50,7 +50,7 @@ describe('utmBreakdown', () => {
       data: [
         {
           dimensions: [{ name: 'vk' }, { name: 'cpc' }, { name: 'spring' }],
-          metrics: [100, 90, 7, 0.07],
+          metrics: [100, 90, 7, 7],
         },
       ],
     });

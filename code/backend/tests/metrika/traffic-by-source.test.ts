@@ -40,7 +40,7 @@ describe('trafficBySource', () => {
 
   it('includes goal metrics when goalId is set', async () => {
     const client = fakeClient({
-      data: [{ dimensions: [{ name: 'podcast' }], metrics: [100, 90, 0.2, 65, 5, 0.05] }],
+      data: [{ dimensions: [{ name: 'podcast' }], metrics: [100, 90, 20, 65, 5, 5] }],
     });
     const { stats } = await trafficBySource(client, {
       counterId: 1,
