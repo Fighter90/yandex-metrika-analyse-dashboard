@@ -42,7 +42,9 @@ describe('validateHypothesis', () => {
   });
 
   it('rejects blank format/criteria/rationale fields', () => {
-    const res = validateHypothesis(valid({ subject: '   ', greenCriteria: '', impactRationale: '' }));
+    const res = validateHypothesis(
+      valid({ subject: '   ', greenCriteria: '', impactRationale: '' }),
+    );
     expect(res.ok).toBe(false);
     expect(res.errors).toContain('subject is required');
     expect(res.errors).toContain('greenCriteria is required');
@@ -89,9 +91,15 @@ describe('validateHypothesis', () => {
   });
 
   it('rejects out-of-range and non-integer ICE factors', () => {
-    expect(validateHypothesis(valid({ impact: 0 })).errors.some((e) => e.startsWith('impact'))).toBe(true);
-    expect(validateHypothesis(valid({ confidence: 11 })).errors.some((e) => e.startsWith('confidence'))).toBe(true);
-    expect(validateHypothesis(valid({ ease: 5.5 })).errors.some((e) => e.startsWith('ease'))).toBe(true);
+    expect(
+      validateHypothesis(valid({ impact: 0 })).errors.some((e) => e.startsWith('impact')),
+    ).toBe(true);
+    expect(
+      validateHypothesis(valid({ confidence: 11 })).errors.some((e) => e.startsWith('confidence')),
+    ).toBe(true);
+    expect(validateHypothesis(valid({ ease: 5.5 })).errors.some((e) => e.startsWith('ease'))).toBe(
+      true,
+    );
   });
 
   it('rejects non-positive or non-integer deadlines', () => {

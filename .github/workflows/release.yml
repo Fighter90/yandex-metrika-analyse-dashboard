@@ -7,7 +7,28 @@ permissions:
   contents: write
 
 jobs:
+  verify:
+    name: Verify before release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm coverage
+      - run: pnpm build
+
   release:
+    name: Package + publish
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,13 +41,28 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - name: Package local-run archive
+
+      - name: Package local-run app archive
         run: |
           tar --exclude-vcs --exclude=node_modules --exclude=data \
             -czf "productcamp-analytics-${GITHUB_REF_NAME}.tar.gz" \
             code docs .claude run.sh package.json pnpm-workspace.yaml pnpm-lock.yaml \
-            tsconfig.base.json eslint.config.js .env.example README.md README.en.md CLAUDE.md
-      - uses: softprops/action-gh-release@v2
+            tsconfig.base.json eslint.config.js .prettierrc.json .env.example \
+            README.md README.en.md CLAUDE.md CHANGELOG.md
+
+      - name: Package frontend static bundle
+        run: |
+          cd code/frontend/dist
+          zip -r "../../../productcamp-frontend-${GITHUB_REF_NAME}.zip" .
+
+      - name: Checksums
+        run: sha256sum productcamp-*.tar.gz productcamp-*.zip > "checksums-${GITHUB_REF_NAME}.txt"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          files: productcamp-analytics-*.tar.gz
           generate_release_notes: true
+          files: |
+            productcamp-analytics-*.tar.gz
+            productcamp-frontend-*.zip
+            checksums-*.txt

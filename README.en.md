@@ -1,5 +1,9 @@
 # ProductCamp Conversion Analytics Dashboard
 
+[![CI](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml)
+[![E2E](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml)
+[![Security](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml)
+
 > [🇷🇺 Русский](README.md) · 🇬🇧 English
 
 A locally-run analytics tool for ProductCamp's **"Conversions & lead-gen"** track.
@@ -88,13 +92,13 @@ pnpm e2e        # Playwright (boots frontend, mocks backend)
 
 ## CLI commands
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | backend (tsx watch) + frontend (vite) |
-| `pnpm build` | build |
-| `pnpm typecheck` | type checking |
-| `pnpm lint` / `pnpm format` | lint / format |
-| `pnpm test` / `pnpm coverage` / `pnpm e2e` | tests |
+| Command                                    | Description                           |
+| ------------------------------------------ | ------------------------------------- |
+| `pnpm dev`                                 | backend (tsx watch) + frontend (vite) |
+| `pnpm build`                               | build                                 |
+| `pnpm typecheck`                           | type checking                         |
+| `pnpm lint` / `pnpm format`                | lint / format                         |
+| `pnpm test` / `pnpm coverage` / `pnpm e2e` | tests                                 |
 
 `sync` / `report` / `new-decision` arrive in Iterations 2/9/7.
 

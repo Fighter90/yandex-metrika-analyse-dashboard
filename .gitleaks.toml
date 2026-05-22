@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated lockfiles and example placeholders are not secrets"
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''\.env\.example''',
+]

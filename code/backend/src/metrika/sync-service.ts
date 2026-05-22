@@ -45,7 +45,11 @@ export class SyncService {
     return goals.length;
   }
 
-  async syncTraffic(from: string, to: string, goalId?: number): Promise<{ days: number; rows: number }> {
+  async syncTraffic(
+    from: string,
+    to: string,
+    goalId?: number,
+  ): Promise<{ days: number; rows: number }> {
     const chunks = dayChunks(from, to);
     let rows = 0;
     for (const chunk of chunks) {

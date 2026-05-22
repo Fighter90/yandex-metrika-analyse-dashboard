@@ -1,8 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import {
-  trafficBySource,
-  trafficMetrics,
-} from '../../src/metrika/queries/traffic-by-source';
+import { trafficBySource, trafficMetrics } from '../../src/metrika/queries/traffic-by-source';
 import type { MetrikaClient } from '../../src/metrika/client';
 
 function fakeClient(fixture: unknown): MetrikaClient {

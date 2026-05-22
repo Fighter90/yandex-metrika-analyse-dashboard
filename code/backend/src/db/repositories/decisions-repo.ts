@@ -128,9 +128,7 @@ export class DecisionsRepo {
   }
 
   getById(id: number): Decision | undefined {
-    const r = this.db.prepare('SELECT * FROM decisions WHERE id = ?').get(id) as
-      | DecRow
-      | undefined;
+    const r = this.db.prepare('SELECT * FROM decisions WHERE id = ?').get(id) as DecRow | undefined;
     return r ? toDecision(r) : undefined;
   }
 

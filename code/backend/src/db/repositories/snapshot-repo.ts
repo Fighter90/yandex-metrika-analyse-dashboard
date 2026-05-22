@@ -63,8 +63,9 @@ export class SnapshotRepo {
 
   list(): ReportSnapshotRecord[] {
     return (
-      this.db.prepare('SELECT * FROM report_snapshots ORDER BY generated_at DESC').all() as
-        SnapshotRow[]
+      this.db
+        .prepare('SELECT * FROM report_snapshots ORDER BY generated_at DESC')
+        .all() as SnapshotRow[]
     ).map(toRecord);
   }
 }

@@ -33,14 +33,14 @@ cp .env.example .env
 
 Заполните:
 
-| Переменная | Значение |
-|---|---|
-| `YANDEX_OAUTH_TOKEN` | токен `metrika:read` (см. README → «Как получить токен») |
-| `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | данные OAuth-приложения |
-| `COUNTER_ID` | `54280963` |
-| `PORT` / `API_PORT` | `5173` / `4000` |
-| `ARCHIVED_GOAL_ID_THRESHOLD` | `77` (цели старше — архивные) |
-| `LOW_UTM_COVERAGE_RATIO` | `0.7` (порог флага низкого покрытия UTM) |
+| Переменная                                  | Значение                                                 |
+| ------------------------------------------- | -------------------------------------------------------- |
+| `YANDEX_OAUTH_TOKEN`                        | токен `metrika:read` (см. README → «Как получить токен») |
+| `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | данные OAuth-приложения                                  |
+| `COUNTER_ID`                                | `54280963`                                               |
+| `PORT` / `API_PORT`                         | `5173` / `4000`                                          |
+| `ARCHIVED_GOAL_ID_THRESHOLD`                | `77` (цели старше — архивные)                            |
+| `LOW_UTM_COVERAGE_RATIO`                    | `0.7` (порог флага низкого покрытия UTM)                 |
 
 `.env` в `.gitignore` — токен и secret никогда не попадают в репозиторий.
 
@@ -64,13 +64,13 @@ pnpm build       # сборка (артефакт frontend → code/frontend/dis
 
 ## 6. Траблшутинг
 
-| Симптом | Причина / решение |
-|---|---|
-| `Node.js 20+ required` | поставьте Node 20 (`nvm install 20 && nvm use 20`). |
+| Симптом                                   | Причина / решение                                                                  |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| `Node.js 20+ required`                    | поставьте Node 20 (`nvm install 20 && nvm use 20`).                                |
 | Браузер открылся, но «Backend недоступен» | backend ещё стартует — обновите через 2–3 сек; проверьте `API_PORT=4000` свободен. |
-| `metrikaTokenPresent: false` | впишите `YANDEX_OAUTH_TOKEN` в `.env` и перезапустите. |
-| `EADDRINUSE :4000` / `:5173` | порт занят — поменяйте `API_PORT` / `PORT` в `.env`. |
-| `pnpm: command not found` | `npm i -g pnpm` (или просто запустите `./run.sh`). |
+| `metrikaTokenPresent: false`              | впишите `YANDEX_OAUTH_TOKEN` в `.env` и перезапустите.                             |
+| `EADDRINUSE :4000` / `:5173`              | порт занят — поменяйте `API_PORT` / `PORT` в `.env`.                               |
+| `pnpm: command not found`                 | `npm i -g pnpm` (или просто запустите `./run.sh`).                                 |
 
 ## 7. Остановка
 

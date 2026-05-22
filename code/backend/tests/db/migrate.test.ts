@@ -24,7 +24,15 @@ describe('migrate', () => {
     const tables = (
       db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as { name: string }[]
     ).map((r) => r.name);
-    for (const t of ['goals', 'raw_responses', 'channel_stats', 'hypotheses', 'b2b_manual', 'report_snapshots', 'decisions']) {
+    for (const t of [
+      'goals',
+      'raw_responses',
+      'channel_stats',
+      'hypotheses',
+      'b2b_manual',
+      'report_snapshots',
+      'decisions',
+    ]) {
       expect(tables).toContain(t);
     }
   });

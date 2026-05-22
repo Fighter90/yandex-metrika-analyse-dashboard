@@ -1,10 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { NewHypothesis } from '@pca/shared';
-import {
-  HypothesesRepo,
-  HypothesisValidationError,
-} from '../db/repositories/hypotheses-repo';
+import { HypothesesRepo, HypothesisValidationError } from '../db/repositories/hypotheses-repo';
 
 export interface HypothesesRouteOptions {
   readonly repo: HypothesesRepo;

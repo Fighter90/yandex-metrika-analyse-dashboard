@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+**/dist/**
+**/coverage/**
+**/node_modules/**
+data/**
+.claude/skills/**
+docs/PROMPT_productcamp_analytics.md

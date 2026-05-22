@@ -65,7 +65,9 @@ export function validateHypothesis(h: NewHypothesis): ValidationResult {
   ];
   for (const [field, value] of iceFactors) {
     if (!inIceRange(value)) {
-      errors.push(`${field} must be an integer in ${ICE_CONFIG.scale.min}..${ICE_CONFIG.scale.max}`);
+      errors.push(
+        `${field} must be an integer in ${ICE_CONFIG.scale.min}..${ICE_CONFIG.scale.max}`,
+      );
     }
   }
 

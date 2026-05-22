@@ -1,9 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import type { NewDecision } from '@pca/shared';
-import {
-  DecisionsRepo,
-  DecisionValidationError,
-} from '../db/repositories/decisions-repo';
+import { DecisionsRepo, DecisionValidationError } from '../db/repositories/decisions-repo';
 
 export interface DecisionsRouteOptions {
   readonly repo: DecisionsRepo;

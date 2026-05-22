@@ -17,9 +17,7 @@ test('skeleton renders and shows backend health', async ({ page }) => {
 
   await page.goto('/');
 
-  await expect(
-    page.getByRole('heading', { name: /Conversion Analytics Dashboard/ }),
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Conversion Analytics Dashboard/ })).toBeVisible();
   await expect(page.getByText('300+ платных билетов')).toBeVisible();
   await expect(page.getByText('ok')).toBeVisible();
   await expect(page.getByText('54280963')).toBeVisible();

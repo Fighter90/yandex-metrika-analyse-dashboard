@@ -34,7 +34,11 @@ function decision(over: Partial<NewDecision> = {}): NewDecision {
 
 describe('decisions API', () => {
   it('creates a decision (201), updating the hypothesis status, and lists/reads it', async () => {
-    const created = await ctx.app.inject({ method: 'POST', url: '/api/decisions', payload: decision() });
+    const created = await ctx.app.inject({
+      method: 'POST',
+      url: '/api/decisions',
+      payload: decision(),
+    });
     expect(created.statusCode).toBe(201);
     expect(created.json().number).toBe('DL-001');
     expect(ctx.deps.hypotheses.getById(hypothesisId)?.status).toBe('yellow');

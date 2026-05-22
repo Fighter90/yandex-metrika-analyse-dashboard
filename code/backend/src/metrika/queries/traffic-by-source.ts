@@ -33,12 +33,7 @@ function mapRow(row: Row, opts: TrafficQueryOptions): ChannelStat {
 
 /** Build the metric list for a traffic-by-source query (goal metrics appended when goalId set). */
 export function trafficMetrics(goalId?: number): string {
-  const base = [
-    'ym:s:visits',
-    'ym:s:users',
-    'ym:s:bounceRate',
-    'ym:s:avgVisitDurationSeconds',
-  ];
+  const base = ['ym:s:visits', 'ym:s:users', 'ym:s:bounceRate', 'ym:s:avgVisitDurationSeconds'];
   if (goalId !== undefined) {
     base.push(`ym:s:goal${goalId}reaches`, `ym:s:goal${goalId}conversionRate`);
   }
