@@ -8,8 +8,9 @@
    Сырой ответ сохраняется при каждом `sync` (`MetricsRepo.saveRawResponse`). В UI — debug-панель
    «Where does this number come from?» (итерации 4+).
 2. **Воспроизводимость.** Отчёт строится из immutable `ReportSnapshot`; один `snapshotId` →
-   байт-идентичные DOCX и PDF.
-3. **Никакого `Date.now()` в render-пути** отчёта — только `snapshot.generatedAt`.
+   идентичный **контент** DOCX и PDF (zip/pdf-таймстемпы — known limitation).
+3. **Никакого `Date.now()` в render-пути** отчёта — только `snapshot.generatedAt`. AI-нарратив
+   генерится один раз и сохраняется в снапшот — в render-пути LLM не вызывается.
 4. **Никаких LLM-вызовов на проде** в пути генерации отчёта. AI используется только на стороне
    разработки (Claude Code) и в CI-ревью PR.
 5. **Заявка ≠ оплата.** Везде в коде и UI явное разделение цели Метрики (заявка) и оплаты.
