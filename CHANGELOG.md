@@ -8,6 +8,12 @@
 
 ### Added
 
+- Итерация 25 — **получение OAuth-токена в приложении** (`pnpm auth`): Yandex ID authorization-code
+  flow. Чистый модуль `metrika/oauth.ts` (`authorizeUrl`, `exchangeCodeForToken` через `POST
+/token`, `upsertEnvVar`) + интерактивный CLI `cli-auth`: печатает ссылку авторизации, принимает код
+  подтверждения, обменивает его на токен (ClientID + Client secret из `.env`) и вписывает
+  `YANDEX_OAUTH_TOKEN` в `.env`. Секрет/токен не логируются. 100% покрытие пуре-модуля (CLI исключён).
+  README: обновлён раздел «Как получить токен».
 - Итерация 24 — **демо-данные** (`pnpm seed`): детерминированный генератор `buildSeedData`
   (каналы, UTM, гео/девайс, страницы входа/выхода, B2B-сделки, цели) + CLI `cli-seed` наполняет SQLite.
   `./run.sh` теперь при отсутствии `YANDEX_OAUTH_TOKEN` автоматически сидит демо-данные, и дашборд
