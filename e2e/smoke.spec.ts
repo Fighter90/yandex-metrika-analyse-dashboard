@@ -36,4 +36,8 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByLabel('Сегмент')).toBeVisible();
   await expect(page.getByText('Цель (платных билетов)')).toBeVisible();
   await expect(page.getByText(/Заявок/)).toBeVisible();
+
+  // Navigate to the Traffic page (same channel data) and confirm it renders.
+  await page.getByRole('link', { name: 'Traffic' }).click();
+  await expect(page.getByText('Каналы — визиты')).toBeVisible();
 });

@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { queryClient } from './lib/query';
 import { Layout } from './components/Layout';
 import { Overview } from './routes/overview';
-import { Traffic, Funnel, Hypotheses, Decisions } from './routes/placeholders';
+import { Traffic } from './routes/traffic';
+import { Funnel, Hypotheses, Decisions } from './routes/placeholders';
 
 export function App(): JSX.Element {
   return (
