@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-22
+
+> Дашборд-итерации 15–17: страницы Behavior (входы/выходы), Trends (временные ряды + WoW) и расширение парсера (page/exit-page).
+
 ### Added
 
 - Итерация 17 — страница **Trends** (временные ряды + WoW): динамика визитов и заявок по дням
@@ -122,6 +126,7 @@
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.
 - Шаблоны PR и Issue (bug, hypothesis), `dependabot.yml`.
 
-[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.1.0
