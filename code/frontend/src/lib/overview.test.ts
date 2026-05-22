@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ChannelStat } from '@pca/shared';
-import { summarizeChannels, channelMixOption, dailyReachesOption } from './overview';
+import { summarizeChannels, channelMixOption, dailyReachesOption, weakSpots } from './overview';
 
 function stat(over: Partial<ChannelStat>): ChannelStat {
   return {
@@ -23,6 +23,25 @@ describe('summarizeChannels', () => {
   it('sums goal reaches against the 300 target', () => {
     const kpi = summarizeChannels([stat({ goalReaches: 5 }), stat({ goalReaches: 3 })]);
     expect(kpi).toEqual({ target: 300, reaches: 8, gap: 292 });
+  });
+});
+
+describe('weakSpots', () => {
+  it('flags channels with traffic but below-overall conversion, sorted by visits desc', () => {
+    // overall CR = (1+1+9) / (100+50+10) = 11/160 ≈ 0.069.
+    // podcast CR 0.01 (<overall, high traffic), direct CR 0.02 (<overall), vip CR 0.9 (>overall).
+    const spots = weakSpots([
+      stat({ channel: 'podcast', visits: 100, goalReaches: 1 }),
+      stat({ channel: 'direct', visits: 50, goalReaches: 1 }),
+      stat({ channel: 'vip', visits: 10, goalReaches: 9 }),
+      stat({ channel: 'empty', visits: 0, goalReaches: 0 }), // zero visits → CR 0, excluded
+    ]);
+    expect(spots.map((s) => s.channel)).toEqual(['podcast', 'direct']);
+    expect(spots[0]?.conversionRate).toBeCloseTo(0.01);
+  });
+
+  it('returns an empty list when there is no data (no divide-by-zero)', () => {
+    expect(weakSpots([])).toEqual([]);
   });
 });
 
