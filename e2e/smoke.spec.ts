@@ -97,6 +97,21 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       ]),
     }),
   );
+  await page.route('**/api/metrics/raw/*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 1,
+        endpoint: '/stat/v1/data',
+        queryHash: 'abc123',
+        dateFrom: '2025-01-01',
+        dateTo: '2025-01-01',
+        payload: { data: [{ metrics: [100] }] },
+        fetchedAt: '2025-01-02T00:00:00.000Z',
+      }),
+    }),
+  );
   await page.route('**/api/b2b', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
@@ -186,4 +201,10 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.docx/)).toBeVisible();
   await page.getByRole('button', { name: 'Export PDF' }).click();
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.pdf/)).toBeVisible();
+
+  // Sources: look up a raw response by id and confirm the cached payload renders.
+  await page.getByRole('link', { name: 'Sources' }).click();
+  await page.getByLabel('raw_response_id').fill('1');
+  await page.getByRole('button', { name: 'Показать' }).click();
+  await expect(page.getByText('/stat/v1/data')).toBeVisible();
 });

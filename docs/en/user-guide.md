@@ -39,6 +39,7 @@ B2C / B2C+B2B / B2B toggle, show-archived-goals toggle, "Sync now" button.
 | **B2B**        | deals CRUD table, pipeline by stage, forecast                                                                            |
 | **Hypotheses** | Double Diamond + Voronkova hypothesis editor (below)                                                                     |
 | **Decisions**  | Decision Log: DL-{N} cards, timeline, filter by outcome                                                                  |
+| **Sources**    | "Where does this number come from?" — look up a raw Metrika response by `raw_response_id`                                |
 
 ### Where does this number come from?
 
