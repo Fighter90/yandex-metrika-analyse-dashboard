@@ -31,6 +31,9 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.route('**/api/b2b', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
+  await page.route('**/api/hypotheses', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  );
 
   await page.goto('/');
 
@@ -47,4 +50,8 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   // Navigate to the B2B page and confirm the CRUD form is present.
   await page.getByRole('link', { name: 'B2B' }).click();
   await expect(page.getByRole('button', { name: 'Добавить' })).toBeVisible();
+
+  // Navigate to Hypotheses and confirm the Voronkova editor blocks save while empty.
+  await page.getByRole('link', { name: 'Hypotheses' }).click();
+  await expect(page.getByRole('button', { name: /Сохранить гипотезу/ })).toBeDisabled();
 });
