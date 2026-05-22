@@ -30,7 +30,7 @@
 │   └── shared/       # общие типы, ICE_CONFIG, Voronkova-валидация (@pca/shared)
 ├── .claude/skills/   # skill-промпты методологии (см. ниже)
 ├── .github/          # workflows, шаблоны, CODEOWNERS, dependabot (см. ниже)
-├── docs/             # эта документация + ADR (decisions/) + EN-зеркала (en/)
+├── docs/             # эта документация + ADR (decisions/) + спеки (specs/) + EN-зеркала (en/)
 ├── data/             # SQLite, отчёты, экспорт DL (gitignored, кроме .gitkeep)
 ├── CLAUDE.md         # контекст продукта для AI-агентов (system prompt)
 ├── run.sh            # запуск одной командой

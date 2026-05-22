@@ -231,6 +231,15 @@ curl -s -X POST localhost:4000/api/report/generate -H 'content-type: application
 | `pnpm lint` / `pnpm format`                     | линт / форматирование                                          |
 | `pnpm test` / `pnpm coverage`                   | vitest (порог покрытия 100%)                                   |
 
+## Разработка по спецификациям (Spec-Driven Development)
+
+Нетривиальные фичи (затрагивают > 1 файла или > ~30 минут; меняют данные, API, методологию или
+KPI-математику) проходят через **спеку** до кода: `docs/specs/NNN-*.md` по шаблону
+[`docs/specs/TEMPLATE.md`](docs/specs/TEMPLATE.md). Цикл — **spec → review → plan → tests → impl**:
+сначала фиксируется _что_ и _почему_ с измеримыми критериями приёмки, затем пишутся падающие тесты
+(TDD red→green→refactor), затем реализация; каждый PR ссылается на спеку. Реестр и процесс —
+[`docs/specs/README.md`](docs/specs/README.md). Мелкие правки (опечатки, чистка, доки) спеки не требуют.
+
 ## CI/CD
 
 Полный набор пайплайнов на каждый push/PR (все зелёные, покрытие 100%):

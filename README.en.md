@@ -205,6 +205,15 @@ pnpm coverage   # enforces 100% (fails CI on regression)
 pnpm e2e        # Playwright (boots frontend, mocks backend)
 ```
 
+## Spec-Driven Development
+
+Non-trivial features (touching > 1 file or > ~30 min; changing data, API, methodology or KPI math) go
+through a **spec** before code: `docs/specs/NNN-*.md` from the [`docs/specs/TEMPLATE.md`](docs/specs/TEMPLATE.md)
+template. The cycle is **spec → review → plan → tests → impl**: first capture _what_ and _why_ with
+measurable acceptance criteria, then write failing tests (TDD red→green→refactor), then implement; every
+PR references its spec. Process and registry: [`docs/specs/README.md`](docs/specs/README.md). Small
+changes (typos, cleanup, docs) need no spec.
+
 ## CLI commands
 
 | Command                                         | Description                                             |

@@ -4,6 +4,7 @@
 
 ## Чек-лист
 
+- [ ] Для нетривиальной фичи есть спека в `docs/specs/` (Spec-Driven Development), PR ссылается на неё
 - [ ] Тесты проходят (`pnpm coverage` зелёный, 100% на изменённой логике)
 - [ ] `pnpm typecheck` чист
 - [ ] `pnpm lint` чист

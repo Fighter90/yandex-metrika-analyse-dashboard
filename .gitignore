@@ -34,3 +34,6 @@ code/backend/data/
 # logs / os
 *.log
 .DS_Store
+
+# Claude Code session lock (never commit)
+.claude/scheduled_tasks.lock

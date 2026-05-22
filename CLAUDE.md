@@ -124,7 +124,8 @@
 - `.github/` — пайплайны (`ci`, `security`, `e2e`, `pr-lint`, `review`, `release`), `CODEOWNERS`,
   `dependabot.yml`, шаблоны PR/Issue.
 - `docs/` — архитектура, модель данных, методология (DD/Воронкова/ICE), anti-hallucination,
-  runbook, user-guide, ADR (`decisions/`), EN-зеркала (`en/`).
+  runbook, user-guide, ADR (`decisions/`), спецификации фич (`specs/` — Spec-Driven Development),
+  EN-зеркала (`en/`).
 - `data/` — SQLite + отчёты + экспорт DL (gitignored, кроме `.gitkeep`).
 
 Поток: `./run.sh` → миграции → `pnpm sync` (Метрика → SQLite) → Fastify API (`/api/*`, Swagger
@@ -140,6 +141,9 @@
   `Date.now()`/LLM в render-пути отчёта; заявка ≠ оплата; B2B входит в KPI 300.
 - **100% покрытие** (`docs/testing-strategy.md`): каждая фича — с тестами; CI гоняет
   `pnpm coverage` с порогом 100%.
+- **Spec-Driven Development** (`docs/specs/README.md`): нетривиальная фича (> 1 файла или > ~30 мин,
+  меняет данные/API/методологию/KPI) — сначала спека в `docs/specs/NNN-*.md` (spec → review → plan →
+  tests → impl), затем реализация; PR ссылается на спеку. Мелкие правки — без спеки.
 - **Поток работы:** ветка под итерацию → Conventional Commits → локальный гейт
   (`lint` / `format:check` / `typecheck` / `coverage` / `build`) → merge в `main` →
   **следить за пайплайнами** (`gh run list`) и чинить красное.
