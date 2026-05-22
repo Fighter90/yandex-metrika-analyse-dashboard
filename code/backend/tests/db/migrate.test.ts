@@ -16,6 +16,7 @@ describe('migrate', () => {
       '004_snapshots.sql',
       '005_decisions.sql',
       '006_utm_stats.sql',
+      '007_geo_device_stats.sql',
     ]);
   });
 

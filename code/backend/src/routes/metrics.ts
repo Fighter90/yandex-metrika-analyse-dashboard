@@ -30,6 +30,16 @@ export async function metricsRoutes(
     },
   );
 
+  app.get(
+    '/metrics/geo-device',
+    { schema: { tags: ['metrics'], summary: 'Geo (country) + device-category breakdown' } },
+    async (req) => {
+      const q = req.query as { from?: string; to?: string };
+      const range = q.from && q.to ? { from: q.from, to: q.to } : undefined;
+      return opts.repo.listGeoDeviceStats(range);
+    },
+  );
+
   app.get('/metrics/goals', { schema: { tags: ['metrics'], summary: 'Goals' } }, async (req) => {
     const archived = (req.query as { archived?: string }).archived === 'true';
     return opts.repo.listGoals(archived);

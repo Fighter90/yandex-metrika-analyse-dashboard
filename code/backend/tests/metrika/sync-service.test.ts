@@ -78,9 +78,21 @@ describe('SyncService.syncUtm', () => {
   });
 });
 
+describe('SyncService.syncGeoDevice', () => {
+  it('caches raw + geo/device stats per day chunk', async () => {
+    const { rows } = await svc.syncGeoDevice('2025-01-01', '2025-01-03', 80);
+    expect(rows).toBe(1);
+    const geo = metrics.listGeoDeviceStats();
+    expect(geo).toHaveLength(1);
+    expect(geo[0]?.date).toBe('2025-01-01');
+    expect(geo[0]?.country).toBe('podcast'); // single-dimension fixture → country = first dim
+    expect(geo[0]?.device).toBe('(none)'); // second dim missing → normalised
+  });
+});
+
 describe('SyncService.syncAll', () => {
-  it('returns a combined summary including UTM rows', async () => {
+  it('returns a combined summary including UTM + geo/device rows', async () => {
     const summary = await svc.syncAll('2025-01-01', '2025-01-07', 80);
-    expect(summary).toEqual({ goals: 2, days: 1, channelRows: 1, utmRows: 1 });
+    expect(summary).toEqual({ goals: 2, days: 1, channelRows: 1, utmRows: 1, geoDeviceRows: 1 });
   });
 });

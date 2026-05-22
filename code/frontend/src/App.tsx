@@ -4,6 +4,7 @@ import { queryClient } from './lib/query';
 import { Layout } from './components/Layout';
 import { Overview } from './routes/overview';
 import { Traffic } from './routes/traffic';
+import { Audience } from './routes/audience';
 import { B2b } from './routes/b2b';
 import { Hypotheses } from './routes/hypotheses';
 import { Decisions } from './routes/decisions';
@@ -18,6 +19,7 @@ export function App(): JSX.Element {
           <Route element={<Layout />}>
             <Route index element={<Overview />} />
             <Route path="traffic" element={<Traffic />} />
+            <Route path="audience" element={<Audience />} />
             <Route path="b2b" element={<B2b />} />
             <Route path="funnel" element={<Funnel />} />
             <Route path="hypotheses" element={<Hypotheses />} />

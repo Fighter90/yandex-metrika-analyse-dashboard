@@ -10,7 +10,9 @@ function appWith(runSync: SyncRunner): FastifyInstance {
 
 describe('POST /api/sync', () => {
   it('runs the sync and returns the summary', async () => {
-    const runSync = vi.fn().mockResolvedValue({ goals: 2, days: 1, channelRows: 1, utmRows: 1 });
+    const runSync = vi
+      .fn()
+      .mockResolvedValue({ goals: 2, days: 1, channelRows: 1, utmRows: 1, geoDeviceRows: 1 });
     const app = appWith(runSync as unknown as SyncRunner);
     const res = await app.inject({
       method: 'POST',
@@ -18,7 +20,7 @@ describe('POST /api/sync', () => {
       payload: { from: '2025-01-01', to: '2025-01-07', goalId: 80 },
     });
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({ goals: 2, days: 1, channelRows: 1, utmRows: 1 });
+    expect(res.json()).toEqual({ goals: 2, days: 1, channelRows: 1, utmRows: 1, geoDeviceRows: 1 });
     expect(runSync).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-01-07', goalId: 80 });
     await app.close();
   });

@@ -8,6 +8,14 @@
 
 ### Added
 
+- Итерация 13 — **гео + девайс** (расширение парсера) и страница **Audience**: новый запрос Stat API
+  `geo-device-breakdown` (`ym:s:regionCountry,ym:s:deviceCategory`), отдельная таблица
+  `geo_device_stats` (migration 007) с историей по дням и репозиторием
+  (`upsertGeoDeviceStats`/`listGeoDeviceStats`), интеграция в `SyncService.syncGeoDevice` + `syncAll`
+  (поле `geoDeviceRows` в `SyncSummary`), эндпоинт `GET /api/metrics/geo-device`, клиент
+  `api.geoDevice()` и страница **Audience** в навигации (таблицы по стране и устройству, агрегаторы
+  `byCountry`/`byDevice`). Своя таблица — чтобы не дублировать визиты. Общий сентинел `DIMENSION_NONE`
+  (`UTM_NONE` оставлен как алиас). 100% покрытие; e2e проверяет страницу Audience.
 - Итерация 12 — **UTM-разбивка** (расширение парсера): новый запрос Stat API `utm-breakdown`
   (`ym:s:UTMSource/UTMMedium/UTMCampaign`), отдельная таблица `utm_stats` (migration 006) с историей
   по дням и репозиторием (`upsertUtmStats`/`listUtmStats`), интеграция в `SyncService.syncUtm` +

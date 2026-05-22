@@ -4,6 +4,7 @@ import { FilterBar } from './FilterBar';
 const NAV = [
   ['/', 'Overview'],
   ['/traffic', 'Traffic'],
+  ['/audience', 'Audience'],
   ['/funnel', 'Funnel'],
   ['/b2b', 'B2B'],
   ['/hypotheses', 'Hypotheses'],

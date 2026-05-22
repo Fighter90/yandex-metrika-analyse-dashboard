@@ -7,6 +7,7 @@ import { ENDPOINTS } from './endpoints';
 import { GoalsResponseSchema } from './schemas';
 import { trafficBySource } from './queries/traffic-by-source';
 import { utmBreakdown } from './queries/utm-breakdown';
+import { geoDeviceBreakdown } from './queries/geo-device-breakdown';
 
 export interface SyncDeps {
   readonly client: MetrikaClient;
@@ -23,6 +24,7 @@ export interface SyncSummary {
   readonly days: number;
   readonly channelRows: number;
   readonly utmRows: number;
+  readonly geoDeviceRows: number;
 }
 
 /** Pulls Metrika data into SQLite: raw responses (for traceability) + derived channel stats. */
@@ -99,10 +101,35 @@ export class SyncService {
     return { rows };
   }
 
+  async syncGeoDevice(from: string, to: string, goalId?: number): Promise<{ rows: number }> {
+    const chunks = dayChunks(from, to);
+    let rows = 0;
+    for (const chunk of chunks) {
+      const { raw, stats } = await geoDeviceBreakdown(this.deps.client, {
+        counterId: this.deps.counterId,
+        from: chunk.from,
+        to: chunk.to,
+        goalId,
+      });
+      this.deps.metrics.saveRawResponse({
+        endpoint: ENDPOINTS.statData,
+        queryHash: stableHash({ q: 'geo-device', goalId, from: chunk.from, to: chunk.to }),
+        dateFrom: chunk.from,
+        dateTo: chunk.to,
+        payload: raw,
+        fetchedAt: this.deps.now(),
+      });
+      this.deps.metrics.upsertGeoDeviceStats(stats);
+      rows += stats.length;
+    }
+    return { rows };
+  }
+
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
     const goals = await this.syncGoals();
     const { days, rows } = await this.syncTraffic(from, to, goalId);
     const utm = await this.syncUtm(from, to, goalId);
-    return { goals, days, channelRows: rows, utmRows: utm.rows };
+    const geo = await this.syncGeoDevice(from, to, goalId);
+    return { goals, days, channelRows: rows, utmRows: utm.rows, geoDeviceRows: geo.rows };
   }
 }

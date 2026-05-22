@@ -58,8 +58,26 @@ export interface UtmStat {
   readonly conversionRate: number;
 }
 
-/** Sentinel for a missing UTM dimension value. */
-export const UTM_NONE = '(none)';
+/** Sentinel for a missing breakdown-dimension value (UTM, geo, device, …). */
+export const DIMENSION_NONE = '(none)';
+
+/** @deprecated use {@link DIMENSION_NONE} — kept as an alias for existing UTM call sites. */
+export const UTM_NONE = DIMENSION_NONE;
+
+/**
+ * Geo (country) + device-category breakdown, in its own table (`geo_device_stats`) — same rationale
+ * as {@link UtmStat}: a distinct aggregation kept apart so visits aren't double-counted. Missing
+ * dimensions are normalised to {@link DIMENSION_NONE}.
+ */
+export interface GeoDeviceStat {
+  readonly date: string;
+  readonly country: string;
+  readonly device: string;
+  readonly visits: number;
+  readonly users: number;
+  readonly goalReaches: number;
+  readonly conversionRate: number;
+}
 
 export type B2bStage = 'lead' | 'negotiation' | 'invoiced' | 'paid';
 
