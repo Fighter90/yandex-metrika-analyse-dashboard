@@ -3,7 +3,8 @@ import type { PageStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
-import { pageRows, type PageRow } from '../lib/behavior';
+import { pageRows, pageBarOption, type PageRow } from '../lib/behavior';
+import { EChart } from '../components/charts/EChart';
 import { combineStatus, type QueryStatus } from '../lib/query-status';
 
 function PageTable({ title, rows }: { title: string; rows: PageRow[] }): JSX.Element {
@@ -56,10 +57,20 @@ export function BehaviorView({
       </p>
     );
 
+  const entryRows = pageRows(entry);
+  const exitRows = pageRows(exit);
   return (
     <section className="space-y-6">
-      <PageTable title="Страницы входа" rows={pageRows(entry)} />
-      <PageTable title="Страницы выхода" rows={pageRows(exit)} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <EChart option={pageBarOption(entryRows, 'Топ страниц входа')} />
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <EChart option={pageBarOption(exitRows, 'Топ страниц выхода')} />
+        </div>
+      </div>
+      <PageTable title="Страницы входа" rows={entryRows} />
+      <PageTable title="Страницы выхода" rows={exitRows} />
     </section>
   );
 }

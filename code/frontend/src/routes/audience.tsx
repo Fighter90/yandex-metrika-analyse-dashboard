@@ -3,7 +3,14 @@ import type { GeoDeviceStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
-import { byCountry, byDevice, type AudienceRow } from '../lib/audience';
+import {
+  byCountry,
+  byDevice,
+  audienceBarOption,
+  deviceShareOption,
+  type AudienceRow,
+} from '../lib/audience';
+import { EChart } from '../components/charts/EChart';
 import type { QueryStatus } from '../lib/query-status';
 
 function AudienceTable({ title, rows }: { title: string; rows: AudienceRow[] }): JSX.Element {
@@ -52,10 +59,20 @@ export function AudienceView({
       </p>
     );
 
+  const countries = byCountry(stats);
+  const devices = byDevice(stats);
   return (
     <section className="space-y-6">
-      <AudienceTable title="Страна" rows={byCountry(stats)} />
-      <AudienceTable title="Устройство" rows={byDevice(stats)} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <EChart option={audienceBarOption(countries, 'Топ стран по визитам')} />
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <EChart option={deviceShareOption(devices)} />
+        </div>
+      </div>
+      <AudienceTable title="Страна" rows={countries} />
+      <AudienceTable title="Устройство" rows={devices} />
     </section>
   );
 }

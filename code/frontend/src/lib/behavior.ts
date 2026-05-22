@@ -38,3 +38,26 @@ export function pageRows(stats: PageStat[]): PageRow[] {
     }))
     .sort((a, b) => b.visits - a.visits);
 }
+
+/** Shorten a URL to its path for chart labels (drops scheme + host). */
+function shortLabel(page: string): string {
+  const path = page.replace(/^https?:\/\/[^/]+/, '');
+  return path === '' ? '/' : path;
+}
+
+/** ECharts horizontal bar: visits per page (top 8), with visits + reaches series. */
+export function pageBarOption(rows: PageRow[], title: string): object {
+  const top = rows.slice(0, 8).reverse();
+  return {
+    title: { text: title, left: 'center', textStyle: { fontSize: 13 } },
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['Визиты', 'Заявки'], bottom: 0 },
+    grid: { left: 140, right: 16, top: 32, bottom: 28 },
+    xAxis: { type: 'value' },
+    yAxis: { type: 'category', data: top.map((r) => shortLabel(r.page)) },
+    series: [
+      { name: 'Визиты', type: 'bar', data: top.map((r) => r.visits) },
+      { name: 'Заявки', type: 'bar', data: top.map((r) => r.goalReaches) },
+    ],
+  };
+}

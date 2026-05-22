@@ -46,6 +46,7 @@ describe('BehaviorView', () => {
     expect(screen.getByRole('heading', { name: 'Страницы выхода' })).toBeInTheDocument();
     expect(screen.getByText('/lp')).toBeInTheDocument();
     expect(screen.getByText('/checkout')).toBeInTheDocument();
+    expect(screen.getAllByTestId('echart')).toHaveLength(2); // entry + exit bars
   });
 });
 

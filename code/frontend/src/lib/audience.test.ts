@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { GeoDeviceStat } from '@pca/shared';
-import { byCountry, byDevice } from './audience';
+import { byCountry, byDevice, audienceBarOption, deviceShareOption } from './audience';
 
 const geo = (over: Partial<GeoDeviceStat>): GeoDeviceStat => ({
   date: '2025-01-01',
@@ -38,5 +38,33 @@ describe('byDevice', () => {
     expect(rows[0]?.label).toBe('mobile');
     expect(rows[0]?.visits).toBe(16);
     expect(rows[0]?.users).toBe(13);
+  });
+});
+
+describe('audienceBarOption', () => {
+  it('builds a horizontal bar of visits (top rows, largest at top) with a title', () => {
+    const rows = byCountry([
+      geo({ country: 'Россия', visits: 100 }),
+      geo({ country: 'Казахстан', visits: 40 }),
+    ]);
+    const o = audienceBarOption(rows, 'Страны') as {
+      title: { text: string };
+      yAxis: { data: string[] };
+      series: { data: number[] }[];
+    };
+    expect(o.title.text).toBe('Страны');
+    // reversed → largest (Россия) at the end for a top-anchored horizontal bar
+    expect(o.yAxis.data).toEqual(['Казахстан', 'Россия']);
+    expect(o.series[0]?.data).toEqual([40, 100]);
+  });
+});
+
+describe('deviceShareOption', () => {
+  it('builds a donut of visit share by device', () => {
+    const o = deviceShareOption(byDevice([geo({ device: 'mobile', visits: 10 })])) as {
+      series: { type: string; data: { name: string; value: number }[] }[];
+    };
+    expect(o.series[0]?.type).toBe('pie');
+    expect(o.series[0]?.data[0]).toEqual({ name: 'mobile', value: 10 });
   });
 });

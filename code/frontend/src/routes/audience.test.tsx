@@ -38,6 +38,7 @@ describe('AudienceView', () => {
     expect(screen.getByRole('heading', { name: 'Устройство' })).toBeInTheDocument();
     expect(screen.getByText('Россия')).toBeInTheDocument();
     expect(screen.getByText('mobile')).toBeInTheDocument();
+    expect(screen.getAllByTestId('echart')).toHaveLength(2); // country bar + device donut
   });
 });
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { PageStat } from '@pca/shared';
-import { pageRows } from './behavior';
+import { pageRows, pageBarOption } from './behavior';
 
 const page = (over: Partial<PageStat>): PageStat => ({
   date: '2025-01-01',
@@ -29,5 +29,25 @@ describe('pageRows', () => {
     const empty = rows.find((r) => r.page === '/empty');
     expect(empty?.bounceRate).toBe(0);
     expect(empty?.conversionRate).toBe(0);
+  });
+});
+
+describe('pageBarOption', () => {
+  it('shortens full URLs to their path, maps host-only URLs to "/", builds visits + reaches bars', () => {
+    const rows = pageRows([
+      page({ page: 'https://productcamp.ru/reg-new', visits: 70, goalReaches: 30 }),
+      page({ page: 'https://productcamp.ru', visits: 40, goalReaches: 2 }), // host only → '/'
+      page({ page: '/program', visits: 10, goalReaches: 1 }), // already a path
+    ]);
+    const o = pageBarOption(rows, 'Входы') as {
+      title: { text: string };
+      yAxis: { data: string[] };
+      series: { name: string; data: number[] }[];
+    };
+    expect(o.title.text).toBe('Входы');
+    // reversed (largest at top): /program(10), '/'(40), /reg-new(70)
+    expect(o.yAxis.data).toEqual(['/program', '/', '/reg-new']);
+    expect(o.series[0]?.name).toBe('Визиты');
+    expect(o.series[1]?.data).toEqual([1, 2, 30]);
   });
 });
