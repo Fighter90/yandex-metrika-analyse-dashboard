@@ -28,10 +28,26 @@ describe('OverviewView', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  it('renders the KPI strip and charts on success', () => {
+  it('renders the KPI strip and charts on success (no weak spots for a single channel)', () => {
     render(<OverviewView status="success" stats={[sample]} />);
     expect(screen.getByText('Цель (платных билетов)')).toBeInTheDocument();
     expect(screen.getByText(/Заявок/)).toBeInTheDocument();
     expect(screen.getAllByTestId('echart')).toHaveLength(2);
+    expect(screen.getByText(/Нет слабых мест/)).toBeInTheDocument();
+  });
+
+  it('lists weak spots when a channel converts below the overall rate', () => {
+    render(
+      <OverviewView
+        status="success"
+        stats={[
+          { ...sample, channel: 'podcast', visits: 100, goalReaches: 1 },
+          { ...sample, channel: 'vip', visits: 10, goalReaches: 9 },
+        ]}
+      />,
+    );
+    expect(screen.getByText('podcast')).toBeInTheDocument();
+    expect(screen.getByText(/100 визитов · CR/)).toBeInTheDocument();
+    expect(screen.queryByText(/Нет слабых мест/)).not.toBeInTheDocument();
   });
 });

@@ -3,8 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import type { ChannelStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
-import { formatInt } from '../lib/format';
-import { channelMixOption, dailyReachesOption, summarizeChannels } from '../lib/overview';
+import { formatInt, formatPercent } from '../lib/format';
+import {
+  channelMixOption,
+  dailyReachesOption,
+  summarizeChannels,
+  weakSpots,
+} from '../lib/overview';
 import { EChart } from '../components/charts/EChart';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
@@ -26,6 +31,7 @@ export function OverviewView({
     );
 
   const kpi = summarizeChannels(stats);
+  const weak = weakSpots(stats);
   return (
     <section className="space-y-6">
       <div className="grid grid-cols-3 gap-4">
@@ -38,6 +44,22 @@ export function OverviewView({
       </Card>
       <Card title="Микс каналов (визиты)">
         <EChart option={channelMixOption(stats)} />
+      </Card>
+      <Card title="Слабые места (трафик есть, конверсия ниже средней)">
+        {weak.length === 0 ? (
+          <p className="text-sm text-slate-500">Нет слабых мест по текущим данным.</p>
+        ) : (
+          <ul className="space-y-1 text-sm">
+            {weak.map((w) => (
+              <li key={w.channel} className="flex justify-between border-b border-slate-100 py-1">
+                <span>{w.channel}</span>
+                <span className="text-slate-500">
+                  {formatInt(w.visits)} визитов · CR {formatPercent(w.conversionRate)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </Card>
     </section>
   );
