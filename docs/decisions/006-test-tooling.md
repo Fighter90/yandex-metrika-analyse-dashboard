@@ -9,12 +9,12 @@
 
 Пирамида:
 
-| Уровень | Инструмент | Где |
-|---|---|---|
-| Unit | Vitest (node) | чистые функции, константы, аналитика (`ice-scorer` и т.п.) |
-| Integration / functional | Vitest (node) | репозитории на реальной SQLite, API через `app.inject()` |
-| Component | Vitest (jsdom) + Testing Library | React-компоненты, валидации форм гипотез |
-| E2E / acceptance | Playwright (chromium) | пользовательские сценарии, критерии §14 |
+| Уровень                  | Инструмент                       | Где                                                        |
+| ------------------------ | -------------------------------- | ---------------------------------------------------------- |
+| Unit                     | Vitest (node)                    | чистые функции, константы, аналитика (`ice-scorer` и т.п.) |
+| Integration / functional | Vitest (node)                    | репозитории на реальной SQLite, API через `app.inject()`   |
+| Component                | Vitest (jsdom) + Testing Library | React-компоненты, валидации форм гипотез                   |
+| E2E / acceptance         | Playwright (chromium)            | пользовательские сценарии, критерии §14                    |
 
 Доп. dev-инструменты (в рамках строки «Tests | Vitest + Playwright» спеки):
 `@vitest/coverage-v8`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`.

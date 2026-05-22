@@ -1,0 +1,6 @@
+# Default owner for everything in the repo.
+* @Fighter90
+
+# Methodology files are adapted from Voronkova — changes need extra care.
+/.claude/skills/ @Fighter90
+/docs/methodology-hypothesis-voronik.md @Fighter90

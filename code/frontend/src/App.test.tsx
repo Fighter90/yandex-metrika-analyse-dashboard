@@ -15,19 +15,28 @@ afterEach(() => {
 
 describe('<App>', () => {
   it('always shows the KPI target of 300', () => {
-    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    );
     render(<App />);
     expect(screen.getByText(/300\+ платных билетов/)).toBeInTheDocument();
   });
 
   it('shows the loading state before health resolves', () => {
-    vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(() => {})));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>(() => {})),
+    );
     render(<App />);
     expect(screen.getByText(/Проверяю/)).toBeInTheDocument();
   });
 
   it('renders ok health with token present', async () => {
-    vi.stubGlobal('fetch', fetchResolving({ status: 'ok', counterId: 54280963, metrikaTokenPresent: true }));
+    vi.stubGlobal(
+      'fetch',
+      fetchResolving({ status: 'ok', counterId: 54280963, metrikaTokenPresent: true }),
+    );
     render(<App />);
     expect(await screen.findByText('ok')).toBeInTheDocument();
     expect(screen.getByText('54280963')).toBeInTheDocument();
@@ -35,7 +44,10 @@ describe('<App>', () => {
   });
 
   it('renders ok health with token absent', async () => {
-    vi.stubGlobal('fetch', fetchResolving({ status: 'ok', counterId: 1, metrikaTokenPresent: false }));
+    vi.stubGlobal(
+      'fetch',
+      fetchResolving({ status: 'ok', counterId: 1, metrikaTokenPresent: false }),
+    );
     render(<App />);
     expect(await screen.findByText(/не задан/)).toBeInTheDocument();
   });

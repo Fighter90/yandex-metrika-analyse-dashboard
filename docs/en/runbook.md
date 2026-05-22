@@ -22,7 +22,7 @@ What `run.sh` does, step by step:
 1. Checks Node; installs `pnpm` if missing.
 2. `pnpm install` (if `node_modules` is absent).
 3. If `.env` is missing — copies it from `.env.example`, asks you to add the token, and exits.
-4. Loads `.env`, runs migrations and `sync` *(wired in Iterations 1–2)*.
+4. Loads `.env`, runs migrations and `sync` _(wired in Iterations 1–2)_.
 5. Starts `pnpm dev` (backend + frontend) and opens the browser.
 
 ## 3. Configuring `.env`
@@ -33,14 +33,14 @@ cp .env.example .env
 
 Fill in:
 
-| Variable | Value |
-|---|---|
-| `YANDEX_OAUTH_TOKEN` | a `metrika:read` token (see README → "Getting a token") |
-| `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | OAuth app credentials |
-| `COUNTER_ID` | `54280963` |
-| `PORT` / `API_PORT` | `5173` / `4000` |
-| `ARCHIVED_GOAL_ID_THRESHOLD` | `77` (older goals → archived) |
-| `LOW_UTM_COVERAGE_RATIO` | `0.7` (low-UTM-coverage flag threshold) |
+| Variable                                    | Value                                                   |
+| ------------------------------------------- | ------------------------------------------------------- |
+| `YANDEX_OAUTH_TOKEN`                        | a `metrika:read` token (see README → "Getting a token") |
+| `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | OAuth app credentials                                   |
+| `COUNTER_ID`                                | `54280963`                                              |
+| `PORT` / `API_PORT`                         | `5173` / `4000`                                         |
+| `ARCHIVED_GOAL_ID_THRESHOLD`                | `77` (older goals → archived)                           |
+| `LOW_UTM_COVERAGE_RATIO`                    | `0.7` (low-UTM-coverage flag threshold)                 |
 
 `.env` is gitignored — the token and secret never reach the repository.
 
@@ -66,13 +66,13 @@ pnpm build       # build (frontend artifact → code/frontend/dist)
 
 ## 6. Troubleshooting
 
-| Symptom | Cause / fix |
-|---|---|
-| `Node.js 20+ required` | install Node 20 (`nvm install 20 && nvm use 20`). |
+| Symptom                                  | Cause / fix                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------ |
+| `Node.js 20+ required`                   | install Node 20 (`nvm install 20 && nvm use 20`).                        |
 | Browser opened but "Backend unavailable" | backend still starting — refresh in 2–3s; check `API_PORT=4000` is free. |
-| `metrikaTokenPresent: false` | add `YANDEX_OAUTH_TOKEN` to `.env` and restart. |
-| `EADDRINUSE :4000` / `:5173` | port busy — change `API_PORT` / `PORT` in `.env`. |
-| `pnpm: command not found` | `npm i -g pnpm` (or just run `./run.sh`). |
+| `metrikaTokenPresent: false`             | add `YANDEX_OAUTH_TOKEN` to `.env` and restart.                          |
+| `EADDRINUSE :4000` / `:5173`             | port busy — change `API_PORT` / `PORT` in `.env`.                        |
+| `pnpm: command not found`                | `npm i -g pnpm` (or just run `./run.sh`).                                |
 
 ## 7. Stopping
 

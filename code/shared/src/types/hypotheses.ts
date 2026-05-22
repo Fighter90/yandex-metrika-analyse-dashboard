@@ -4,13 +4,7 @@ export type DiamondPhase = 'define' | 'develop';
 export type HypothesisKind = 'problem' | 'solution';
 export type AssumptionCategory = 'behavior' | 'market' | 'tech';
 export type ValidationMethodType = 'synthetic' | 'live' | 'quantitative' | 'market';
-export type HypothesisStatus =
-  | 'draft'
-  | 'in_progress'
-  | 'green'
-  | 'yellow'
-  | 'red'
-  | 'expired';
+export type HypothesisStatus = 'draft' | 'in_progress' | 'green' | 'yellow' | 'red' | 'expired';
 
 export interface HiddenAssumption {
   readonly category: AssumptionCategory;

@@ -1,7 +1,19 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  ci:
+  quality:
+    name: Lint · Format · Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,11 +25,71 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm coverage
+      - name: ESLint
+        run: pnpm lint
+      - name: Prettier
+        run: pnpm format:check
+      - name: Typecheck
+        run: pnpm typecheck
+
+  test:
+    name: Test + coverage (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Coverage (100% thresholds enforced)
+        run: pnpm coverage
+      - name: Upload coverage
+        if: ${{ matrix.node == 20 }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: '**/coverage/lcov.info'
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: frontend-dist
           path: code/frontend/dist
+          retention-days: 7
+
+  actionlint:
+    name: Lint workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: actionlint
+        uses: raven-actions/actionlint@v2
+
+  ci-ok:
+    name: CI passed
+    needs: [quality, test, build, actionlint]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All CI checks passed."

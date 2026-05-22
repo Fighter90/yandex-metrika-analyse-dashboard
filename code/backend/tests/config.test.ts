@@ -16,8 +16,7 @@ describe('hasMetrikaToken', () => {
 
   it('falls back to the configured token when no argument is given', () => {
     const expected =
-      config.YANDEX_OAUTH_TOKEN.length > 0 &&
-      config.YANDEX_OAUTH_TOKEN !== 'YOUR_OAUTH_TOKEN_HERE';
+      config.YANDEX_OAUTH_TOKEN.length > 0 && config.YANDEX_OAUTH_TOKEN !== 'YOUR_OAUTH_TOKEN_HERE';
     expect(hasMetrikaToken()).toBe(expected);
   });
 });

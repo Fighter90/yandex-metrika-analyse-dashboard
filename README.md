@@ -1,5 +1,9 @@
 # ProductCamp Conversion Analytics Dashboard
 
+[![CI](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml)
+[![E2E](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml)
+[![Security](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml)
+
 > 🇷🇺 Русский · [🇬🇧 English](README.en.md)
 
 Локально запускаемый аналитический инструмент для трека **«Конверсии и лидген» ProductCamp**.
@@ -100,13 +104,13 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 
 ## CLI-команды
 
-| Команда | Описание |
-|---|---|
-| `pnpm dev` | backend (tsx watch) + frontend (vite) |
-| `pnpm build` | сборка |
-| `pnpm typecheck` | проверка типов |
-| `pnpm lint` / `pnpm format` | линт / форматирование |
-| `pnpm test` | vitest |
+| Команда                     | Описание                              |
+| --------------------------- | ------------------------------------- |
+| `pnpm dev`                  | backend (tsx watch) + frontend (vite) |
+| `pnpm build`                | сборка                                |
+| `pnpm typecheck`            | проверка типов                        |
+| `pnpm lint` / `pnpm format` | линт / форматирование                 |
+| `pnpm test`                 | vitest                                |
 
 _Команды `sync` / `report` / `new-decision` подключаются в итерациях 2/9/7._
 

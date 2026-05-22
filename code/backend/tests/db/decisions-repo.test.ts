@@ -1,10 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { DB } from '../../src/db/connection';
 import { HypothesesRepo } from '../../src/db/repositories/hypotheses-repo';
-import {
-  DecisionsRepo,
-  DecisionValidationError,
-} from '../../src/db/repositories/decisions-repo';
+import { DecisionsRepo, DecisionValidationError } from '../../src/db/repositories/decisions-repo';
 import { freshDb, validHypothesis } from './helpers';
 import type { NewDecision } from '@pca/shared';
 

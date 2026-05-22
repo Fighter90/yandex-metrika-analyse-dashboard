@@ -21,7 +21,10 @@ export function App(): JSX.Element {
         }),
       )
       .catch((e: unknown) =>
-        setHealth({ kind: 'error', message: e instanceof Error ? e.message : 'backend unreachable' }),
+        setHealth({
+          kind: 'error',
+          message: e instanceof Error ? e.message : 'backend unreachable',
+        }),
       );
   }, []);
 
@@ -33,20 +36,27 @@ export function App(): JSX.Element {
         </p>
         <h1 className="mt-2 text-3xl font-bold">Conversion Analytics Dashboard</h1>
         <p className="mt-3 text-slate-600">
-          Цель кампании: <span className="font-semibold">{KPI_TARGET_PAID_TICKETS}+ платных билетов</span>.
-          Заявка ≠ оплата — инструмент разделяет их явно.
+          Цель кампании:{' '}
+          <span className="font-semibold">{KPI_TARGET_PAID_TICKETS}+ платных билетов</span>. Заявка
+          ≠ оплата — инструмент разделяет их явно.
         </p>
 
         <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold">Backend health</h2>
-          {health.kind === 'loading' && <p className="mt-2 text-slate-500">Проверяю /api/health…</p>}
+          {health.kind === 'loading' && (
+            <p className="mt-2 text-slate-500">Проверяю /api/health…</p>
+          )}
           {health.kind === 'error' && (
             <p className="mt-2 text-red-600">Backend недоступен: {health.message}</p>
           )}
           {health.kind === 'ok' && (
             <ul className="mt-2 space-y-1 text-sm">
-              <li>Статус: <span className="font-mono text-green-700">{health.status}</span></li>
-              <li>Counter ID: <span className="font-mono">{health.counterId}</span></li>
+              <li>
+                Статус: <span className="font-mono text-green-700">{health.status}</span>
+              </li>
+              <li>
+                Counter ID: <span className="font-mono">{health.counterId}</span>
+              </li>
               <li>
                 OAuth-токен:{' '}
                 <span className={health.tokenPresent ? 'text-green-700' : 'text-amber-600'}>

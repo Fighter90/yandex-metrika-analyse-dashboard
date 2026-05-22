@@ -6,6 +6,11 @@
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-05-22
+
+Первый релиз: рабочий backend (слой данных + Metrika-клиент + REST API) с 100% покрытием,
+полный CI/CD-пайплайн и инструмент запуска `./run.sh`. Дашборд-фронтенд — в следующих релизах.
+
 ### Added
 
 - Итерация 3 — Backend API: `/api/metrics/*` (channels с фильтром по датам, goals с тоглом
@@ -31,4 +36,5 @@
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.
 - Шаблоны PR и Issue (bug, hypothesis), `dependabot.yml`.
 
-[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/commits/main
+[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.1.0

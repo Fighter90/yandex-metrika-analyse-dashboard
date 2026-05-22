@@ -20,12 +20,12 @@
 
 Base URL: `https://api-metrika.yandex.net`
 
-| Endpoint | Назначение |
-|---|---|
+| Endpoint                                | Назначение           |
+| --------------------------------------- | -------------------- |
 | `GET /management/v1/counter/{id}/goals` | seed таблицы `goals` |
-| `GET /stat/v1/data` | основные отчёты |
-| `GET /stat/v1/data/bytime` | временные ряды |
-| `GET /stat/v1/data/drilldown` | drill-down |
+| `GET /stat/v1/data`                     | основные отчёты      |
+| `GET /stat/v1/data/bytime`              | временные ряды       |
+| `GET /stat/v1/data/drilldown`           | drill-down           |
 
 ## Параметры Stat API (основное)
 

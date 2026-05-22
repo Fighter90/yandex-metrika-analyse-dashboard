@@ -113,7 +113,10 @@ export class MetrikaClient {
       const json = await res.json();
       const parsed = schema.safeParse(json);
       if (!parsed.success) {
-        throw new MetrikaSchemaError(parsed.error.issues, this.dump(path, json, parsed.error.issues));
+        throw new MetrikaSchemaError(
+          parsed.error.issues,
+          this.dump(path, json, parsed.error.issues),
+        );
       }
       return parsed.data;
     };

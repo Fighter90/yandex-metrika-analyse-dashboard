@@ -81,7 +81,12 @@ describe('MetricsRepo — channel stats', () => {
   it('upserts and lists channel stats, optionally filtered by date range', () => {
     repo.upsertChannelStats([
       stat('2025-01-01'),
-      stat('2025-01-02', { channel: 'direct', utmSource: null, utmMedium: null, utmCampaign: null }),
+      stat('2025-01-02', {
+        channel: 'direct',
+        utmSource: null,
+        utmMedium: null,
+        utmCampaign: null,
+      }),
       stat('2025-01-03'),
     ]);
     expect(repo.listChannelStats()).toHaveLength(3);

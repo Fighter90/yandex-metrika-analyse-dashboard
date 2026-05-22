@@ -3,7 +3,9 @@ import { dayChunks } from '../../src/utils/date-range';
 
 describe('dayChunks', () => {
   it('keeps a <=7-day range as a single chunk', () => {
-    expect(dayChunks('2025-01-01', '2025-01-07')).toEqual([{ from: '2025-01-01', to: '2025-01-07' }]);
+    expect(dayChunks('2025-01-01', '2025-01-07')).toEqual([
+      { from: '2025-01-01', to: '2025-01-07' },
+    ]);
   });
 
   it('splits a >7-day range into per-day chunks', () => {
