@@ -1,4 +1,5 @@
 import type { ChannelStat, B2bDeal } from '@pca/shared';
+import { intTooltip } from './echart-format';
 
 export interface FunnelStage {
   readonly label: string;
@@ -37,7 +38,7 @@ export function buildFunnel(stats: ChannelStat[], deals: B2bDeal[]): FunnelStage
 /** ECharts funnel option from the computed stages. */
 export function funnelOption(stages: FunnelStage[]): object {
   return {
-    tooltip: { trigger: 'item' },
+    tooltip: { trigger: 'item', ...intTooltip },
     series: [
       {
         type: 'funnel',

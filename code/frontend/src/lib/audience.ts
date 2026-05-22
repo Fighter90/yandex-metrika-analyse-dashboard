@@ -1,4 +1,5 @@
 import type { GeoDeviceStat } from '@pca/shared';
+import { intTooltip } from './echart-format';
 
 export interface AudienceRow {
   readonly label: string;
@@ -46,7 +47,7 @@ export function audienceBarOption(rows: AudienceRow[], title: string): object {
   const top = rows.slice(0, 8).reverse(); // reverse → largest at top of a horizontal bar
   return {
     title: { text: title, left: 'center', textStyle: { fontSize: 13 } },
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', ...intTooltip },
     grid: { left: 120, right: 16, top: 32, bottom: 24 },
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: top.map((r) => r.label) },
@@ -58,7 +59,7 @@ export function audienceBarOption(rows: AudienceRow[], title: string): object {
 export function deviceShareOption(rows: AudienceRow[]): object {
   return {
     title: { text: 'Доля устройств (визиты)', left: 'center', textStyle: { fontSize: 13 } },
-    tooltip: { trigger: 'item' },
+    tooltip: { trigger: 'item', ...intTooltip },
     series: [
       {
         type: 'pie',
