@@ -10,7 +10,8 @@ import { authorizeUrl, exchangeCodeForToken, upsertEnvVar, type OAuthFetch } fro
  * prints the authorize URL, reads the confirmation code, exchanges it for a token and writes
  * YANDEX_OAUTH_TOKEN into .env. Excluded from coverage (interactive IO); oauth.ts is the tested part.
  */
-const ENV_PATH = join(dirname(fileURLToPath(import.meta.url)), '../../../.env');
+// This file lives at code/backend/src/metrika → four levels up is the repo root that holds .env.
+const ENV_PATH = join(dirname(fileURLToPath(import.meta.url)), '../../../../.env');
 
 if (!config.YANDEX_CLIENT_ID || !config.YANDEX_CLIENT_SECRET) {
   console.error('YANDEX_CLIENT_ID / YANDEX_CLIENT_SECRET must be set in .env first.');
