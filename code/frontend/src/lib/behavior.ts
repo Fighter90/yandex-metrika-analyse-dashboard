@@ -1,5 +1,5 @@
 import type { PageStat } from '@pca/shared';
-import { intTooltip } from './echart-format';
+import { intTooltip, intBarLabel } from './echart-format';
 
 export interface PageRow {
   readonly page: string;
@@ -57,8 +57,13 @@ export function pageBarOption(rows: PageRow[], title: string): object {
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: top.map((r) => shortLabel(r.page)) },
     series: [
-      { name: 'Визиты', type: 'bar', data: top.map((r) => r.visits) },
-      { name: 'Заявки', type: 'bar', data: top.map((r) => r.goalReaches) },
+      { name: 'Визиты', type: 'bar', data: top.map((r) => r.visits), label: intBarLabel('right') },
+      {
+        name: 'Заявки',
+        type: 'bar',
+        data: top.map((r) => r.goalReaches),
+        label: intBarLabel('right'),
+      },
     ],
   };
 }
