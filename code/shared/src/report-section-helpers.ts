@@ -16,6 +16,12 @@ import type {
   ReportSnapshot,
   UtmBreakdownRow,
 } from './types/report';
+import type {
+  GeneratedHypotheses,
+  ProblemHypothesis,
+  SolutionHypothesis,
+  SolutionRiskKind,
+} from './types/generated-hypotheses';
 import { iceBucket, type IceBucket } from './validation';
 
 export const CATEGORY_LABEL: Record<AssumptionCategory, string> = {
@@ -101,4 +107,124 @@ export function channelTotals(channels: ReportSnapshot['channels']): ChannelTota
 export function priorityLine(h: Hypothesis, rank: number): string {
   const bucket = BUCKET_LABEL[iceBucket(h.iceScore)];
   return `${rank}. [ICE ${h.iceScore} · ${bucket}] ${KIND_LABEL[h.kind]}: ${hypothesisStatement(h)} — статус: ${STATUS_LABEL[h.status]}, дедлайн ${h.deadlineAt}`;
+}
+
+// ---------------------------------------------------------------------------
+// AI-generated hypotheses (generatedHypotheses in ReportSnapshot)
+// ---------------------------------------------------------------------------
+
+/** Shared section type — mirrors ReportSection from report-sections.ts (no circular import). */
+export interface AiReportSection {
+  readonly heading: string;
+  readonly lines: string[];
+}
+
+/** Russian labels for the five mandatory solution risk dimensions. */
+export const RISK_KIND_LABEL: Record<SolutionRiskKind, string> = {
+  value: 'Ценность',
+  usability: 'Удобство',
+  feasibility: 'Технический',
+  business: 'Бизнес',
+  legal: 'Юридический-репутационный',
+};
+
+/**
+ * Prioritisation overview section for AI-generated solutions, sorted by ICE score descending.
+ * One line per solution: «[ICE {score}] {id}: Если {action}, то {userBenefit}, что приведёт к {businessResult}».
+ */
+export function aiSolutionPrioritySection(
+  solutions: readonly SolutionHypothesis[],
+): AiReportSection {
+  const sorted = [...solutions].sort((a, b) => b.ice.score - a.ice.score);
+  return {
+    heading: 'Приоритизация AI-гипотез (по ICE)',
+    lines:
+      sorted.length === 0
+        ? ['AI-гипотезы ещё не сгенерированы.']
+        : [
+            'AI-решенческие гипотезы, отсортированы по убыванию ICE:',
+            '',
+            ...sorted.map(
+              (s) =>
+                `[ICE ${s.ice.score}] ${s.id}: Если ${s.action}, то ${s.userBenefit}, что приведёт к ${s.businessResult}`,
+            ),
+          ],
+  };
+}
+
+/** Full per-problem section for an AI-generated problem hypothesis. */
+export function aiProblemSection(p: ProblemHypothesis, ordinal: number): AiReportSection {
+  return {
+    heading: `${ordinal}. ${p.id}`,
+    lines: [
+      `${p.segment} испытывает ${p.trouble} при ${p.action}, потому что ${p.barrier}`,
+      `Обоснование (данные): ${p.evidence}`,
+    ],
+  };
+}
+
+/** Full per-solution section for an AI-generated solution hypothesis. */
+export function aiSolutionSection(s: SolutionHypothesis, ordinal: number): AiReportSection {
+  const lines: string[] = [
+    `Если ${s.action}, то ${s.userBenefit}, что приведёт к ${s.businessResult}`,
+    `Критерий успеха: ${s.successCriteria}`,
+    `Связана с проблемой: ${s.problemId}`,
+    '',
+    'Риски:',
+    ...s.risks.map((r) => `  • ${RISK_KIND_LABEL[r.kind]}: ${r.note}`),
+    '',
+    'План проверки:',
+    `  Что проверяем: ${s.validation.whatToVerify}`,
+    `  Методы: ${s.validation.methods.join(', ')}`,
+    `  Аудитория: ${s.validation.audience}`,
+    `  Канал: ${s.validation.channel}`,
+    `  Критерий успеха: ${s.validation.successCriteria}`,
+    '',
+    'ICE:',
+    `  Impact ${s.ice.impact}/10 — ${s.ice.impactRationale}`,
+    `  Confidence ${s.ice.confidence}/10 — ${s.ice.confidenceRationale}`,
+    `  Ease ${s.ice.ease}/10 — ${s.ice.easeRationale}`,
+    `  Score: ${s.ice.impact} × ${s.ice.confidence} × ${s.ice.ease} = ${s.ice.score}`,
+  ];
+  return { heading: `${ordinal}. ${s.id}`, lines };
+}
+
+/**
+ * Build all AI-hypothesis sections from a GeneratedHypotheses value.
+ * Returns an empty array when the value is absent or has no entries.
+ * Insertion order: priority overview → problem sections → solution sections (sorted by ICE desc).
+ */
+export function aiHypothesisSections(gh: GeneratedHypotheses | undefined): AiReportSection[] {
+  if (!gh || (gh.problems.length === 0 && gh.solutions.length === 0)) return [];
+
+  const sortedSolutions = [...gh.solutions].sort((a, b) => b.ice.score - a.ice.score);
+
+  return [
+    aiSolutionPrioritySection(gh.solutions),
+    {
+      heading: 'Проблемные гипотезы (AI)',
+      lines:
+        gh.problems.length === 0
+          ? ['Проблемные AI-гипотезы не сгенерированы.']
+          : [
+              `Сгенерировано ${gh.problems.length} проблемных гипотез. Полная карточка каждой — ниже.`,
+              ...gh.problems.map((p, i) => `  ${i + 1}) ${p.id}: ${p.segment} — ${p.trouble}`),
+            ],
+    },
+    ...gh.problems.map((p, i) => aiProblemSection(p, i + 1)),
+    {
+      heading: 'Решенческие гипотезы (AI)',
+      lines:
+        sortedSolutions.length === 0
+          ? ['Решенческие AI-гипотезы не сгенерированы.']
+          : [
+              `Сгенерировано ${sortedSolutions.length} решенческих гипотез. Полная карточка каждой — ниже.`,
+              ...sortedSolutions.map(
+                (s, i) =>
+                  `  ${i + 1}) ${s.id} [ICE ${s.ice.score}]: Если ${s.action}, то ${s.userBenefit}`,
+              ),
+            ],
+    },
+    ...sortedSolutions.map((s, i) => aiSolutionSection(s, i + 1)),
+  ];
 }
