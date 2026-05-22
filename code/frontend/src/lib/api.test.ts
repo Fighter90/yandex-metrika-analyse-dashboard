@@ -43,6 +43,8 @@ describe('api client', () => {
     await api.geoDevice({ from: '2025-01-01', to: '2025-01-07' });
     await api.pages();
     await api.pages({ from: '2025-01-01', to: '2025-01-07' });
+    await api.exitPages();
+    await api.exitPages({ from: '2025-01-01', to: '2025-01-07' });
     await api.goals();
     await api.goals(true);
     expect(calls[0]).toBe('/api/metrics/channels');
@@ -53,8 +55,10 @@ describe('api client', () => {
     expect(calls[5]).toContain('/api/metrics/geo-device?from=2025-01-01&to=2025-01-07');
     expect(calls[6]).toBe('/api/metrics/pages');
     expect(calls[7]).toContain('/api/metrics/pages?from=2025-01-01&to=2025-01-07');
-    expect(calls[8]).toBe('/api/metrics/goals');
-    expect(calls[9]).toContain('archived=true');
+    expect(calls[8]).toBe('/api/metrics/exit-pages');
+    expect(calls[9]).toContain('/api/metrics/exit-pages?from=2025-01-01&to=2025-01-07');
+    expect(calls[10]).toBe('/api/metrics/goals');
+    expect(calls[11]).toContain('archived=true');
   });
 
   it('POSTs create-hypothesis and sync with JSON bodies', async () => {

@@ -39,6 +39,7 @@ export interface SyncSummary {
   utmRows: number;
   geoDeviceRows: number;
   pageRows: number;
+  exitPageRows: number;
 }
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
@@ -63,6 +64,8 @@ export const api = {
     ),
   pages: (range?: { from: string; to: string }) =>
     http<PageStat[]>(`/metrics/pages${range ? `?from=${range.from}&to=${range.to}` : ''}`),
+  exitPages: (range?: { from: string; to: string }) =>
+    http<PageStat[]>(`/metrics/exit-pages${range ? `?from=${range.from}&to=${range.to}` : ''}`),
   goals: (archived = false) => http<Goal[]>(`/metrics/goals${archived ? '?archived=true' : ''}`),
   hypotheses: () => http<Hypothesis[]>('/hypotheses'),
   createHypothesis: (h: NewHypothesis) =>

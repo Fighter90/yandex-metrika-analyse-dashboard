@@ -99,6 +99,26 @@ beforeAll(() => {
       conversionRate: 0.04,
     },
   ]);
+  ctx.deps.metrics.upsertExitPageStats([
+    {
+      date: '2025-01-01',
+      page: '/checkout',
+      visits: 40,
+      users: 35,
+      bounceRate: 0.6,
+      goalReaches: 2,
+      conversionRate: 0.05,
+    },
+    {
+      date: '2025-01-09',
+      page: '/thanks',
+      visits: 10,
+      users: 9,
+      bounceRate: 0.1,
+      goalReaches: 1,
+      conversionRate: 0.1,
+    },
+  ]);
 });
 afterAll(async () => {
   await ctx.app.close();
@@ -151,6 +171,18 @@ describe('GET /api/metrics', () => {
     });
     expect(ranged.json()).toHaveLength(1);
     expect(ranged.json()[0].page).toBe('/lp');
+  });
+
+  it('returns all exit-page stats, and a date-filtered subset', async () => {
+    const all = await ctx.app.inject({ method: 'GET', url: '/api/metrics/exit-pages' });
+    expect(all.json()).toHaveLength(2);
+
+    const ranged = await ctx.app.inject({
+      method: 'GET',
+      url: '/api/metrics/exit-pages?from=2025-01-01&to=2025-01-05',
+    });
+    expect(ranged.json()).toHaveLength(1);
+    expect(ranged.json()[0].page).toBe('/checkout');
   });
 
   it('hides archived goals by default, includes them with ?archived=true', async () => {

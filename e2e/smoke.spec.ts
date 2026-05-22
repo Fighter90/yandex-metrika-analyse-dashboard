@@ -80,6 +80,23 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       ]),
     }),
   );
+  await page.route('**/api/metrics/exit-pages*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          date: '2025-01-01',
+          page: '/checkout',
+          visits: 40,
+          users: 35,
+          bounceRate: 0.6,
+          goalReaches: 2,
+          conversionRate: 0.05,
+        },
+      ]),
+    }),
+  );
   await page.route('**/api/b2b', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
@@ -136,6 +153,8 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.getByRole('link', { name: 'Behavior' }).click();
   await expect(page.getByRole('heading', { name: 'Страницы входа' })).toBeVisible();
   await expect(page.getByText('/lp')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Страницы выхода' })).toBeVisible();
+  await expect(page.getByText('/checkout')).toBeVisible();
 
   // Navigate to the Funnel page and confirm the «заявка ≠ оплата» stages render.
   await page.getByRole('link', { name: 'Funnel' }).click();

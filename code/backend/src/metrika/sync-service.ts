@@ -9,6 +9,7 @@ import { trafficBySource } from './queries/traffic-by-source';
 import { utmBreakdown } from './queries/utm-breakdown';
 import { geoDeviceBreakdown } from './queries/geo-device-breakdown';
 import { pageBehavior } from './queries/page-behavior';
+import { exitPageBehavior } from './queries/exit-page-behavior';
 
 export interface SyncDeps {
   readonly client: MetrikaClient;
@@ -27,6 +28,7 @@ export interface SyncSummary {
   readonly utmRows: number;
   readonly geoDeviceRows: number;
   readonly pageRows: number;
+  readonly exitPageRows: number;
 }
 
 /** Pulls Metrika data into SQLite: raw responses (for traceability) + derived channel stats. */
@@ -151,12 +153,37 @@ export class SyncService {
     return { rows };
   }
 
+  async syncExitPages(from: string, to: string, goalId?: number): Promise<{ rows: number }> {
+    const chunks = dayChunks(from, to);
+    let rows = 0;
+    for (const chunk of chunks) {
+      const { raw, stats } = await exitPageBehavior(this.deps.client, {
+        counterId: this.deps.counterId,
+        from: chunk.from,
+        to: chunk.to,
+        goalId,
+      });
+      this.deps.metrics.saveRawResponse({
+        endpoint: ENDPOINTS.statData,
+        queryHash: stableHash({ q: 'exit-page-behavior', goalId, from: chunk.from, to: chunk.to }),
+        dateFrom: chunk.from,
+        dateTo: chunk.to,
+        payload: raw,
+        fetchedAt: this.deps.now(),
+      });
+      this.deps.metrics.upsertExitPageStats(stats);
+      rows += stats.length;
+    }
+    return { rows };
+  }
+
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
     const goals = await this.syncGoals();
     const { days, rows } = await this.syncTraffic(from, to, goalId);
     const utm = await this.syncUtm(from, to, goalId);
     const geo = await this.syncGeoDevice(from, to, goalId);
     const pages = await this.syncPages(from, to, goalId);
+    const exitPages = await this.syncExitPages(from, to, goalId);
     return {
       goals,
       days,
@@ -164,6 +191,7 @@ export class SyncService {
       utmRows: utm.rows,
       geoDeviceRows: geo.rows,
       pageRows: pages.rows,
+      exitPageRows: exitPages.rows,
     };
   }
 }

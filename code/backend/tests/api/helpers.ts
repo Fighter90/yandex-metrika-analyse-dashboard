@@ -54,6 +54,7 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
       utmRows: 0,
       geoDeviceRows: 0,
       pageRows: 0,
+      exitPageRows: 0,
     }),
     report,
   };

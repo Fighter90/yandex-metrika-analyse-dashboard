@@ -18,6 +18,7 @@ describe('migrate', () => {
       '006_utm_stats.sql',
       '007_geo_device_stats.sql',
       '008_page_stats.sql',
+      '009_exit_page_stats.sql',
     ]);
   });
 

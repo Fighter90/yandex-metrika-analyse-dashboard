@@ -182,3 +182,21 @@ describe('MetricsRepo — page stats', () => {
     expect(ranged[0]?.bounceRate).toBe(0.3);
   });
 });
+
+describe('MetricsRepo — exit-page stats', () => {
+  it('upserts and lists exit-page stats independently of entry pages', () => {
+    repo.upsertPageStats([page('2025-01-01', { page: '/lp' })]);
+    repo.upsertExitPageStats([
+      page('2025-01-01', { page: '/checkout', bounceRate: 0.6 }),
+      page('2025-01-02', { page: '/pricing' }),
+    ]);
+    // entry-page table is untouched by exit-page writes
+    expect(repo.listPageStats()).toHaveLength(1);
+    const exits = repo.listExitPageStats();
+    expect(exits).toHaveLength(2);
+    expect(exits[0]?.page).toBe('/checkout');
+    expect(exits[0]?.bounceRate).toBe(0.6);
+    const ranged = repo.listExitPageStats({ from: '2025-01-02', to: '2025-01-03' });
+    expect(ranged.map((p) => p.page)).toEqual(['/pricing']);
+  });
+});
