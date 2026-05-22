@@ -161,16 +161,19 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByText('Цель (платных билетов)')).toBeVisible();
   await expect(page.getByText(/Заявок/)).toBeVisible();
   await expect(page.getByText(/Слабые места/)).toBeVisible();
+  await expect(page.locator('canvas').first()).toBeVisible(); // ECharts paints
 
   // Navigate to the Traffic page (same channel data) and confirm it renders.
   await page.getByRole('link', { name: 'Traffic' }).click();
   await expect(page.getByText('Каналы — визиты')).toBeVisible();
   await expect(page.getByText('UTM-разбивка')).toBeVisible();
+  await expect(page.locator('canvas').first()).toBeVisible();
 
-  // Navigate to the Audience page and confirm the geo + device tables render.
+  // Navigate to the Audience page and confirm the geo + device tables + charts render.
   await page.getByRole('link', { name: 'Audience' }).click();
   await expect(page.getByRole('heading', { name: 'Страна' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Устройство' })).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(2); // country bar + device donut
 
   // Navigate to the Behavior page and confirm the entry-page table renders.
   await page.getByRole('link', { name: 'Behavior' }).click();
@@ -178,15 +181,18 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByText('/lp')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Страницы выхода' })).toBeVisible();
   await expect(page.getByText('/checkout')).toBeVisible();
+  await expect(page.locator('canvas')).toHaveCount(2); // entry + exit bars
 
   // Navigate to the Trends page (reuses channel data) and confirm the time-series renders.
   await page.getByRole('link', { name: 'Trends' }).click();
   await expect(page.getByText('Динамика по дням')).toBeVisible();
+  await expect(page.locator('canvas').first()).toBeVisible();
 
   // Navigate to the Funnel page and confirm the «заявка ≠ оплата» stages render.
   await page.getByRole('link', { name: 'Funnel' }).click();
   await expect(page.getByText('Воронка конверсии')).toBeVisible();
   await expect(page.getByText('Оплачено B2B')).toBeVisible();
+  await expect(page.locator('canvas').first()).toBeVisible();
 
   // Navigate to the B2B page and confirm the CRUD form is present.
   await page.getByRole('link', { name: 'B2B' }).click();
