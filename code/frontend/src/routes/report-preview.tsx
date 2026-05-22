@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import type { ReportSnapshot } from '@pca/shared';
+import { reportSections, type ReportSnapshot } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt } from '../lib/format';
@@ -11,6 +11,40 @@ function Stat({ label, value }: { label: string; value: string }): JSX.Element {
       <div className="text-xs uppercase text-slate-500">{label}</div>
       <div className="text-lg font-bold">{value}</div>
     </div>
+  );
+}
+
+/**
+ * On-screen render of the full report — the exact same sections DOCX and PDF produce
+ * (via the shared reportSections), so what you read here is byte-for-byte the exported content.
+ */
+export function ReportFullView({ snapshot }: { snapshot: ReportSnapshot }): JSX.Element {
+  const sections = reportSections(snapshot);
+  return (
+    <article
+      aria-label="Полный отчёт"
+      className="max-h-[70vh] space-y-4 overflow-auto rounded-lg border border-slate-200 bg-white p-4 text-sm shadow-sm"
+    >
+      <p className="text-xs text-slate-500">
+        Полный отчёт ({sections.length} разделов) — идентичен экспортируемым DOCX и PDF.
+      </p>
+      {sections.map((sec, i) => (
+        <section key={`${sec.heading}-${i}`} className="space-y-1">
+          <h3 className="border-b border-slate-200 pb-1 font-semibold text-slate-800">
+            {sec.heading}
+          </h3>
+          {sec.lines.map((line, j) =>
+            line === '' ? (
+              <div key={j} className="h-2" />
+            ) : (
+              <p key={j} className="whitespace-pre-wrap text-slate-600">
+                {line}
+              </p>
+            ),
+          )}
+        </section>
+      ))}
+    </article>
   );
 }
 
@@ -119,6 +153,8 @@ export function ReportPreviewView({
               </div>
             ) : null}
           </div>
+
+          <ReportFullView snapshot={snapshot} />
         </div>
       ) : (
         <p className="text-slate-500">

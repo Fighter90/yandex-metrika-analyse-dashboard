@@ -71,19 +71,26 @@ to the outcome (green/yellow/red). Entries can be exported to `data/decisions/DL
 On the **Report** page:
 
 1. Pick the period in the header, then click **"Build snapshot"** — this builds and stores an
-   immutable `ReportSnapshot` and shows the KPI summary.
+   immutable `ReportSnapshot`, shows the KPI summary and **renders the full report on screen**
+   (the same content as the DOCX/PDF).
 2. (Optional) **"Generate AI analysis"** — calls Anthropic from the snapshot numbers and adds a
    clearly-labelled «AI analysis» section. Needs `ANTHROPIC_API_KEY`; without it you get a clear
    message and the report is built without that section.
 3. **Export DOCX** or **Export PDF** — renders the file into `data/reports/{snapshotId}.{docx|pdf}`.
 
-Report sections: Cover, Executive Summary (application ≠ payment), Methodology, Define/Develop
-hypotheses, Deliver/Decision Log, top breakdowns (UTM, geo+device, entry/exit pages), AI analysis
-(if generated), Data Appendix.
+The report is **detailed (≥25 A4 pages)** — each section starts on a new page. Sections: Cover,
+Executive Summary (application ≠ payment), Methodology, Visit→application→payment funnel, Channel
+analysis, ICE prioritization, Define (a full card per problem hypothesis), Develop (a full card per
+solution hypothesis), Deliver/Decision Log (findings, evidence, outcome, next step), AI analysis (if
+generated), top breakdowns (UTM, geo+device, entry/exit pages), Roadmap, Glossary, Data Appendix.
+Every hypothesis is spelled out in full: Voronkova statement, hidden assumptions by category,
+validation methods, the ICE breakdown with a rationale per factor, traffic-light criteria, deadline
+and status — with a detailed justification per item.
 
-Reports are built from the immutable **snapshot**: the same `snapshotId` yields the same content
-(no `Date.now()`/LLM in the render path — the AI narrative is generated once and stored). PDF needs a
-local Chrome via `PUPPETEER_EXECUTABLE_PATH`; DOCX needs nothing extra.
+Reports are built from the immutable **snapshot**: the same `snapshotId` yields the same content in
+DOCX, PDF and on screen (no `Date.now()`/LLM in the render path — the AI narrative is generated once
+and stored; content comes from one shared `reportSections` in `@pca/shared`). PDF needs a local
+Chrome via `PUPPETEER_EXECUTABLE_PATH`; DOCX needs nothing extra.
 
 ## 7. Principles to remember
 
