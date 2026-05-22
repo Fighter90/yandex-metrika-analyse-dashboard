@@ -1,5 +1,6 @@
 import type { ChannelStat } from '@pca/shared';
 import { KPI_TARGET_PAID_TICKETS } from '@pca/shared';
+import { intTooltip } from './echart-format';
 
 export interface OverviewKpi {
   readonly target: number;
@@ -52,7 +53,7 @@ export function channelMixOption(stats: ChannelStat[]): object {
   const byChannel = new Map<string, number>();
   for (const s of stats) byChannel.set(s.channel, (byChannel.get(s.channel) ?? 0) + s.visits);
   return {
-    tooltip: { trigger: 'item' },
+    tooltip: { trigger: 'item', ...intTooltip },
     series: [
       {
         type: 'pie',
@@ -71,6 +72,7 @@ export function dailyReachesOption(stats: ChannelStat[]): object {
   // lookup is always defined.
   const keys = [...byDate.keys()].sort();
   return {
+    tooltip: { trigger: 'axis', ...intTooltip },
     xAxis: { type: 'category', data: keys },
     yAxis: { type: 'value' },
     series: [{ type: 'line', smooth: true, data: keys.map((k) => byDate.get(k) as number) }],

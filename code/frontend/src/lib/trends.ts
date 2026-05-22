@@ -1,4 +1,5 @@
 import type { ChannelStat } from '@pca/shared';
+import { intTooltip } from './echart-format';
 
 export interface DailyPoint {
   readonly date: string;
@@ -63,7 +64,7 @@ export function weekOverWeek(stats: ChannelStat[]): Wow {
 /** ECharts line option: daily visits + goal reaches over the period. */
 export function trendsOption(series: DailyPoint[]): object {
   return {
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', ...intTooltip },
     legend: { data: ['Визиты', 'Заявки'] },
     xAxis: { type: 'category', data: series.map((p) => p.date) },
     yAxis: { type: 'value' },

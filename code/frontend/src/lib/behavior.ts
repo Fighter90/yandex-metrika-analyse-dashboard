@@ -1,4 +1,5 @@
 import type { PageStat } from '@pca/shared';
+import { intTooltip } from './echart-format';
 
 export interface PageRow {
   readonly page: string;
@@ -50,7 +51,7 @@ export function pageBarOption(rows: PageRow[], title: string): object {
   const top = rows.slice(0, 8).reverse();
   return {
     title: { text: title, left: 'center', textStyle: { fontSize: 13 } },
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', ...intTooltip },
     legend: { data: ['Визиты', 'Заявки'], bottom: 0 },
     grid: { left: 140, right: 16, top: 32, bottom: 28 },
     xAxis: { type: 'value' },
