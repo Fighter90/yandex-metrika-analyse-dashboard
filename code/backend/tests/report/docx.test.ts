@@ -117,6 +117,13 @@ describe('reportSections', () => {
   it('is deterministic — same snapshot yields identical content', () => {
     expect(reportSections(snapshot)).toEqual(reportSections(snapshot));
   });
+
+  it('includes an AI-анализ section only when aiNarrative is present', () => {
+    expect(reportSections(snapshot).some((s) => s.heading.startsWith('AI-анализ'))).toBe(false);
+    const withAi = reportSections({ ...snapshot, aiNarrative: 'Итог: рост.\n\nРиски: отвал.' });
+    const ai = withAi.find((s) => s.heading.startsWith('AI-анализ'));
+    expect(ai?.lines).toEqual(['Итог: рост.', 'Риски: отвал.']); // blank lines dropped
+  });
 });
 
 describe('buildDocx', () => {

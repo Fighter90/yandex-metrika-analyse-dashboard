@@ -7,6 +7,8 @@ import type { SnapshotRepo } from '../db/repositories/snapshot-repo';
 import type { ReportRunner } from '../routes/report';
 import { buildDocx } from './docx/builder';
 import { buildPdf } from './pdf/renderer';
+import { generateInsights, type AnthropicFetch } from './ai-insights';
+import { config, hasAnthropicKey } from '../config';
 
 const REPORTS_DIR = 'data/reports';
 
@@ -34,6 +36,34 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
       const filePath = join(REPORTS_DIR, `${snapshotId}.${format}`);
       writeFileSync(filePath, buf);
       return { filePath };
+    },
+    insights: async (snapshotId) => {
+      const record = snapshots.getById(snapshotId);
+      if (!record) return { ok: false, reason: 'not_found', message: 'snapshot not found' };
+      if (!hasAnthropicKey()) {
+        return {
+          ok: false,
+          reason: 'unavailable',
+          message: 'ANTHROPIC_API_KEY не задан — запустите ./init.sh или впишите ключ в .env',
+        };
+      }
+      const snapshot = record.payload as ReportSnapshot;
+      const narrative = await generateInsights(globalThis.fetch as unknown as AnthropicFetch, {
+        apiKey: config.ANTHROPIC_API_KEY,
+        model: config.ANTHROPIC_MODEL,
+        snapshot,
+      });
+      // Persist the narrative onto the snapshot so DOCX/PDF render it (deterministically) later.
+      snapshots.save({
+        id: record.id,
+        generatedAt: record.generatedAt,
+        dateFrom: record.dateFrom,
+        dateTo: record.dateTo,
+        payload: { ...snapshot, aiNarrative: narrative },
+        docxPath: record.docxPath,
+        pdfPath: record.pdfPath,
+      });
+      return { ok: true, narrative };
     },
   };
 }

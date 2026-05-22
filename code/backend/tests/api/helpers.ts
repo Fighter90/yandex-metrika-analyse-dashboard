@@ -41,6 +41,10 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
     get: (id) => snapshots.getById(id)?.payload as ReportSnapshot | undefined,
     generate: async (id, format) =>
       snapshots.getById(id) ? { filePath: `data/reports/${id}.${format}` } : undefined,
+    insights: async (id) =>
+      snapshots.getById(id)
+        ? { ok: true, narrative: 'AI: тест-анализ' }
+        : { ok: false, reason: 'not_found', message: 'snapshot not found' },
   };
   const deps: AppDeps = {
     metrics,

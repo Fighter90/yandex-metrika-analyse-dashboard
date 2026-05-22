@@ -69,6 +69,14 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
     { heading: 'Define — Problem Hypotheses', lines: s.hypotheses.problems.map(hypothesisLine) },
     { heading: 'Develop — Solution Hypotheses', lines: s.hypotheses.solutions.map(hypothesisLine) },
     { heading: 'Deliver — Decision Log', lines: s.decisions.map(decisionLine) },
+    ...(s.aiNarrative
+      ? [
+          {
+            heading: 'AI-анализ (интерпретация, проверяйте по данным)',
+            lines: s.aiNarrative.split('\n').filter((l) => l.trim() !== ''),
+          },
+        ]
+      : []),
     { heading: 'Топ источников UTM', lines: s.breakdowns.utm.map(utmLine) },
     { heading: 'Топ гео + устройства', lines: s.breakdowns.geoDevice.map(geoLine) },
     { heading: 'Топ страниц входа', lines: s.breakdowns.entryPages.map(pageLine) },

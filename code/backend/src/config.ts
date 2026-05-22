@@ -18,6 +18,11 @@ const EnvSchema = z.object({
   YANDEX_CLIENT_SECRET: z.string().default(''),
   OAUTH_REDIRECT_URI: z.string().default('https://oauth.yandex.ru/verification_code'),
   COUNTER_ID: z.coerce.number().int().positive().default(54280963),
+  // The Metrika goal that counts as a «заявка» for the KPI (0 = none → goal metrics skipped).
+  GOAL_ID: z.coerce.number().int().default(0),
+  // AI report narrative (Anthropic). Empty key → AI analysis is unavailable, dashboard still works.
+  ANTHROPIC_API_KEY: z.string().default(''),
+  ANTHROPIC_MODEL: z.string().default('claude-sonnet-4-6'),
   TIMEZONE: z.string().default('Europe/Moscow'),
   PORT: z.coerce.number().int().default(5173),
   API_PORT: z.coerce.number().int().default(4000),
@@ -32,3 +37,7 @@ export type AppConfig = typeof config;
 /** True once a real OAuth token (not the placeholder) is present. Pure for testability. */
 export const hasMetrikaToken = (token: string = config.YANDEX_OAUTH_TOKEN): boolean =>
   token.length > 0 && token !== 'YOUR_OAUTH_TOKEN_HERE';
+
+/** True once an Anthropic API key (not the placeholder) is present. Pure for testability. */
+export const hasAnthropicKey = (key: string = config.ANTHROPIC_API_KEY): boolean =>
+  key.length > 0 && key !== 'YOUR_ANTHROPIC_API_KEY_HERE';

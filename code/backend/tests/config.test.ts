@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { config, hasMetrikaToken } from '../src/config';
+import { config, hasMetrikaToken, hasAnthropicKey } from '../src/config';
 
 describe('hasMetrikaToken', () => {
   it('is false for an empty token', () => {
@@ -18,6 +18,21 @@ describe('hasMetrikaToken', () => {
     const expected =
       config.YANDEX_OAUTH_TOKEN.length > 0 && config.YANDEX_OAUTH_TOKEN !== 'YOUR_OAUTH_TOKEN_HERE';
     expect(hasMetrikaToken()).toBe(expected);
+  });
+});
+
+describe('hasAnthropicKey', () => {
+  it('is false for empty or placeholder, true for a real-looking key', () => {
+    expect(hasAnthropicKey('')).toBe(false);
+    expect(hasAnthropicKey('YOUR_ANTHROPIC_API_KEY_HERE')).toBe(false);
+    expect(hasAnthropicKey('sk-ant-xyz')).toBe(true);
+  });
+
+  it('falls back to the configured key when no argument is given', () => {
+    const expected =
+      config.ANTHROPIC_API_KEY.length > 0 &&
+      config.ANTHROPIC_API_KEY !== 'YOUR_ANTHROPIC_API_KEY_HERE';
+    expect(hasAnthropicKey()).toBe(expected);
   });
 });
 

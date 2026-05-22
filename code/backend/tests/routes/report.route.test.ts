@@ -25,6 +25,7 @@ describe('report routes', () => {
       build: vi.fn().mockReturnValue(snap),
       get: vi.fn(),
       generate: vi.fn(),
+      insights: vi.fn(),
     };
     const app = appWith(runner);
     const res = await app.inject({
@@ -39,7 +40,12 @@ describe('report routes', () => {
   });
 
   it('POST rejects an invalid body with 400', async () => {
-    const app = appWith({ build: vi.fn(), get: vi.fn(), generate: vi.fn() } as ReportRunner);
+    const app = appWith({
+      build: vi.fn(),
+      get: vi.fn(),
+      generate: vi.fn(),
+      insights: vi.fn(),
+    } as ReportRunner);
     const res = await app.inject({
       method: 'POST',
       url: '/api/report/snapshot',
@@ -54,6 +60,7 @@ describe('report routes', () => {
       build: vi.fn(),
       get: vi.fn((id: string) => (id === 'snap-1' ? snap : undefined)),
       generate: vi.fn(),
+      insights: vi.fn(),
     };
     const app = appWith(runner);
     const found = await app.inject({ method: 'GET', url: '/api/report/snapshot/snap-1' });
@@ -70,6 +77,7 @@ describe('report routes', () => {
       generate: vi.fn(async (id: string, format: string) =>
         id === 'snap-1' ? { filePath: `data/reports/snap-1.${format}` } : undefined,
       ),
+      insights: vi.fn(),
     };
     const app = appWith(runner);
 
@@ -102,6 +110,47 @@ describe('report routes', () => {
       payload: { snapshotId: 'none', format: 'docx' },
     });
     expect(missing.statusCode).toBe(404);
+    await app.close();
+  });
+
+  it('POST /api/report/insights returns the narrative, 404 / 503 on failure, 400 on bad body', async () => {
+    const runner: ReportRunner = {
+      build: vi.fn(),
+      get: vi.fn(),
+      generate: vi.fn(),
+      insights: vi.fn(async (id: string) => {
+        if (id === 'ok') return { ok: true as const, narrative: 'анализ' };
+        if (id === 'missing')
+          return { ok: false as const, reason: 'not_found' as const, message: 'not found' };
+        return { ok: false as const, reason: 'unavailable' as const, message: 'no key' };
+      }),
+    };
+    const app = appWith(runner);
+
+    const ok = await app.inject({
+      method: 'POST',
+      url: '/api/report/insights',
+      payload: { snapshotId: 'ok' },
+    });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json().narrative).toBe('анализ');
+
+    const missing = await app.inject({
+      method: 'POST',
+      url: '/api/report/insights',
+      payload: { snapshotId: 'missing' },
+    });
+    expect(missing.statusCode).toBe(404);
+
+    const unavailable = await app.inject({
+      method: 'POST',
+      url: '/api/report/insights',
+      payload: { snapshotId: 'nokey' },
+    });
+    expect(unavailable.statusCode).toBe(503);
+
+    const bad = await app.inject({ method: 'POST', url: '/api/report/insights', payload: {} });
+    expect(bad.statusCode).toBe(400);
     await app.close();
   });
 });

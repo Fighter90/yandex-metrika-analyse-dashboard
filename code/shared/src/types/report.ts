@@ -57,4 +57,10 @@ export interface ReportSnapshot {
   };
   readonly decisions: Decision[];
   readonly breakdowns: ReportBreakdowns;
+  /**
+   * Optional AI-generated narrative analysis (Anthropic), produced from the snapshot's numbers at
+   * generation time and stored here. Clearly labelled in the report; the deterministic render path
+   * never calls an LLM — it only prints this stored text. Absent until insights are generated.
+   */
+  readonly aiNarrative?: string;
 }
