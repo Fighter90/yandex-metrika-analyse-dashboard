@@ -1,7 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ChannelStat } from '@pca/shared';
-import { OverviewView } from './overview';
+import { renderWithProviders } from '../test/utils';
+
+vi.mock('../lib/api', () => ({
+  api: { channels: vi.fn(), primaryGoal: vi.fn() },
+}));
+import { api } from '../lib/api';
+import { OverviewView, Overview } from './overview';
 
 const sample: ChannelStat = {
   date: '2025-01-01',
@@ -34,6 +40,13 @@ describe('OverviewView', () => {
     expect(screen.getByText(/Заявок/)).toBeInTheDocument();
     expect(screen.getAllByTestId('echart')).toHaveLength(2);
     expect(screen.getByText(/Нет слабых мест/)).toBeInTheDocument();
+    expect(screen.queryByText(/KPI-цель определена автоматически/)).not.toBeInTheDocument();
+  });
+
+  it('shows the auto-detected KPI goal badge when a primary goal is provided', () => {
+    render(<OverviewView status="success" stats={[sample]} primaryGoalName="Ecommerce: покупка" />);
+    expect(screen.getByText(/KPI-цель определена автоматически/)).toBeInTheDocument();
+    expect(screen.getByText('Ecommerce: покупка')).toBeInTheDocument();
   });
 
   it('lists weak spots when a channel converts below the overall rate', () => {
@@ -49,5 +62,32 @@ describe('OverviewView', () => {
     expect(screen.getByText('podcast')).toBeInTheDocument();
     expect(screen.getByText(/100 визитов · CR/)).toBeInTheDocument();
     expect(screen.queryByText(/Нет слабых мест/)).not.toBeInTheDocument();
+  });
+});
+
+describe('Overview (data wrapper)', () => {
+  afterEach(() => vi.resetAllMocks());
+
+  it('shows the auto-detected goal badge when /primary-goal resolves', async () => {
+    vi.mocked(api.channels).mockResolvedValue([sample]);
+    vi.mocked(api.primaryGoal).mockResolvedValue({
+      id: 8,
+      name: 'Ecommerce: покупка',
+      type: 'action',
+      isB2b: false,
+      isArchived: false,
+      syncedAt: 'x',
+    });
+    renderWithProviders(<Overview />);
+    expect(await screen.findByText(/KPI-цель определена автоматически/)).toBeInTheDocument();
+    expect(screen.getByText('Ecommerce: покупка')).toBeInTheDocument();
+  });
+
+  it('hides the badge when no primary goal is detected (404)', async () => {
+    vi.mocked(api.channels).mockResolvedValue([sample]);
+    vi.mocked(api.primaryGoal).mockRejectedValue(new Error('404'));
+    renderWithProviders(<Overview />);
+    expect(await screen.findByText('Цель (платных билетов)')).toBeInTheDocument();
+    expect(screen.queryByText(/KPI-цель определена автоматически/)).not.toBeInTheDocument();
   });
 });
