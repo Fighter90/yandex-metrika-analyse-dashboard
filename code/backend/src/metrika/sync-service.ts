@@ -177,13 +177,30 @@ export class SyncService {
     return { rows };
   }
 
+  /**
+   * Run an optional breakdown sync best-effort: a counter-specific failure (an attribute the API
+   * rejects, an unavailable goal) is logged and skipped rather than aborting the whole pipeline,
+   * so the dashboard still gets every dataset that IS available. Goals + traffic stay required.
+   */
+  private async best(
+    label: string,
+    fn: () => Promise<{ rows: number }>,
+  ): Promise<{ rows: number }> {
+    try {
+      return await fn();
+    } catch (err) {
+      console.warn(`[sync] ${label} skipped: ${(err as Error).message}`);
+      return { rows: 0 };
+    }
+  }
+
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
     const goals = await this.syncGoals();
     const { days, rows } = await this.syncTraffic(from, to, goalId);
-    const utm = await this.syncUtm(from, to, goalId);
-    const geo = await this.syncGeoDevice(from, to, goalId);
-    const pages = await this.syncPages(from, to, goalId);
-    const exitPages = await this.syncExitPages(from, to, goalId);
+    const utm = await this.best('utm', () => this.syncUtm(from, to, goalId));
+    const geo = await this.best('geo-device', () => this.syncGeoDevice(from, to, goalId));
+    const pages = await this.best('pages', () => this.syncPages(from, to, goalId));
+    const exitPages = await this.best('exit-pages', () => this.syncExitPages(from, to, goalId));
     return {
       goals,
       days,

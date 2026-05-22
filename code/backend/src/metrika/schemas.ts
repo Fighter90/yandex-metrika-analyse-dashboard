@@ -11,7 +11,9 @@ export const StatDataResponseSchema = z
   .object({
     data: z.array(StatDataRowSchema),
     total_rows: z.number().optional(),
-    totals: z.array(z.array(z.number().nullable())).optional(),
+    // /stat/v1/data returns flat per-metric totals (number[]); bytime nests them (number[][]).
+    // We don't consume totals, so accept either shape rather than over-constrain the live API.
+    totals: z.array(z.union([z.number().nullable(), z.array(z.number().nullable())])).optional(),
     query: z.unknown().optional(),
   })
   .passthrough();

@@ -125,4 +125,31 @@ describe('SyncService.syncAll', () => {
       exitPageRows: 1,
     });
   });
+
+  it('skips a breakdown whose query the API rejects, still completing the rest', async () => {
+    const client = {
+      get: vi.fn(async (path: string, params?: { dimensions?: string }) => {
+        if (path.includes('/goals')) return goalsFixture;
+        if (params?.dimensions?.includes('exitURL')) {
+          throw new Error('Metrika 400: invalid attribute ym:s:exitURL');
+        }
+        return statFixture;
+      }),
+    } as unknown as MetrikaClient;
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const svc2 = new SyncService({
+      client,
+      metrics,
+      counterId: 1,
+      archivedThreshold: 77,
+      now: () => 'T',
+    });
+
+    const summary = await svc2.syncAll('2025-01-01', '2025-01-03', 80);
+    expect(summary.exitPageRows).toBe(0); // skipped
+    expect(summary.channelRows).toBe(1); // rest still synced
+    expect(summary.utmRows).toBe(1);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('exit-pages skipped'));
+    warn.mockRestore();
+  });
 });
