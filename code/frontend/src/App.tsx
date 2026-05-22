@@ -11,6 +11,7 @@ import { B2b } from './routes/b2b';
 import { Hypotheses } from './routes/hypotheses';
 import { Decisions } from './routes/decisions';
 import { ReportPreview } from './routes/report-preview';
+import { Sources } from './routes/sources';
 import { Funnel } from './routes/funnel';
 
 export function App(): JSX.Element {
@@ -29,6 +30,7 @@ export function App(): JSX.Element {
             <Route path="hypotheses" element={<Hypotheses />} />
             <Route path="decisions" element={<Decisions />} />
             <Route path="report" element={<ReportPreview />} />
+            <Route path="sources" element={<Sources />} />
           </Route>
         </Routes>
       </BrowserRouter>

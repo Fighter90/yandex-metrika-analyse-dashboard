@@ -12,6 +12,7 @@ import type {
   UtmStat,
   GeoDeviceStat,
   PageStat,
+  RawResponse,
 } from '@pca/shared';
 
 const BASE = '/api';
@@ -67,6 +68,7 @@ export const api = {
   exitPages: (range?: { from: string; to: string }) =>
     http<PageStat[]>(`/metrics/exit-pages${range ? `?from=${range.from}&to=${range.to}` : ''}`),
   goals: (archived = false) => http<Goal[]>(`/metrics/goals${archived ? '?archived=true' : ''}`),
+  rawResponse: (id: number) => http<RawResponse>(`/metrics/raw/${id}`),
   hypotheses: () => http<Hypothesis[]>('/hypotheses'),
   createHypothesis: (h: NewHypothesis) =>
     http<Hypothesis>('/hypotheses', { method: 'POST', body: JSON.stringify(h) }),
