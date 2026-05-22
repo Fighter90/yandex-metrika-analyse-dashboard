@@ -19,9 +19,16 @@ set -a
 source .env
 set +a
 
-# Iteration 1+ will add these scripts; --if-present keeps the skeleton runnable today.
+# Apply migrations, then populate data. With a real OAuth token we sync from Metrika; without one
+# we seed deterministic demo data so the dashboard is usable immediately (--if-present stays safe).
 pnpm --filter @pca/backend run --if-present migrate
-pnpm --filter @pca/backend run --if-present sync
+if [[ -z "${YANDEX_OAUTH_TOKEN:-}" || "${YANDEX_OAUTH_TOKEN}" == "YOUR_OAUTH_TOKEN_HERE" ]]; then
+  echo "→ YANDEX_OAUTH_TOKEN не задан — наполняю дашборд демо-данными (pnpm seed)."
+  echo "  Укажи токен в .env для реальной выгрузки из Яндекс.Метрики."
+  pnpm --filter @pca/backend run --if-present seed
+else
+  pnpm --filter @pca/backend run --if-present sync
+fi
 
 pnpm dev &
 DEV_PID=$!

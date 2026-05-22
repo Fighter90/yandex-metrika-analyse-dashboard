@@ -22,8 +22,13 @@ What `run.sh` does, step by step:
 1. Checks Node; installs `pnpm` if missing.
 2. `pnpm install` (if `node_modules` is absent).
 3. If `.env` is missing — copies it from `.env.example`, asks you to add the token, and exits.
-4. Loads `.env`, runs migrations and `sync` _(wired in Iterations 1–2)_.
+4. Loads `.env`, runs migrations. If `YANDEX_OAUTH_TOKEN` is **not set**, it seeds the DB with
+   **demo data** (`pnpm seed`) so the dashboard works right away; if set, it runs a real `sync`.
 5. Starts `pnpm dev` (backend + frontend) and opens the browser.
+
+> **Demo mode without a token.** `pnpm seed` (or `pnpm --filter @pca/backend seed`) loads a
+> deterministic sample dataset (channels, UTM, geo/device, entry/exit pages, B2B deals, goals).
+> Illustrative data, not from Metrika — handy for showing the tool to volunteers before the OAuth token.
 
 ## 3. Configuring `.env`
 

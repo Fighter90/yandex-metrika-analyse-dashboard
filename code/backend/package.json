@@ -7,6 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
     "migrate": "tsx src/db/cli-migrate.ts",
+    "seed": "tsx src/db/cli-seed.ts",
     "sync": "tsx src/metrika/cli-sync.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",

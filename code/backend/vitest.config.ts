@@ -12,6 +12,7 @@ export default defineConfig({
       exclude: [
         'src/server.ts',
         'src/db/cli-migrate.ts',
+        'src/db/cli-seed.ts',
         'src/metrika/cli-sync.ts',
         'src/metrika/production-sync.ts',
         'src/report/production-report.ts',

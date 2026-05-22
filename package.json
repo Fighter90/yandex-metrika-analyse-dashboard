@@ -14,6 +14,7 @@
     "test": "pnpm -r --if-present test",
     "coverage": "pnpm -r --if-present coverage",
     "e2e": "playwright test",
+    "seed": "pnpm --filter @pca/backend seed",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
