@@ -1,15 +1,20 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import type { ReportSnapshot } from '@pca/shared';
+import type { GeneratedHypotheses, ReportSnapshot } from '@pca/shared';
 
 const SnapshotBody = z.object({ from: z.string(), to: z.string() });
 const GenerateBody = z.object({ snapshotId: z.string(), format: z.enum(['docx', 'pdf']) });
 const InsightsBody = z.object({ snapshotId: z.string() });
+const HypothesesBody = z.object({ snapshotId: z.string() });
 
 export type ReportFormat = z.infer<typeof GenerateBody>['format'];
 
 export type InsightsResult =
   | { ok: true; narrative: string }
+  | { ok: false; reason: 'not_found' | 'unavailable'; message: string };
+
+export type HypothesesResult =
+  | { ok: true; hypotheses: GeneratedHypotheses }
   | { ok: false; reason: 'not_found' | 'unavailable'; message: string };
 
 export interface ReportRunner {
@@ -18,6 +23,8 @@ export interface ReportRunner {
   generate: (snapshotId: string, format: ReportFormat) => Promise<{ filePath: string } | undefined>;
   /** Generate + persist the AI narrative for a snapshot. */
   insights: (snapshotId: string) => Promise<InsightsResult>;
+  /** Generate + persist the AI hypotheses for a snapshot. */
+  hypotheses: (snapshotId: string) => Promise<HypothesesResult>;
 }
 
 export interface ReportRouteOptions {
@@ -49,6 +56,14 @@ export async function reportRoutes(app: FastifyInstance, opts: ReportRouteOption
     if (!parsed.success) return reply.code(400).send({ error: 'invalid body' });
     const result = await opts.runner.insights(parsed.data.snapshotId);
     if (result.ok) return { narrative: result.narrative };
+    return reply.code(result.reason === 'not_found' ? 404 : 503).send({ error: result.message });
+  });
+
+  app.post('/report/hypotheses', async (req, reply) => {
+    const parsed = HypothesesBody.safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'invalid body' });
+    const result = await opts.runner.hypotheses(parsed.data.snapshotId);
+    if (result.ok) return { hypotheses: result.hypotheses };
     return reply.code(result.reason === 'not_found' ? 404 : 503).send({ error: result.message });
   });
 }

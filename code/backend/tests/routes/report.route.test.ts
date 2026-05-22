@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
-import type { ReportSnapshot } from '@pca/shared';
+import type { GeneratedHypotheses, ReportSnapshot } from '@pca/shared';
 import { reportRoutes, type ReportRunner } from '../../src/routes/report';
 
 const snap = {
@@ -26,6 +26,7 @@ describe('report routes', () => {
       get: vi.fn(),
       generate: vi.fn(),
       insights: vi.fn(),
+      hypotheses: vi.fn(),
     };
     const app = appWith(runner);
     const res = await app.inject({
@@ -45,6 +46,7 @@ describe('report routes', () => {
       get: vi.fn(),
       generate: vi.fn(),
       insights: vi.fn(),
+      hypotheses: vi.fn(),
     } as ReportRunner);
     const res = await app.inject({
       method: 'POST',
@@ -61,6 +63,7 @@ describe('report routes', () => {
       get: vi.fn((id: string) => (id === 'snap-1' ? snap : undefined)),
       generate: vi.fn(),
       insights: vi.fn(),
+      hypotheses: vi.fn(),
     };
     const app = appWith(runner);
     const found = await app.inject({ method: 'GET', url: '/api/report/snapshot/snap-1' });
@@ -78,6 +81,7 @@ describe('report routes', () => {
         id === 'snap-1' ? { filePath: `data/reports/snap-1.${format}` } : undefined,
       ),
       insights: vi.fn(),
+      hypotheses: vi.fn(),
     };
     const app = appWith(runner);
 
@@ -124,6 +128,7 @@ describe('report routes', () => {
           return { ok: false as const, reason: 'not_found' as const, message: 'not found' };
         return { ok: false as const, reason: 'unavailable' as const, message: 'no key' };
       }),
+      hypotheses: vi.fn(),
     };
     const app = appWith(runner);
 
@@ -150,6 +155,49 @@ describe('report routes', () => {
     expect(unavailable.statusCode).toBe(503);
 
     const bad = await app.inject({ method: 'POST', url: '/api/report/insights', payload: {} });
+    expect(bad.statusCode).toBe(400);
+    await app.close();
+  });
+
+  it('POST /api/report/hypotheses returns the hypotheses, 404 / 503 on failure, 400 on bad body', async () => {
+    const fakeHypotheses: GeneratedHypotheses = { problems: [], solutions: [] };
+    const runner: ReportRunner = {
+      build: vi.fn(),
+      get: vi.fn(),
+      generate: vi.fn(),
+      insights: vi.fn(),
+      hypotheses: vi.fn(async (id: string) => {
+        if (id === 'ok') return { ok: true as const, hypotheses: fakeHypotheses };
+        if (id === 'missing')
+          return { ok: false as const, reason: 'not_found' as const, message: 'not found' };
+        return { ok: false as const, reason: 'unavailable' as const, message: 'no key' };
+      }),
+    };
+    const app = appWith(runner);
+
+    const ok = await app.inject({
+      method: 'POST',
+      url: '/api/report/hypotheses',
+      payload: { snapshotId: 'ok' },
+    });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json()).toEqual({ hypotheses: fakeHypotheses });
+
+    const missing = await app.inject({
+      method: 'POST',
+      url: '/api/report/hypotheses',
+      payload: { snapshotId: 'missing' },
+    });
+    expect(missing.statusCode).toBe(404);
+
+    const unavailable = await app.inject({
+      method: 'POST',
+      url: '/api/report/hypotheses',
+      payload: { snapshotId: 'nokey' },
+    });
+    expect(unavailable.statusCode).toBe(503);
+
+    const bad = await app.inject({ method: 'POST', url: '/api/report/hypotheses', payload: {} });
     expect(bad.statusCode).toBe(400);
     await app.close();
   });

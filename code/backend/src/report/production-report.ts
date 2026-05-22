@@ -8,6 +8,7 @@ import type { ReportRunner } from '../routes/report';
 import { buildDocx } from './docx/builder';
 import { buildPdf } from './pdf/renderer';
 import { generateInsights, type AnthropicFetch } from './ai-insights';
+import { generateHypotheses } from './ai-hypotheses';
 import { config, hasAnthropicKey } from '../config';
 
 const REPORTS_DIR = 'data/reports';
@@ -64,6 +65,34 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
         pdfPath: record.pdfPath,
       });
       return { ok: true, narrative };
+    },
+    hypotheses: async (snapshotId) => {
+      const record = snapshots.getById(snapshotId);
+      if (!record) return { ok: false, reason: 'not_found', message: 'snapshot not found' };
+      if (!hasAnthropicKey()) {
+        return {
+          ok: false,
+          reason: 'unavailable',
+          message: 'ANTHROPIC_API_KEY не задан — запустите ./init.sh или впишите ключ в .env',
+        };
+      }
+      const snapshot = record.payload as ReportSnapshot;
+      const generatedHypotheses = await generateHypotheses(snapshot, {
+        fetch: globalThis.fetch as unknown as AnthropicFetch,
+        apiKey: config.ANTHROPIC_API_KEY,
+        model: config.ANTHROPIC_MODEL,
+      });
+      // Persist the hypotheses onto the snapshot so DOCX/PDF render them (deterministically) later.
+      snapshots.save({
+        id: record.id,
+        generatedAt: record.generatedAt,
+        dateFrom: record.dateFrom,
+        dateTo: record.dateTo,
+        payload: { ...snapshot, generatedHypotheses },
+        docxPath: record.docxPath,
+        pdfPath: record.pdfPath,
+      });
+      return { ok: true, hypotheses: generatedHypotheses };
     },
   };
 }
