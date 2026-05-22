@@ -130,9 +130,24 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
         generatedAt: 'T',
         period: { from: '2025-01-01', to: '2025-01-07' },
         kpi: { target: 300, b2cApplications: 7, b2bPaidTickets: 20, gap: 280 },
-        channels: [],
+        channels: [
+          {
+            date: '2025-01-01',
+            channel: 'podcast',
+            utmSource: null,
+            utmMedium: null,
+            utmCampaign: null,
+            visits: 100,
+            users: 90,
+            bounceRate: 0.2,
+            avgDuration: 60,
+            goalReaches: 7,
+            conversionRate: 0.07,
+          },
+        ],
         hypotheses: { problems: [], solutions: [] },
         decisions: [],
+        breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
       }),
     }),
   );
@@ -210,6 +225,14 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.getByRole('link', { name: 'Report' }).click();
   await page.getByRole('button', { name: 'Сформировать snapshot' }).click();
   await expect(page.getByText(/snapshot snap-e2e/)).toBeVisible();
+  // The full report renders on screen — same sections as the exported DOCX/PDF.
+  const fullReport = page.getByRole('article', { name: 'Полный отчёт' });
+  await expect(fullReport).toBeVisible();
+  await expect(fullReport.getByRole('heading', { name: 'Executive Summary' })).toBeVisible();
+  await expect(
+    fullReport.getByRole('heading', { name: 'Воронка: визит → заявка → оплата' }),
+  ).toBeVisible();
+  await expect(fullReport.getByRole('heading', { name: 'Глоссарий и принципы' })).toBeVisible();
   await page.getByRole('button', { name: 'Export DOCX' }).click();
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.docx/)).toBeVisible();
   await page.getByRole('button', { name: 'Export PDF' }).click();
