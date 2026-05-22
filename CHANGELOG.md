@@ -8,6 +8,13 @@
 
 ### Added
 
+- Итерация 28 — **развёртывание одной командой** (install → init → start): `./setup.sh` делает всё;
+  `./init.sh` интерактивно создаёт `.env` и собирает Anthropic key + `COUNTER_ID` + `GOAL_ID`
+  (+ опц. OAuth через `pnpm auth`). Чистый `setup/init-env.ts` (`applyInitValues`, переиспользует
+  `upsertEnvVar`) — 100% покрытие; CLI `cli-init.ts` (`pnpm --filter @pca/backend configure`) исключён
+  как интерактивный IO. `run.sh` теперь использует `GOAL_ID` для sync (KPI «заявки»). README:
+  подробный раздел развёртывания + таблица CLI-команд.
+
 - Итерация 27 — **AI-анализ отчёта (Anthropic Claude), backend**: модуль `report/ai-insights.ts`
   (`buildInsightsRequest`/`parseInsights`/`generateInsights`) строит запрос из чисел снапшота с
   anti-hallucination system-промптом и парсит ответ Anthropic Messages API; эндпоинт

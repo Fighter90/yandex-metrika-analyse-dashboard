@@ -9,6 +9,7 @@
     "migrate": "tsx src/db/cli-migrate.ts",
     "seed": "tsx src/db/cli-seed.ts",
     "auth": "tsx src/metrika/cli-auth.ts",
+    "configure": "tsx src/setup/cli-init.ts",
     "sync": "tsx src/metrika/cli-sync.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",

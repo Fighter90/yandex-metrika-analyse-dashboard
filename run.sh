@@ -9,7 +9,7 @@ command -v pnpm >/dev/null || npm i -g pnpm
 
 if [[ ! -f .env ]]; then
   cp .env.example .env
-  echo "→ Заполни YANDEX_OAUTH_TOKEN в .env и запусти снова"
+  echo "→ Создан .env. Запусти ./init.sh (Anthropic key + Метрика), затем ./run.sh"
   exit 1
 fi
 
@@ -24,10 +24,13 @@ set +a
 pnpm --filter @pca/backend run --if-present migrate
 if [[ -z "${YANDEX_OAUTH_TOKEN:-}" || "${YANDEX_OAUTH_TOKEN}" == "YOUR_OAUTH_TOKEN_HERE" ]]; then
   echo "→ YANDEX_OAUTH_TOKEN не задан — наполняю дашборд демо-данными (pnpm seed)."
-  echo "  Укажи токен в .env для реальной выгрузки из Яндекс.Метрики."
+  echo "  Запусти ./init.sh для OAuth и реальной выгрузки из Яндекс.Метрики."
   pnpm --filter @pca/backend run --if-present seed
 else
-  pnpm --filter @pca/backend run --if-present sync
+  # GOAL_ID (если задан и > 0) включает метрики целей → KPI «заявки».
+  GOAL_ARG=""
+  if [[ -n "${GOAL_ID:-}" && "${GOAL_ID}" != "0" ]]; then GOAL_ARG="--goalId=${GOAL_ID}"; fi
+  pnpm --filter @pca/backend run --if-present sync ${GOAL_ARG}
 fi
 
 pnpm dev &

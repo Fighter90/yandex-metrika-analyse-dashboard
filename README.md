@@ -13,10 +13,11 @@
 
 > **KPI кампании:** 300+ **платных** билетов. Везде в инструменте: **заявка ≠ оплата**.
 
-> ⚠️ **Статус: Итерация 0 (скелет).** Сейчас работают: монорепо, backend `/api/health`,
-> frontend-заглушка, `./run.sh`, CI. Дашборд, гипотезы и отчёты появятся в следующих
-> итерациях (см. [Roadmap](#roadmap)). Документация ниже описывает целевой сценарий и
-> отмечает, что доступно уже сегодня.
+> ✅ **Статус: рабочий продукт.** Доступно: парсер Метрики (живой OAuth-sync + демо-данные),
+> дашборд из 11 страниц (Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses,
+> Decisions, Report, Sources), гипотезы по Воронковой + Decision Log, детерминированные DOCX/PDF
+> с опциональным **AI-анализом** (Anthropic), 100% покрытие тестами и полный CI/CD. Релизы
+> v0.1.0–v0.5.0.
 
 ## Скриншоты
 
@@ -24,16 +25,38 @@ _Появятся по мере готовности страниц: Overview, H
 
 ## Quickstart
 
+### Одной командой
+
 ```bash
 git clone git@github.com:Fighter90/metrika_analyse_dashboard.git
 cd metrika_analyse_dashboard
-cp .env.example .env        # затем впишите YANDEX_OAUTH_TOKEN (см. ниже)
-./run.sh
+./setup.sh          # install → init → start
 ```
 
-`./run.sh` сам поставит `pnpm` при отсутствии, установит зависимости, (с итерации 1)
-прогонит миграции, поднимет backend + frontend и откроет браузер на
-`http://localhost:5173`. Backend API — на `http://localhost:4000` (проксируется как `/api`).
+`./setup.sh` последовательно делает три шага ниже. Если хотите контроль на каждом шаге —
+выполняйте их по отдельности:
+
+### По шагам (install → init → start)
+
+```bash
+pnpm install        # 1. зависимости
+./init.sh           # 2. инициализация: Anthropic key + параметры Метрики (+ опц. OAuth)
+./run.sh            # 3. запуск: миграции → sync (или демо-seed без токена) → дашборд
+```
+
+**Шаг 2 — `./init.sh`** интерактивно создаёт `.env` (из `.env.example`) и спрашивает:
+
+- `ANTHROPIC_API_KEY` — ключ для AI-анализа отчётов (можно пропустить — дашборд работает без него);
+- `COUNTER_ID` — счётчик Яндекс.Метрики (по умолчанию `54280963`);
+- `GOAL_ID` — id цели «заявка» для KPI (`0` = без цели);
+- предложит сразу настроить **OAuth Яндекс.Метрики** (`pnpm auth`).
+
+**Шаг 3 — `./run.sh`** ставит `pnpm` при отсутствии, прогоняет миграции, затем: при наличии
+`YANDEX_OAUTH_TOKEN` тянет живые данные (`pnpm sync --goalId=$GOAL_ID`), иначе наполняет дашборд
+**демо-данными** (`pnpm seed`), поднимает backend + frontend и открывает
+`http://localhost:5173` (API — `http://localhost:4000`, проксируется как `/api`).
+
+> Без токена и без AI-ключа всё равно запустится в демо-режиме — удобно показать инструмент сразу.
 
 Подробный разбор запуска и устранение проблем — в [docs/runbook.md](docs/runbook.md).
 Руководство пользователя (дашборд, отчёты) — в [docs/user-guide.md](docs/user-guide.md).
@@ -118,15 +141,19 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 
 ## CLI-команды
 
-| Команда                     | Описание                              |
-| --------------------------- | ------------------------------------- |
-| `pnpm dev`                  | backend (tsx watch) + frontend (vite) |
-| `pnpm build`                | сборка                                |
-| `pnpm typecheck`            | проверка типов                        |
-| `pnpm lint` / `pnpm format` | линт / форматирование                 |
-| `pnpm test`                 | vitest                                |
-
-_Команды `sync` / `report` / `new-decision` подключаются в итерациях 2/9/7._
+| Команда                                         | Описание                                                       |
+| ----------------------------------------------- | -------------------------------------------------------------- |
+| `./setup.sh`                                    | всё одной командой: install → init → start                     |
+| `./init.sh`                                     | инициализация .env (Anthropic key, COUNTER_ID, GOAL_ID, OAuth) |
+| `./run.sh`                                      | запуск: миграции → sync/seed → дашборд                         |
+| `pnpm install`                                  | установка зависимостей                                         |
+| `pnpm auth`                                     | OAuth Яндекс.Метрики → `YANDEX_OAUTH_TOKEN` в .env             |
+| `pnpm seed`                                     | наполнить БД демо-данными (без токена)                         |
+| `pnpm --filter @pca/backend sync --goalId=<id>` | живая выгрузка из Метрики за период                            |
+| `pnpm dev`                                      | backend (tsx watch) + frontend (vite)                          |
+| `pnpm build` / `pnpm typecheck`                 | сборка / проверка типов                                        |
+| `pnpm lint` / `pnpm format`                     | линт / форматирование                                          |
+| `pnpm test` / `pnpm coverage`                   | vitest (порог покрытия 100%)                                   |
 
 ## CI/CD
 
