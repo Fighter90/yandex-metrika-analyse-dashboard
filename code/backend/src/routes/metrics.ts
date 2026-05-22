@@ -1,4 +1,5 @@
 import type { FastifyInstance } from 'fastify';
+import { selectPrimaryGoal } from '@pca/shared';
 import type { MetricsRepo } from '../db/repositories/metrics-repo';
 
 export interface MetricsRouteOptions {
@@ -64,6 +65,15 @@ export async function metricsRoutes(
     const archived = (req.query as { archived?: string }).archived === 'true';
     return opts.repo.listGoals(archived);
   });
+
+  app.get(
+    '/metrics/primary-goal',
+    { schema: { tags: ['metrics'], summary: 'Auto-detected primary KPI goal' } },
+    async (_req, reply) => {
+      const primary = selectPrimaryGoal(opts.repo.listGoals());
+      return primary ?? reply.code(404).send({ error: 'no primary goal detected' });
+    },
+  );
 
   app.get(
     '/metrics/raw/:id',

@@ -53,6 +53,7 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
     b2b,
     runSync: async () => ({
       goals: 0,
+      resolvedGoalId: undefined,
       days: 0,
       channelRows: 0,
       utmRows: 0,

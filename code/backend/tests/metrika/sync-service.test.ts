@@ -40,8 +40,8 @@ afterEach(() => db.close());
 
 describe('SyncService.syncGoals', () => {
   it('upserts goals and flags those below the archive threshold', async () => {
-    const count = await svc.syncGoals();
-    expect(count).toBe(2);
+    const goals = await svc.syncGoals();
+    expect(goals.map((g) => g.id)).toEqual([80, 10]); // returned in API order, pre-archive-filter
     expect(metrics.listGoals().map((g) => g.id)).toEqual([80]); // 10 is archived (< 77)
     expect(metrics.listGoals(true).map((g) => g.id)).toEqual([10, 80]);
   });
@@ -117,6 +117,7 @@ describe('SyncService.syncAll', () => {
     const summary = await svc.syncAll('2025-01-01', '2025-01-07', 80);
     expect(summary).toEqual({
       goals: 2,
+      resolvedGoalId: 80, // explicit goalId passed through
       days: 1,
       channelRows: 1,
       utmRows: 1,
@@ -124,6 +125,12 @@ describe('SyncService.syncAll', () => {
       pageRows: 1,
       exitPageRows: 1,
     });
+  });
+
+  it('auto-detects the primary KPI goal when no goalId is passed', async () => {
+    // The goals fixture has a purchase-looking goal (id 80 «Оплата») → selected automatically.
+    const summary = await svc.syncAll('2025-01-01', '2025-01-07');
+    expect(summary.resolvedGoalId).toBe(80);
   });
 
   it('skips a breakdown whose query the API rejects, still completing the rest', async () => {

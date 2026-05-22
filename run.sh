@@ -27,7 +27,8 @@ if [[ -z "${YANDEX_OAUTH_TOKEN:-}" || "${YANDEX_OAUTH_TOKEN}" == "YOUR_OAUTH_TOK
   echo "  Запусти ./init.sh для OAuth и реальной выгрузки из Яндекс.Метрики."
   pnpm --filter @pca/backend run --if-present seed
 else
-  # GOAL_ID (если задан и > 0) включает метрики целей → KPI «заявки».
+  # GOAL_ID > 0 жёстко фиксирует цель KPI; иначе (0/не задан) sync сам определит основную цель
+  # (оплата/покупка) из списка целей Метрики — выбирать вручную не нужно.
   GOAL_ARG=""
   if [[ -n "${GOAL_ID:-}" && "${GOAL_ID}" != "0" ]]; then GOAL_ARG="--goalId=${GOAL_ID}"; fi
   pnpm --filter @pca/backend run --if-present sync ${GOAL_ARG}
