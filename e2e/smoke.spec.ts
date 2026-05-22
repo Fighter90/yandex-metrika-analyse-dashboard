@@ -136,6 +136,13 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       }),
     }),
   );
+  await page.route('**/api/report/insights', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ narrative: 'AI-анализ: визиты растут, конверсия стабильна.' }),
+    }),
+  );
   await page.route('**/api/report/generate', async (route) => {
     const body = JSON.parse(route.request().postData() ?? '{}') as { format?: string };
     const ext = body.format === 'pdf' ? 'pdf' : 'docx';
@@ -201,6 +208,8 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.docx/)).toBeVisible();
   await page.getByRole('button', { name: 'Export PDF' }).click();
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.pdf/)).toBeVisible();
+  await page.getByRole('button', { name: 'Сгенерировать AI-анализ' }).click();
+  await expect(page.getByText(/AI-анализ: визиты растут/)).toBeVisible();
 
   // Sources: look up a raw response by id and confirm the cached payload renders.
   await page.getByRole('link', { name: 'Sources' }).click();

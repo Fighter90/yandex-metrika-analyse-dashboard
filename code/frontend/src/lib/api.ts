@@ -88,6 +88,11 @@ export const api = {
     http<ReportSnapshot>('/report/snapshot', { method: 'POST', body: JSON.stringify(body) }),
   generateReport: (body: { snapshotId: string; format: 'docx' | 'pdf' }) =>
     http<{ filePath: string }>('/report/generate', { method: 'POST', body: JSON.stringify(body) }),
+  generateInsights: (snapshotId: string) =>
+    http<{ narrative: string }>('/report/insights', {
+      method: 'POST',
+      body: JSON.stringify({ snapshotId }),
+    }),
   sync: (body: { from: string; to: string; goalId?: number }) =>
     http<SyncSummary>('/sync', { method: 'POST', body: JSON.stringify(body) }),
 };

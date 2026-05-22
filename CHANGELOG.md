@@ -8,6 +8,11 @@
 
 ### Added
 
+- Итерация 29 — **AI-анализ на странице Report (UI)**: кнопка «Сгенерировать AI-анализ» вызывает
+  `POST /api/report/insights`, показывает нарратив с пометкой «интерпретация поверх точных цифр»,
+  состояния pending/ошибка (без ключа — понятное сообщение). Клиент `api.generateInsights`, чистый
+  хелпер `errorMessage`. 100% покрытие; e2e генерит AI-анализ на странице Report.
+
 - Итерация 28 — **развёртывание одной командой** (install → init → start): `./setup.sh` делает всё;
   `./init.sh` интерактивно создаёт `.env` и собирает Anthropic key + `COUNTER_ID` + `GOAL_ID`
   (+ опц. OAuth через `pnpm auth`). Чистый `setup/init-env.ts` (`applyInitValues`, переиспользует

@@ -3,7 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import type { ReportSnapshot } from '@pca/shared';
 import { renderWithProviders } from '../test/utils';
 
-vi.mock('../lib/api', () => ({ api: { buildSnapshot: vi.fn(), generateReport: vi.fn() } }));
+vi.mock('../lib/api', () => ({
+  api: { buildSnapshot: vi.fn(), generateReport: vi.fn(), generateInsights: vi.fn() },
+}));
 import { api } from '../lib/api';
 import { ReportPreviewView, ReportPreview } from './report-preview';
 
@@ -25,6 +27,10 @@ const baseProps = {
   exportPending: false,
   exportedPath: undefined,
   onExport: vi.fn(),
+  insightsPending: false,
+  narrative: undefined,
+  insightsError: undefined,
+  onInsights: vi.fn(),
 };
 
 describe('ReportPreviewView', () => {
@@ -66,6 +72,26 @@ describe('ReportPreviewView', () => {
     expect(exporting).toHaveLength(2);
     exporting.forEach((btn) => expect(btn).toBeDisabled());
   });
+
+  it('triggers AI insights, shows pending, the narrative, and an error', () => {
+    const onInsights = vi.fn();
+    const { rerender } = render(
+      <ReportPreviewView {...baseProps} snapshot={snapshot} onInsights={onInsights} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Сгенерировать AI-анализ' }));
+    expect(onInsights).toHaveBeenCalledWith('snap-1');
+
+    rerender(<ReportPreviewView {...baseProps} snapshot={snapshot} insightsPending />);
+    expect(screen.getByRole('button', { name: 'Анализирую…' })).toBeDisabled();
+
+    rerender(
+      <ReportPreviewView {...baseProps} snapshot={snapshot} narrative="Итог: рост заявок." />,
+    );
+    expect(screen.getByText(/Итог: рост заявок\./)).toBeInTheDocument();
+
+    rerender(<ReportPreviewView {...baseProps} snapshot={snapshot} insightsError="нет ключа" />);
+    expect(screen.getByRole('alert')).toHaveTextContent(/нет ключа/);
+  });
 });
 
 describe('ReportPreview (wrapper)', () => {
@@ -82,5 +108,16 @@ describe('ReportPreview (wrapper)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Export DOCX' }));
     expect(await screen.findByText(/Сохранено/)).toBeInTheDocument();
     expect(api.generateReport).toHaveBeenCalled();
+  });
+
+  it('generates an AI narrative for the snapshot', async () => {
+    vi.mocked(api.generateInsights).mockResolvedValue({ narrative: 'AI: рост заявок' });
+    renderWithProviders(<ReportPreview />);
+    fireEvent.click(screen.getByRole('button', { name: 'Сформировать snapshot' }));
+    expect(await screen.findByText(/snapshot snap-1/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Сгенерировать AI-анализ' }));
+    expect(await screen.findByText(/AI: рост заявок/)).toBeInTheDocument();
+    expect(vi.mocked(api.generateInsights).mock.calls[0]?.[0]).toBe('snap-1');
   });
 });

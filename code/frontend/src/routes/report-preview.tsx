@@ -3,6 +3,7 @@ import type { ReportSnapshot } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt } from '../lib/format';
+import { errorMessage } from '../lib/error-message';
 
 function Stat({ label, value }: { label: string; value: string }): JSX.Element {
   return (
@@ -20,6 +21,10 @@ export interface ReportPreviewProps {
   exportPending: boolean;
   exportedPath: string | undefined;
   onExport: (snapshotId: string, format: 'docx' | 'pdf') => void;
+  insightsPending: boolean;
+  narrative: string | undefined;
+  insightsError: string | undefined;
+  onInsights: (snapshotId: string) => void;
 }
 
 /** Pure preview: the snapshot summary that DOCX/PDF render from, plus export. */
@@ -30,6 +35,10 @@ export function ReportPreviewView({
   exportPending,
   exportedPath,
   onExport,
+  insightsPending,
+  narrative,
+  insightsError,
+  onInsights,
 }: ReportPreviewProps): JSX.Element {
   return (
     <section className="space-y-4">
@@ -84,6 +93,32 @@ export function ReportPreviewView({
               <span className="text-xs text-green-700">Сохранено: {exportedPath}</span>
             ) : null}
           </div>
+
+          <div className="space-y-2 border-t border-slate-100 pt-3">
+            <button
+              type="button"
+              onClick={() => onInsights(snapshot.id)}
+              disabled={insightsPending}
+              className="rounded bg-violet-600 px-3 py-1 text-sm text-white disabled:opacity-40"
+            >
+              {insightsPending ? 'Анализирую…' : 'Сгенерировать AI-анализ'}
+            </button>
+            {insightsError ? (
+              <p role="alert" className="text-xs text-red-600">
+                AI-анализ недоступен: {insightsError}
+              </p>
+            ) : null}
+            {narrative ? (
+              <div className="space-y-1">
+                <p className="text-xs text-violet-700">
+                  AI-анализ (интерпретация поверх точных цифр — проверяйте по данным):
+                </p>
+                <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-slate-50 p-3 text-xs text-slate-700">
+                  {narrative}
+                </pre>
+              </div>
+            ) : null}
+          </div>
         </div>
       ) : (
         <p className="text-slate-500">
@@ -99,6 +134,7 @@ export function ReportPreview(): JSX.Element {
   const { from, to } = useFilters();
   const buildMut = useMutation({ mutationFn: api.buildSnapshot });
   const exportMut = useMutation({ mutationFn: api.generateReport });
+  const insightsMut = useMutation({ mutationFn: api.generateInsights });
   return (
     <ReportPreviewView
       snapshot={buildMut.data}
@@ -107,6 +143,10 @@ export function ReportPreview(): JSX.Element {
       exportPending={exportMut.isPending}
       exportedPath={exportMut.data?.filePath}
       onExport={(snapshotId, format) => exportMut.mutate({ snapshotId, format })}
+      insightsPending={insightsMut.isPending}
+      narrative={insightsMut.data?.narrative}
+      insightsError={errorMessage(insightsMut.error)}
+      onInsights={(snapshotId) => insightsMut.mutate(snapshotId)}
     />
   );
 }
