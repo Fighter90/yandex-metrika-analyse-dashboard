@@ -13,16 +13,24 @@ function Stat({ label, value }: { label: string; value: string }): JSX.Element {
   );
 }
 
-/** Pure preview: the snapshot summary that DOCX/PDF will render from. */
+export interface ReportPreviewProps {
+  snapshot: ReportSnapshot | undefined;
+  isPending: boolean;
+  onBuild: () => void;
+  exportPending: boolean;
+  exportedPath: string | undefined;
+  onExport: (snapshotId: string) => void;
+}
+
+/** Pure preview: the snapshot summary that DOCX/PDF render from, plus export. */
 export function ReportPreviewView({
   snapshot,
   isPending,
   onBuild,
-}: {
-  snapshot: ReportSnapshot | undefined;
-  isPending: boolean;
-  onBuild: () => void;
-}): JSX.Element {
+  exportPending,
+  exportedPath,
+  onExport,
+}: ReportPreviewProps): JSX.Element {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
@@ -55,6 +63,19 @@ export function ReportPreviewView({
             <li>Solution-гипотез: {snapshot.hypotheses.solutions.length}</li>
             <li>Решений: {snapshot.decisions.length}</li>
           </ul>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onExport(snapshot.id)}
+              disabled={exportPending}
+              className="rounded border border-indigo-600 px-3 py-1 text-sm text-indigo-700 disabled:opacity-40"
+            >
+              {exportPending ? 'Экспорт…' : 'Export DOCX'}
+            </button>
+            {exportedPath ? (
+              <span className="text-xs text-green-700">Сохранено: {exportedPath}</span>
+            ) : null}
+          </div>
         </div>
       ) : (
         <p className="text-slate-500">
@@ -65,15 +86,19 @@ export function ReportPreviewView({
   );
 }
 
-/** Data wrapper: builds a snapshot for the current period via mutation. */
+/** Data wrapper: builds a snapshot, then exports it to DOCX. */
 export function ReportPreview(): JSX.Element {
   const { from, to } = useFilters();
-  const mut = useMutation({ mutationFn: api.buildSnapshot });
+  const buildMut = useMutation({ mutationFn: api.buildSnapshot });
+  const exportMut = useMutation({ mutationFn: api.generateReport });
   return (
     <ReportPreviewView
-      snapshot={mut.data}
-      isPending={mut.isPending}
-      onBuild={() => mut.mutate({ from, to })}
+      snapshot={buildMut.data}
+      isPending={buildMut.isPending}
+      onBuild={() => buildMut.mutate({ from, to })}
+      exportPending={exportMut.isPending}
+      exportedPath={exportMut.data?.filePath}
+      onExport={(snapshotId) => exportMut.mutate({ snapshotId, format: 'docx' })}
     />
   );
 }

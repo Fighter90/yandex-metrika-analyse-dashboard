@@ -3,17 +3,21 @@ import { z } from 'zod';
 import type { ReportSnapshot } from '@pca/shared';
 
 const SnapshotBody = z.object({ from: z.string(), to: z.string() });
+const GenerateBody = z.object({ snapshotId: z.string(), format: z.enum(['docx']) });
+
+export type ReportFormat = z.infer<typeof GenerateBody>['format'];
 
 export interface ReportRunner {
   build: (opts: { from: string; to: string }) => ReportSnapshot;
   get: (id: string) => ReportSnapshot | undefined;
+  generate: (snapshotId: string, format: ReportFormat) => Promise<{ filePath: string } | undefined>;
 }
 
 export interface ReportRouteOptions {
   readonly runner: ReportRunner;
 }
 
-/** Build/fetch immutable report snapshots. */
+/** Build/fetch immutable report snapshots and generate report files. */
 export async function reportRoutes(app: FastifyInstance, opts: ReportRouteOptions): Promise<void> {
   app.post('/report/snapshot', async (req, reply) => {
     const parsed = SnapshotBody.safeParse(req.body);
@@ -24,5 +28,12 @@ export async function reportRoutes(app: FastifyInstance, opts: ReportRouteOption
   app.get('/report/snapshot/:id', async (req, reply) => {
     const snap = opts.runner.get((req.params as { id: string }).id);
     return snap ?? reply.code(404).send({ error: 'not found' });
+  });
+
+  app.post('/report/generate', async (req, reply) => {
+    const parsed = GenerateBody.safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'invalid body' });
+    const result = await opts.runner.generate(parsed.data.snapshotId, parsed.data.format);
+    return result ?? reply.code(404).send({ error: 'snapshot not found' });
   });
 }

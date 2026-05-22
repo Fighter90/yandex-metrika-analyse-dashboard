@@ -67,6 +67,8 @@ export const api = {
   removeB2b: (id: number) => http<void>(`/b2b/${id}`, { method: 'DELETE' }),
   buildSnapshot: (body: { from: string; to: string }) =>
     http<ReportSnapshot>('/report/snapshot', { method: 'POST', body: JSON.stringify(body) }),
+  generateReport: (body: { snapshotId: string; format: 'docx' }) =>
+    http<{ filePath: string }>('/report/generate', { method: 'POST', body: JSON.stringify(body) }),
   sync: (body: { from: string; to: string; goalId?: number }) =>
     http<SyncSummary>('/sync', { method: 'POST', body: JSON.stringify(body) }),
 };
