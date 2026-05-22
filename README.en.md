@@ -13,7 +13,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product (releases v0.1.0–v0.9.0).** Available: the Metrika parser (live OAuth
+> ✅ **Status: working product (releases v0.1.0–v0.10.0).** Available: the Metrika parser (live OAuth
 > sync + demo data), an 11-page dashboard (Overview, Traffic, Audience, Behavior, Trends, Funnel,
 > B2B, Hypotheses, Decisions, Report, Sources), Voronkova hypotheses + Decision Log, deterministic
 > DOCX/PDF with an optional **AI analysis** (Anthropic), one-command deploy, 100% test coverage and

@@ -6,6 +6,11 @@
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-05-22
+
+> Подготовка к публичному репозиторию: счётчик Метрики больше не зашит в код/доки, внедрён
+> Spec-Driven Development, документация и QA-промпты актуализированы.
+
 ### Security
 
 - **Счётчик Метрики больше не «зашит» в код и документацию.** `COUNTER_ID` удалён из README/доков
@@ -293,7 +298,8 @@
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.
 - Шаблоны PR и Issue (bug, hypothesis), `dependabot.yml`.
 
-[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.6.0...v0.7.0
