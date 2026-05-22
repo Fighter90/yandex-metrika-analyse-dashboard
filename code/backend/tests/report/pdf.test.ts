@@ -45,11 +45,18 @@ const snapshot: ReportSnapshot = {
 };
 
 describe('reportHtml', () => {
-  it('produces an HTML document with the report sections', () => {
+  it('produces a ГОСТ-formatted HTML document (cover, TOC, numbered sections, A4/Times New Roman)', () => {
     const html = reportHtml(snapshot);
     expect(html.startsWith('<!doctype html>')).toBe(true);
-    expect(html).toContain('<h1>Executive Summary</h1>');
-    expect(html).toContain('ProductCamp · Конверсии и лидген · 2025-01-01 — 2025-01-07');
+    expect(html).toContain('@page{size:A4;margin:20mm 15mm 20mm 30mm}');
+    expect(html).toContain(
+      "font-family:'Times New Roman',Times,serif;font-size:14pt;line-height:1.5",
+    );
+    expect(html).toContain('class="cover"');
+    expect(html).toContain('Содержание');
+    expect(html).toContain('Период: 2025-01-01 — 2025-01-07');
+    expect(html).toContain('<h1>1. Executive Summary</h1>');
+    expect(html).toContain('<li>1. Executive Summary</li>');
   });
 
   it('escapes &, < and > in content', () => {
