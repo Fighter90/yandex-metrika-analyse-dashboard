@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Итерация 4 (старт) — фронтенд-дашборд: app shell (React Router + TanStack Query),
+  sticky-фильтры (Zustand: период-пресеты, сегмент, архивные), страница **Overview**
+  (KPI «заявка ≠ оплата», графики ECharts «заявки по дням» и «микс каналов»),
+  страницы-заглушки Traffic/Funnel/Hypotheses/Decisions. Типизированный API-клиент.
+  100% покрытие (Vitest + Testing Library, ECharts замокан), e2e обновлён под новый shell.
+
 ## [0.1.0] - 2026-05-22
 
 Первый релиз: рабочий backend (слой данных + Metrika-клиент + REST API) с 100% покрытием,
