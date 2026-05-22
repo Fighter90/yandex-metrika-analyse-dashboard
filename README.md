@@ -13,15 +13,11 @@
 
 > **KPI кампании:** 300+ **платных** билетов. Везде в инструменте: **заявка ≠ оплата**.
 
-> ✅ **Статус: рабочий продукт.** Доступно: парсер Метрики (живой OAuth-sync + демо-данные),
-> дашборд из 11 страниц (Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses,
-> Decisions, Report, Sources), гипотезы по Воронковой + Decision Log, детерминированные DOCX/PDF
-> с опциональным **AI-анализом** (Anthropic), 100% покрытие тестами и полный CI/CD. Релизы
-> v0.1.0–v0.5.0.
-
-## Скриншоты
-
-_Появятся по мере готовности страниц: Overview, Hypotheses, Decisions, Report Preview._
+> ✅ **Статус: рабочий продукт (релизы v0.1.0–v0.7.0).** Доступно: парсер Метрики (живой OAuth-sync +
+> демо-данные), дашборд из 11 страниц (Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B,
+> Hypotheses, Decisions, Report, Sources), гипотезы по Воронковой + Decision Log, детерминированные
+> DOCX/PDF с опциональным **AI-анализом** (Anthropic), развёртывание одной командой, 100% покрытие
+> тестами и полный CI/CD. Проверено на живых данных счётчика `54280963`.
 
 ## Quickstart
 
@@ -97,7 +93,8 @@ pnpm auth        # из корня репозитория
                           snapshot-builder ──▶ DOCX / PDF (детерминированно)
 ```
 
-Полная диаграмма (mermaid) — в [docs/architecture.md](docs/architecture.md) _(добавляется в итерации 11)_.
+Полная диаграмма и слои — в [docs/architecture.md](docs/architecture.md); модель БД —
+[docs/data-model.md](docs/data-model.md).
 
 ## Технологический стек
 
@@ -124,6 +121,80 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 [**Voronik1801 / Podlodka_crew_AI_Product**](https://github.com/Voronik1801/Podlodka_crew_AI_Product)
 (с атрибуцией в каждом файле `.claude/skills/`).
 
+## Что делает проект (по логике кода)
+
+Сквозной поток данных, как он реализован в коде:
+
+1. **Аутентификация (OAuth).** `code/backend/src/metrika/oauth.ts` + CLI `cli-auth.ts` (`pnpm auth`)
+   реализуют Yandex ID authorization-code flow: строят ссылку авторизации, обменивают код
+   подтверждения на токен (`POST https://oauth.yandex.ru/token`) и пишут `YANDEX_OAUTH_TOKEN` в `.env`.
+2. **Парсер / ETL.** `SyncService` (`metrika/sync-service.ts`) через `MetrikaClient` (token-bucket
+   лимитер, backoff-retry, Zod-валидация ответов) тянет отчёты Stat API **дневными чанками** и для
+   каждого среза вызывает запрос-модуль из `metrika/queries/`:
+   - `traffic-by-source` → `channel_stats` (визиты/пользователи/отказы/заявки/CR по каналам);
+   - `utm-breakdown` → `utm_stats`; `geo-device-breakdown` → `geo_device_stats`;
+   - `page-behavior` (startURL) → `page_stats`; `exit-page-behavior` (exitURL) → `exit_page_stats`.
+     Каждый **сырой** ответ сохраняется в `raw_responses` (прослеживаемость), затем нормализуется в
+     производные таблицы. Проценты Метрики (`bounceRate`, `conversionRate`) нормализуются в долю 0–1
+     (`queries/ratio.ts`). Опциональные разбивки синхронятся **best-effort**: недоступный атрибут не
+     валит весь пайплайн. Без токена `pnpm seed` кладёт детерминированные демо-данные.
+3. **Хранилище.** SQLite (`better-sqlite3`, WAL + FK), миграции `db/migrations/001..009`, доступ
+   только через репозитории (`db/repositories/`). История копится **по дням** (повторный sync
+   дополняет, не затирая) — отсюда WoW-сравнения и воспроизводимость.
+4. **API.** Fastify (`app.ts`) отдаёт `/api/metrics/*`, `/api/hypotheses`, `/api/decisions`,
+   `/api/b2b`, `/api/report/*`, `/api/sync`; Swagger на `/docs`. Репозитории инжектятся в
+   `buildServer(deps)`.
+5. **Дашборд.** React + TanStack Query читает API; страницы — паттерн «чистая View(status,…) + тонкий
+   data-wrapper»; графики на ECharts. KPI всюду разделяет **заявку и оплату**.
+6. **Отчёт.** `SnapshotBuilder` собирает **неизменяемый** `ReportSnapshot` из БД (детерминированно:
+   `id` и `generatedAt` — входные параметры, без `Date.now()`/LLM в render-пути). `reportSections`
+   даёт общий контент для DOCX (`docx/builder.ts`) и PDF (`pdf/html.ts` → `pdf/renderer.ts` через
+   puppeteer-core). Опциональный **AI-анализ** генерится отдельно из чисел снапшота.
+
+## Виды отчётов и как их строить (end-to-end)
+
+Отчёт строится из **immutable-снапшота** — это гарантирует, что один `snapshotId` всегда даёт один и
+тот же контент (anti-hallucination + воспроизводимость).
+
+**Что входит в отчёт** (секции `reportSections`):
+
+- Cover (период, id снапшота, цель), **Executive Summary** (заявки B2C, оплачено B2B, gap — «заявка ≠
+  оплата»), **Methodology** (Double Diamond + Воронкова, с атрибуцией);
+- **Define — Problem Hypotheses** и **Develop — Solution Hypotheses** (с ICE и дедлайнами);
+- **Deliver — Decision Log** (DL-{N} с исходами);
+- **Топ-разбивки**: UTM, гео+устройство, страницы входа, страницы выхода (топ-5 по визитам);
+- **AI-анализ** (если сгенерирован) — отдельная помеченная секция;
+- **Data Appendix** (каналы за период).
+
+**Форматы:** **DOCX** (работает из коробки) и **PDF** (нужен локальный Chrome через
+`PUPPETEER_EXECUTABLE_PATH`). Файлы пишутся в `data/reports/{snapshotId}.{docx|pdf}`.
+
+**Шаги (через дашборд, страница Report):**
+
+1. Выберите период в шапке. Нажмите **«Сформировать snapshot»** → `POST /api/report/snapshot` строит
+   и сохраняет снапшот, показывает сводку KPI.
+2. (Опц.) **«Сгенерировать AI-анализ»** → `POST /api/report/insights` вызывает Anthropic из чисел
+   снапшота, сохраняет нарратив в снапшот (помечен как интерпретация). Без `ANTHROPIC_API_KEY` —
+   понятное сообщение, отчёт строится без AI-секции.
+3. **Export DOCX** / **Export PDF** → `POST /api/report/generate` рендерит файл из снапшота.
+
+**Шаги (через API напрямую):**
+
+```bash
+# 1) собрать снапшот за период
+SID=$(curl -s -X POST localhost:4000/api/report/snapshot -H 'content-type: application/json' \
+  -d '{"from":"2026-05-09","to":"2026-05-22"}' | jq -r .id)
+# 2) (опц.) AI-анализ
+curl -s -X POST localhost:4000/api/report/insights -H 'content-type: application/json' \
+  -d "{\"snapshotId\":\"$SID\"}"
+# 3) сгенерировать файл (docx | pdf)
+curl -s -X POST localhost:4000/api/report/generate -H 'content-type: application/json' \
+  -d "{\"snapshotId\":\"$SID\",\"format\":\"docx\"}"
+```
+
+Любое число в отчёте прослеживается до `raw_responses` в SQLite (на дашборде — страница **Sources**
+по `raw_response_id`).
+
 ## Структура проекта
 
 ```
@@ -133,10 +204,13 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 │   ├── frontend/   # React + Vite дашборд
 │   └── shared/     # общие типы и константы (ICE_CONFIG)
 ├── .claude/skills/ # 4 skill-промпта Воронковой (с атрибуцией)
-├── docs/           # архитектура, методология, руководство пользователя, ADR
+├── docs/           # архитектура, модель данных, методология, руководство, runbook, ADR
+├── QA/             # промпты для тестирования: регресс + UX (аналитик/проектировщик/дизайнер)
 ├── data/           # SQLite + отчёты + экспорт DL (gitignored)
 ├── CLAUDE.md       # контекст продукта для AI-агентов
-└── run.sh          # запуск одной командой
+├── setup.sh        # одна команда: install → init → start
+├── init.sh         # интерактивная инициализация .env
+└── run.sh          # запуск (миграции → sync/seed → дашборд)
 ```
 
 ## CLI-команды
@@ -157,26 +231,33 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
 
 ## CI/CD
 
-`.github/workflows/ci.yml` на каждый push/PR: `install → lint → typecheck → test → build`
-и заливает артефакт сборки frontend. `e2e.yml` и `release.yml` — в итерации 11.
+Полный набор пайплайнов на каждый push/PR (все зелёные, покрытие 100%):
 
-## Roadmap
+- **ci.yml** — `lint → format:check → typecheck → coverage (Node 20 + 22) → build` + actionlint + gate;
+- **e2e.yml** — Playwright (smoke по всему дашборду);
+- **security.yml** — gitleaks + `pnpm audit` (high+);
+- **review.yml** — AI code-review (если задан `ANTHROPIC_API_KEY` в секретах репо);
+- **pr-lint.yml** — Conventional PR title;
+- **release.yml** — по тегу `v*.*.*`: verify → упаковка (app tar.gz + frontend zip + checksums) → GitHub Release.
 
-- [x] **Итерация 0** — скелет, skill-файлы, CLAUDE.md, run.sh, CI.
-- [x] **1** — SQLite + миграции 001–005 + repository pattern + тесты.
-- [x] **2** — Metrika-клиент (OAuth, Zod, rate limiter, retry) + `POST /api/sync`.
-- [x] **3** — Backend API (metrics/hypotheses/decisions/b2b) + Swagger.
-- [ ] **4–5** — Дашборд: Overview, Traffic, Funnel, Behavior, Forms, B2B.
-- [ ] **6** — Hypotheses (формат Воронковой, валидации, ICE-product, ICEScatter).
-- [ ] **7** — Decisions (Decision Log, авто-апдейт статуса, экспорт .md).
-- [ ] **8–10** — Snapshot + Report Preview + DOCX + PDF.
-- [ ] **11** — Polish, e2e, docs, ADR, release.
+## Готово (статус по итерациям)
+
+- [x] Скелет, SQLite + миграции, repository pattern, тесты, CI/CD, версионирование.
+- [x] Metrika-клиент (OAuth, Zod, rate limiter, retry) + `POST /api/sync`, CLI `pnpm auth`/`sync`/`seed`.
+- [x] Backend API (metrics/hypotheses/decisions/b2b/report) + Swagger `/docs`.
+- [x] Дашборд: Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses, Decisions, Report, Sources.
+- [x] Гипотезы по Воронковой (формат + валидация + ICE-product) и Decision Log с авто-апдейтом статуса.
+- [x] Snapshot + Report Preview + детерминированные DOCX/PDF + опциональный AI-анализ (Anthropic).
+- [x] Графики (тултипы с разделителями, значения на барах), пустые состояния, развёртывание одной командой.
+- [x] Проверено на живых данных Метрики; security-аудит + ужесточённый `.gitignore`.
 
 ### Known limitations
 
 - B2B — ручной ввод (`b2b_manual`), Метрика B2B-пайплайн не покрывает.
 - UTM-разметка неравномерная: сегменты с покрытием < 70% помечаются `low_utm_coverage`.
 - Цели с `id < ARCHIVED_GOAL_ID_THRESHOLD` (по умолчанию 77) считаются архивными.
+- `ym:s:exitURL` не поддерживается Stat API → таблица «Страницы выхода» на живых данных пустая.
+- PDF требует локального Chrome (`PUPPETEER_EXECUTABLE_PATH`); DOCX — без зависимостей.
 
 ## License · Authors · Credits
 
