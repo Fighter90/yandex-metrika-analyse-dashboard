@@ -10,6 +10,7 @@ import {
   summarizeChannels,
   weakSpots,
 } from '../lib/overview';
+import { dailySeries, trendsOption } from '../lib/trends';
 import { EChart } from '../components/charts/EChart';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
@@ -47,6 +48,9 @@ export function OverviewView({
         <Kpi label="Заявок (goal reaches)" value={formatInt(kpi.reaches)} hint="заявка ≠ оплата" />
         <Kpi label="Gap до цели" value={formatInt(kpi.gap)} />
       </div>
+      <Card title="Визиты и заявки по дням">
+        <EChart option={trendsOption(dailySeries(stats))} />
+      </Card>
       <Card title="Заявки по дням">
         <EChart option={dailyReachesOption(stats)} />
       </Card>

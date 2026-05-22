@@ -38,7 +38,8 @@ describe('OverviewView', () => {
     render(<OverviewView status="success" stats={[sample]} />);
     expect(screen.getByText('Цель (платных билетов)')).toBeInTheDocument();
     expect(screen.getByText(/Заявок/)).toBeInTheDocument();
-    expect(screen.getAllByTestId('echart')).toHaveLength(2);
+    expect(screen.getByText('Визиты и заявки по дням')).toBeInTheDocument();
+    expect(screen.getAllByTestId('echart')).toHaveLength(3);
     expect(screen.getByText(/Нет слабых мест/)).toBeInTheDocument();
     expect(screen.queryByText(/KPI-цель определена автоматически/)).not.toBeInTheDocument();
   });
