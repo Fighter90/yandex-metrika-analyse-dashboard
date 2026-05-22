@@ -8,6 +8,11 @@
 
 ### Added
 
+- Итерация 2 — Metrika-клиент: OAuth (`Authorization: OAuth`), token-bucket rate limiter,
+  retry с экспоненциальным backoff + jitter, Zod-валидация с дампом ошибок в `data/errors/`,
+  pino-логгер с редактированием токена. Запрос traffic-by-source + goals, дневные чанки для
+  периодов >7 дней, `SyncService` (raw_responses + channel_stats, история по дням), `POST /api/sync`,
+  CLI `pnpm --filter @pca/backend sync` (мягко пропускает без токена). 94 теста, 100% покрытие.
 - Итерация 1 — слой данных: SQLite (`better-sqlite3`), миграции 001–005, runner с трекингом,
   repository pattern (metrics/hypotheses/decisions/b2b/snapshot), общие типы и Voronkova-валидация
   в `@pca/shared`. Гипотеза без ≥3 допущений/≥2 методов отклоняется на уровне репозитория;

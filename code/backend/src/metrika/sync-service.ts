@@ -1,0 +1,77 @@
+import type { Goal } from '@pca/shared';
+import type { MetricsRepo } from '../db/repositories/metrics-repo';
+import { dayChunks } from '../utils/date-range';
+import { stableHash } from '../utils/hash';
+import type { MetrikaClient } from './client';
+import { ENDPOINTS } from './endpoints';
+import { GoalsResponseSchema } from './schemas';
+import { trafficBySource } from './queries/traffic-by-source';
+
+export interface SyncDeps {
+  readonly client: MetrikaClient;
+  readonly metrics: MetricsRepo;
+  readonly counterId: number;
+  /** Goals with id below this threshold are flagged archived (§5.5). */
+  readonly archivedThreshold: number;
+  /** ISO timestamp source (injectable for deterministic tests). */
+  readonly now: () => string;
+}
+
+export interface SyncSummary {
+  readonly goals: number;
+  readonly days: number;
+  readonly channelRows: number;
+}
+
+/** Pulls Metrika data into SQLite: raw responses (for traceability) + derived channel stats. */
+export class SyncService {
+  constructor(private readonly deps: SyncDeps) {}
+
+  async syncGoals(): Promise<number> {
+    const res = await this.deps.client.get(
+      ENDPOINTS.goals(this.deps.counterId),
+      {},
+      GoalsResponseSchema,
+    );
+    const goals: Goal[] = res.goals.map((g) => ({
+      id: g.id,
+      name: g.name,
+      type: g.type,
+      isB2b: false,
+      isArchived: g.id < this.deps.archivedThreshold,
+      syncedAt: this.deps.now(),
+    }));
+    this.deps.metrics.upsertGoals(goals);
+    return goals.length;
+  }
+
+  async syncTraffic(from: string, to: string, goalId?: number): Promise<{ days: number; rows: number }> {
+    const chunks = dayChunks(from, to);
+    let rows = 0;
+    for (const chunk of chunks) {
+      const { raw, stats } = await trafficBySource(this.deps.client, {
+        counterId: this.deps.counterId,
+        from: chunk.from,
+        to: chunk.to,
+        goalId,
+      });
+      this.deps.metrics.saveRawResponse({
+        endpoint: ENDPOINTS.statData,
+        queryHash: stableHash({ q: 'traffic-by-source', goalId, from: chunk.from, to: chunk.to }),
+        dateFrom: chunk.from,
+        dateTo: chunk.to,
+        payload: raw,
+        fetchedAt: this.deps.now(),
+      });
+      this.deps.metrics.upsertChannelStats(stats);
+      rows += stats.length;
+    }
+    return { days: chunks.length, rows };
+  }
+
+  async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
+    const goals = await this.syncGoals();
+    const { days, rows } = await this.syncTraffic(from, to, goalId);
+    return { goals, days, channelRows: rows };
+  }
+}
