@@ -4,7 +4,7 @@
 
 How to use the dashboard and generate reports. For the "Conversions & lead-gen" track team.
 
-> ✅ **Status: working product (v0.7.0).** All pages below, live Metrika sync, deterministic
+> ✅ **Status: working product (v0.8.0).** All pages below, live Metrika sync, deterministic
 > DOCX/PDF reports and the optional AI analysis are available. Run with `./setup.sh`.
 
 ## 1. What it is and why

@@ -6,8 +6,19 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-05-22
+
+> Детальный отчёт на ≥25 страниц A4 (DOCX/PDF/на экране) с полным раскрытием каждой гипотезы и
+> приоритизацией, плюс полная Playwright-пирамида e2e на каждый функционал.
+
 ### Added
 
+- Итерация 34 — **Playwright-пирамида e2e**: общий слой моков `e2e/fixtures.ts` (stateful CRUD для
+  B2B/гипотез/решений, read-only метрики, отчёт, режим принудительных ошибок) и фокусные спеки на
+  каждый функционал — рендер страниц дашборда + error-state, B2B CRUD, редактор гипотез (гейтинг +
+  создание), Decision Log (гейтинг + создание), фильтры, отчёт (снапшот + полный отчёт на экране +
+  экспорт DOCX/PDF + AI-анализ), Sources (поиск + not-found). `smoke.spec` переписан в кросс-страничный
+  navigation-journey. 24 теста / 8 спеков, зелёные в CI.
 - Итерация 33 — **детальный отчёт (≥25 страниц A4)**: `reportSections` вынесен в `@pca/shared` —
   единый источник контента для DOCX, PDF и экрана. Каждая гипотеза рендерится полностью (формат
   Воронковой, все скрытые допущения по категориям, методы проверки, разбор ICE с обоснованиями,
@@ -237,7 +248,8 @@
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.
 - Шаблоны PR и Issue (bug, hypothesis), `dependabot.yml`.
 
-[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.4.0...v0.5.0
