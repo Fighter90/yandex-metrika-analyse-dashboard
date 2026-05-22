@@ -23,6 +23,14 @@ playwright-report/
 /data/decisions/*
 !/data/decisions/.gitkeep
 
+# Local SQLite + raw API error dumps must NEVER be committed (real Metrika data), from any path —
+# the CLIs write these relative to their cwd (e.g. code/backend/data/ when run there).
+**/data/errors/
+**/*.sqlite
+**/*.sqlite-shm
+**/*.sqlite-wal
+code/backend/data/
+
 # logs / os
 *.log
 .DS_Store
