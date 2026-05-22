@@ -8,109 +8,29 @@
  * rationale, the traffic-light thresholds, deadline and status), plus a prioritization section and
  * an expanded Decision Log. With a populated dataset this yields a detailed multi-page document.
  */
-import type {
-  AssumptionCategory,
-  Hypothesis,
-  HypothesisStatus,
-  ValidationMethodType,
-} from './types/hypotheses';
+import type { Hypothesis } from './types/hypotheses';
 import type { Decision } from './types/decisions';
-import type {
-  GeoDeviceBreakdownRow,
-  PageBreakdownRow,
-  ReportSnapshot,
-  UtmBreakdownRow,
-} from './types/report';
-import { iceBucket, type IceBucket } from './validation';
+import type { ReportSnapshot } from './types/report';
+import { iceBucket } from './validation';
+import {
+  BUCKET_LABEL,
+  CATEGORY_LABEL,
+  KIND_LABEL,
+  METHOD_LABEL,
+  STATUS_LABEL,
+  channelLine,
+  channelTotals,
+  geoLine,
+  pageLine,
+  pct,
+  priorityLine,
+  utmLine,
+  voronkovaStatement,
+} from './report-section-helpers';
 
 export interface ReportSection {
   readonly heading: string;
   readonly lines: string[];
-}
-
-const CATEGORY_LABEL: Record<AssumptionCategory, string> = {
-  behavior: 'Поведение',
-  market: 'Рынок',
-  tech: 'Технологии',
-};
-
-const METHOD_LABEL: Record<ValidationMethodType, string> = {
-  synthetic: 'Синтетический CustDev',
-  live: 'Живой тест',
-  quantitative: 'Количественный анализ',
-  market: 'Рыночное исследование',
-};
-
-const STATUS_LABEL: Record<HypothesisStatus, string> = {
-  draft: 'черновик',
-  in_progress: 'в работе',
-  green: '🟢 подтверждена',
-  yellow: '🟡 частично подтверждена',
-  red: '🔴 опровергнута',
-  expired: '⏳ просрочена',
-};
-
-const BUCKET_LABEL: Record<IceBucket, string> = {
-  low: 'низкий',
-  medium: 'средний',
-  high: 'высокий',
-  top: 'топ-приоритет',
-};
-
-const KIND_LABEL = { problem: 'проблема', solution: 'решение' } as const;
-
-/** Full Voronkova statement: «{subject} {action} {solution}, если {condition}». */
-function voronkovaStatement(h: Hypothesis): string {
-  return `«${h.subject} ${h.action} ${h.solution}, если ${h.condition}»`;
-}
-
-function utmLine(u: UtmBreakdownRow): string {
-  const cr = u.visits > 0 ? ((u.goalReaches / u.visits) * 100).toFixed(1) : '0.0';
-  return `${u.source} / ${u.medium} / ${u.campaign}: визитов ${u.visits}, заявок ${u.goalReaches} (CR ${cr}%)`;
-}
-
-function geoLine(g: GeoDeviceBreakdownRow): string {
-  const cr = g.visits > 0 ? ((g.goalReaches / g.visits) * 100).toFixed(1) : '0.0';
-  return `${g.country} · ${g.device}: визитов ${g.visits}, заявок ${g.goalReaches} (CR ${cr}%)`;
-}
-
-function pageLine(p: PageBreakdownRow): string {
-  return `${p.page}: визитов ${p.visits}, отказы ${(p.bounceRate * 100).toFixed(1)}%, заявок ${p.goalReaches}`;
-}
-
-function channelLine(c: ReportSnapshot['channels'][number]): string {
-  const cr = c.visits > 0 ? ((c.goalReaches / c.visits) * 100).toFixed(1) : '0.0';
-  return `${c.date} · ${c.channel}: визитов ${c.visits}, заявок ${c.goalReaches} (CR ${cr}%), отказы ${(c.bounceRate * 100).toFixed(1)}%`;
-}
-
-function pct(numerator: number, denominator: number): string {
-  return denominator > 0 ? `${((numerator / denominator) * 100).toFixed(1)}%` : '0.0%';
-}
-
-interface ChannelTotal {
-  channel: string;
-  visits: number;
-  goalReaches: number;
-}
-
-/** Aggregate the per-date channel rows into per-channel totals, busiest first. */
-function channelTotals(channels: ReportSnapshot['channels']): ChannelTotal[] {
-  const map = new Map<string, ChannelTotal>();
-  for (const c of channels) {
-    const cur = map.get(c.channel) ?? { channel: c.channel, visits: 0, goalReaches: 0 };
-    cur.visits += c.visits;
-    cur.goalReaches += c.goalReaches;
-    map.set(c.channel, cur);
-  }
-  return [...map.values()].sort(
-    (a, b) => b.visits - a.visits || a.channel.localeCompare(b.channel),
-  );
-}
-
-/** One-line ICE summary used in the prioritization table. */
-function priorityLine(h: Hypothesis, rank: number): string {
-  const bucket = BUCKET_LABEL[iceBucket(h.iceScore)];
-  return `${rank}. [ICE ${h.iceScore} · ${bucket}] ${KIND_LABEL[h.kind]}: ${voronkovaStatement(h)} — статус: ${STATUS_LABEL[h.status]}, дедлайн ${h.deadlineAt}`;
 }
 
 /** A full per-hypothesis section: every Voronkova field spelled out for the report reader. */
