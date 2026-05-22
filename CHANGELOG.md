@@ -8,6 +8,11 @@
 
 ### Added
 
+- Итерация 9 — генерация **DOCX**: детерминированный контент отчёта (`reportSections`: cover,
+  executive summary, methodology с атрибуцией Воронковой, define/develop гипотезы, deliver/Decision Log,
+  data appendix), рендер через `docx` (`buildDocx`), роут `POST /api/report/generate` (формат docx) и
+  кнопка **Export DOCX** на странице Report. 100% покрытие; e2e: build snapshot → export. Байт-идентичность
+  аппроксимирована детерминизмом контента (zip-таймстемпы — known limitation).
 - Итерация 8 — страница **Report Preview**: кнопка «Сформировать snapshot» (`POST /api/report/snapshot`
   за выбранный период) и сводка (KPI заявка/оплата, счётчики каналов/гипотез/решений, период и время
   генерации) — то же, что пойдёт в DOCX/PDF. Пункт Report в навигации. 100% покрытие, e2e.
