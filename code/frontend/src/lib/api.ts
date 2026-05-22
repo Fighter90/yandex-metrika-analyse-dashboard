@@ -68,6 +68,7 @@ export const api = {
   exitPages: (range?: { from: string; to: string }) =>
     http<PageStat[]>(`/metrics/exit-pages${range ? `?from=${range.from}&to=${range.to}` : ''}`),
   goals: (archived = false) => http<Goal[]>(`/metrics/goals${archived ? '?archived=true' : ''}`),
+  primaryGoal: () => http<Goal>('/metrics/primary-goal'),
   rawResponse: (id: number) => http<RawResponse>(`/metrics/raw/${id}`),
   hypotheses: () => http<Hypothesis[]>('/hypotheses'),
   createHypothesis: (h: NewHypothesis) =>

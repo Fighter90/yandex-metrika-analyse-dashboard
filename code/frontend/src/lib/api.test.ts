@@ -47,6 +47,7 @@ describe('api client', () => {
     await api.exitPages({ from: '2025-01-01', to: '2025-01-07' });
     await api.goals();
     await api.goals(true);
+    await api.primaryGoal();
     await api.rawResponse(42);
     expect(calls[0]).toBe('/api/metrics/channels');
     expect(calls[1]).toContain('from=2025-01-01&to=2025-01-07');
@@ -60,7 +61,8 @@ describe('api client', () => {
     expect(calls[9]).toContain('/api/metrics/exit-pages?from=2025-01-01&to=2025-01-07');
     expect(calls[10]).toBe('/api/metrics/goals');
     expect(calls[11]).toContain('archived=true');
-    expect(calls[12]).toBe('/api/metrics/raw/42');
+    expect(calls[12]).toBe('/api/metrics/primary-goal');
+    expect(calls[13]).toBe('/api/metrics/raw/42');
   });
 
   it('POSTs create-hypothesis and sync with JSON bodies', async () => {

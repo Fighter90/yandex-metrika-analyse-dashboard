@@ -143,6 +143,18 @@ export async function installMocks(page: Page, opts: MockOptions = {}): Promise<
   await metric('pages', '**/api/metrics/pages*', PAGES);
   await metric('exit-pages', '**/api/metrics/exit-pages*', EXIT_PAGES);
   await metric('goals', '**/api/metrics/goals*', []);
+  await page.route('**/api/metrics/primary-goal', (r) =>
+    fail.has('primary-goal')
+      ? json(r, { error: 'no primary goal detected' }, 404)
+      : json(r, {
+          id: 8,
+          name: 'Ecommerce: покупка',
+          type: 'action',
+          isB2b: false,
+          isArchived: false,
+          syncedAt: '2025-01-01T00:00:00.000Z',
+        }),
+  );
 
   await page.route('**/api/metrics/raw/*', (r) => {
     const id = r.request().url().split('/').pop() ?? '';

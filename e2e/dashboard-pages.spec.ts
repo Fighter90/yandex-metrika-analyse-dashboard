@@ -2,13 +2,18 @@ import { test, expect } from '@playwright/test';
 import { installMocks } from './fixtures';
 
 test.describe('Read-only dashboard pages render their data', () => {
-  test('Overview: KPI strip + weak spots + charts', async ({ page }) => {
+  test('Overview: KPI strip + weak spots + charts + auto-detected KPI goal badge', async ({
+    page,
+  }) => {
     await installMocks(page);
     await page.goto('/');
     await expect(page.getByText('Цель (платных билетов)')).toBeVisible();
     await expect(page.getByText(/Заявок/)).toBeVisible();
     await expect(page.getByText(/Слабые места/)).toBeVisible();
     await expect(page.locator('canvas').first()).toBeVisible();
+    // The auto-detected KPI goal is surfaced (no manual GOAL_ID needed).
+    await expect(page.getByText(/KPI-цель определена автоматически/)).toBeVisible();
+    await expect(page.getByText('Ecommerce: покупка')).toBeVisible();
   });
 
   test('Traffic: channel chart + UTM table', async ({ page }) => {

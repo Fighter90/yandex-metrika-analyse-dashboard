@@ -18,9 +18,11 @@ export type QueryStatus = 'pending' | 'error' | 'success';
 export function OverviewView({
   status,
   stats,
+  primaryGoalName,
 }: {
   status: QueryStatus;
   stats: ChannelStat[];
+  primaryGoalName?: string;
 }): JSX.Element {
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
@@ -34,6 +36,12 @@ export function OverviewView({
   const weak = weakSpots(stats);
   return (
     <section className="space-y-6">
+      {primaryGoalName ? (
+        <p className="rounded border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
+          KPI-цель определена автоматически: <b>{primaryGoalName}</b> — на её достижениях строятся
+          заявки. Чтобы зафиксировать другую, задайте <code>GOAL_ID</code>.
+        </p>
+      ) : null}
       <div className="grid grid-cols-3 gap-4">
         <Kpi label="Цель (платных билетов)" value={formatInt(kpi.target)} />
         <Kpi label="Заявок (goal reaches)" value={formatInt(kpi.reaches)} hint="заявка ≠ оплата" />
@@ -72,7 +80,9 @@ export function Overview(): JSX.Element {
     queryKey: ['channels', from, to],
     queryFn: () => api.channels({ from, to }),
   });
-  return <OverviewView status={q.status} stats={q.data ?? []} />;
+  // The auto-detected KPI goal — independent of the date range. Absent (404) → badge hidden.
+  const goal = useQuery({ queryKey: ['primary-goal'], queryFn: api.primaryGoal, retry: false });
+  return <OverviewView status={q.status} stats={q.data ?? []} primaryGoalName={goal.data?.name} />;
 }
 
 function Kpi({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {
