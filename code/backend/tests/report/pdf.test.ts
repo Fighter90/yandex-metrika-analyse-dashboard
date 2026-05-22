@@ -41,6 +41,7 @@ const snapshot: ReportSnapshot = {
     solutions: [],
   },
   decisions: [],
+  breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
 };
 
 describe('reportHtml', () => {

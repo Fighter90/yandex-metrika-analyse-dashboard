@@ -73,7 +73,7 @@ On the **Report Preview** page:
 
 1. Pick the period and the data cut-off date.
 2. Tick the sections (Cover, Executive Summary, Methodology, Discover, Define, Develop,
-   Deliver, Data Appendix).
+   Deliver, top breakdowns UTM / geo+device / entry & exit pages, Data Appendix).
 3. Click **Export DOCX** or **Export PDF**.
 
 Via CLI without UI _(Iterations 9–10)_:

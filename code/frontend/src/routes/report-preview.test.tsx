@@ -15,6 +15,7 @@ const snapshot: ReportSnapshot = {
   channels: [],
   hypotheses: { problems: [], solutions: [] },
   decisions: [],
+  breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
 };
 
 const baseProps = {

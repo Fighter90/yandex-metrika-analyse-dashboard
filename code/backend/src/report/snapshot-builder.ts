@@ -3,6 +3,7 @@ import type { MetricsRepo } from '../db/repositories/metrics-repo';
 import type { HypothesesRepo } from '../db/repositories/hypotheses-repo';
 import type { DecisionsRepo } from '../db/repositories/decisions-repo';
 import type { B2bRepo } from '../db/repositories/b2b-repo';
+import { topUtm, topGeoDevice, topPages } from './breakdowns';
 
 export interface SnapshotBuilderDeps {
   readonly metrics: MetricsRepo;
@@ -26,7 +27,8 @@ export class SnapshotBuilder {
   constructor(private readonly deps: SnapshotBuilderDeps) {}
 
   build(opts: BuildOptions): ReportSnapshot {
-    const channels = this.deps.metrics.listChannelStats({ from: opts.from, to: opts.to });
+    const range = { from: opts.from, to: opts.to };
+    const channels = this.deps.metrics.listChannelStats(range);
     const all = this.deps.hypotheses.list();
     const decisions = this.deps.decisions.list();
     const b2b = this.deps.b2b.list();
@@ -52,6 +54,12 @@ export class SnapshotBuilder {
         solutions: all.filter((h) => h.kind === 'solution'),
       },
       decisions,
+      breakdowns: {
+        utm: topUtm(this.deps.metrics.listUtmStats(range)),
+        geoDevice: topGeoDevice(this.deps.metrics.listGeoDeviceStats(range)),
+        entryPages: topPages(this.deps.metrics.listPageStats(range)),
+        exitPages: topPages(this.deps.metrics.listExitPageStats(range)),
+      },
     };
   }
 }

@@ -76,7 +76,7 @@
 
 1. Выберите период и дату отсечки данных.
 2. Отметьте чекбоксами нужные секции (Cover, Executive Summary, Methodology, Discover,
-   Define, Develop, Deliver, Data Appendix).
+   Define, Develop, Deliver, топ-разбивки UTM / гео+устройство / страницы входа и выхода, Data Appendix).
 3. Нажмите **Export DOCX** или **Export PDF**.
 
 Через CLI без UI _(итерация 9–10)_:

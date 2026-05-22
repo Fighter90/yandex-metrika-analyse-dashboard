@@ -33,6 +33,51 @@ beforeEach(() => {
       conversionRate: 0.07,
     },
   ]);
+  metrics.upsertUtmStats([
+    {
+      date: '2025-01-02',
+      utmSource: 'vk',
+      utmMedium: 'cpc',
+      utmCampaign: 'spring',
+      visits: 80,
+      users: 70,
+      goalReaches: 4,
+      conversionRate: 0.05,
+    },
+  ]);
+  metrics.upsertGeoDeviceStats([
+    {
+      date: '2025-01-02',
+      country: 'Россия',
+      device: 'mobile',
+      visits: 60,
+      users: 55,
+      goalReaches: 3,
+      conversionRate: 0.05,
+    },
+  ]);
+  metrics.upsertPageStats([
+    {
+      date: '2025-01-02',
+      page: '/lp',
+      visits: 70,
+      users: 60,
+      bounceRate: 0.25,
+      goalReaches: 4,
+      conversionRate: 0.05,
+    },
+  ]);
+  metrics.upsertExitPageStats([
+    {
+      date: '2025-01-02',
+      page: '/checkout',
+      visits: 40,
+      users: 35,
+      bounceRate: 0.6,
+      goalReaches: 2,
+      conversionRate: 0.05,
+    },
+  ]);
   hypotheses.create(validHypothesis({ kind: 'problem' }));
   hypotheses.create(validHypothesis({ kind: 'solution', diamondPhase: 'develop' }));
   b2b.create({ company: 'BigCorp', tickets: 20, stage: 'paid', dateAdded: '2025-01-01' });
@@ -54,6 +99,14 @@ describe('SnapshotBuilder', () => {
     expect(snap.hypotheses.problems).toHaveLength(1);
     expect(snap.hypotheses.solutions).toHaveLength(1);
     expect(snap.period).toEqual({ from: '2025-01-01', to: '2025-01-07' });
+  });
+
+  it('includes top breakdowns (UTM, geo/device, entry + exit pages) for the period', () => {
+    const snap = builder.build({ id: 's', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' });
+    expect(snap.breakdowns.utm[0]).toMatchObject({ source: 'vk', visits: 80 });
+    expect(snap.breakdowns.geoDevice[0]).toMatchObject({ country: 'Россия', device: 'mobile' });
+    expect(snap.breakdowns.entryPages[0]).toMatchObject({ page: '/lp', visits: 70 });
+    expect(snap.breakdowns.exitPages[0]).toMatchObject({ page: '/checkout', visits: 40 });
   });
 
   it('is deterministic — same inputs + data yield an identical snapshot', () => {

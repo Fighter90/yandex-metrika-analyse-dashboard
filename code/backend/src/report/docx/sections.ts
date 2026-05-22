@@ -1,8 +1,27 @@
-import type { Decision, Hypothesis, ReportSnapshot } from '@pca/shared';
+import type {
+  Decision,
+  GeoDeviceBreakdownRow,
+  Hypothesis,
+  PageBreakdownRow,
+  ReportSnapshot,
+  UtmBreakdownRow,
+} from '@pca/shared';
 
 export interface ReportSection {
   readonly heading: string;
   readonly lines: string[];
+}
+
+function utmLine(u: UtmBreakdownRow): string {
+  return `${u.source} / ${u.medium} / ${u.campaign}: визитов ${u.visits}, заявок ${u.goalReaches}`;
+}
+
+function geoLine(g: GeoDeviceBreakdownRow): string {
+  return `${g.country} · ${g.device}: визитов ${g.visits}, заявок ${g.goalReaches}`;
+}
+
+function pageLine(p: PageBreakdownRow): string {
+  return `${p.page}: визитов ${p.visits}, отказы ${(p.bounceRate * 100).toFixed(1)}%, заявок ${p.goalReaches}`;
 }
 
 function hypothesisLine(h: Hypothesis): string {
@@ -50,6 +69,10 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
     { heading: 'Define — Problem Hypotheses', lines: s.hypotheses.problems.map(hypothesisLine) },
     { heading: 'Develop — Solution Hypotheses', lines: s.hypotheses.solutions.map(hypothesisLine) },
     { heading: 'Deliver — Decision Log', lines: s.decisions.map(decisionLine) },
+    { heading: 'Топ источников UTM', lines: s.breakdowns.utm.map(utmLine) },
+    { heading: 'Топ гео + устройства', lines: s.breakdowns.geoDevice.map(geoLine) },
+    { heading: 'Топ страниц входа', lines: s.breakdowns.entryPages.map(pageLine) },
+    { heading: 'Топ страниц выхода', lines: s.breakdowns.exitPages.map(pageLine) },
     {
       heading: 'Data Appendix',
       lines: [`Каналов в выборке: ${s.channels.length}`, ...s.channels.map(channelLine)],

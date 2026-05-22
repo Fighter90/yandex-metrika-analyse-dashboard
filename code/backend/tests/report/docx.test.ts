@@ -72,6 +72,7 @@ const snapshot: ReportSnapshot = {
   ],
   hypotheses: { problems: [hyp({ kind: 'problem' })], solutions: [hyp({ kind: 'solution' })] },
   decisions: [decision],
+  breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
 };
 
 describe('reportSections', () => {
@@ -84,11 +85,33 @@ describe('reportSections', () => {
       'Define — Problem Hypotheses',
       'Develop — Solution Hypotheses',
       'Deliver — Decision Log',
+      'Топ источников UTM',
+      'Топ гео + устройства',
+      'Топ страниц входа',
+      'Топ страниц выхода',
       'Data Appendix',
     ]);
     expect(sections[2]?.lines.join(' ')).toContain('Voronik1801');
     expect(sections.find((s) => s.heading.startsWith('Deliver'))?.lines[0]).toContain('DL-001');
     expect(sections.find((s) => s.heading.startsWith('Define'))?.lines[0]).toContain('ICE 336');
+  });
+
+  it('renders the breakdown lines when present (UTM, geo/device, entry + exit pages)', () => {
+    const sections = reportSections({
+      ...snapshot,
+      breakdowns: {
+        utm: [{ source: 'vk', medium: 'cpc', campaign: 'spring', visits: 80, goalReaches: 4 }],
+        geoDevice: [{ country: 'Россия', device: 'mobile', visits: 60, goalReaches: 3 }],
+        entryPages: [{ page: '/lp', visits: 70, bounceRate: 0.25, goalReaches: 4 }],
+        exitPages: [{ page: '/checkout', visits: 40, bounceRate: 0.6, goalReaches: 2 }],
+      },
+    });
+    const line = (h: string): string => sections.find((s) => s.heading === h)?.lines[0] ?? '';
+    expect(line('Топ источников UTM')).toContain('vk / cpc / spring');
+    expect(line('Топ гео + устройства')).toContain('Россия · mobile');
+    expect(line('Топ страниц входа')).toContain('/lp');
+    expect(line('Топ страниц входа')).toContain('25.0%');
+    expect(line('Топ страниц выхода')).toContain('/checkout');
   });
 
   it('is deterministic — same snapshot yields identical content', () => {
