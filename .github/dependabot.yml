@@ -8,7 +8,14 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+    # The stack is pinned (Fastify 4, React 18, etc.); major bumps need an ADR, not an auto-PR.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: '/'
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']

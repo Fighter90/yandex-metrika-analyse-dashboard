@@ -10,18 +10,20 @@ permissions:
 
 jobs:
   review:
-    # Auto-skips until ANTHROPIC_API_KEY is set in repo secrets
-    # (Settings → Secrets and variables → Actions).
-    if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     runs-on: ubuntu-latest
+    # The `secrets` context is not allowed in `if:`; expose it via env and gate the step.
+    # Until ANTHROPIC_API_KEY is set the review step is skipped and the job stays green.
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Claude review
+        if: ${{ env.ANTHROPIC_API_KEY != '' }}
         uses: anthropics/claude-code-action@beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          anthropic_api_key: ${{ env.ANTHROPIC_API_KEY }}
           direct_prompt: |
             Review this PR for the ProductCamp conversion-analytics tool. Be concise; flag only
             real issues with file:line. Check specifically:
