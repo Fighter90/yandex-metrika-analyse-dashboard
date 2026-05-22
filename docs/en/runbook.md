@@ -43,6 +43,7 @@ Fill in:
 | `YANDEX_OAUTH_TOKEN`                        | a `metrika:read` token (see README → "Getting a token") |
 | `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | OAuth app credentials                                   |
 | `COUNTER_ID`                                | `54280963`                                              |
+| `GOAL_ID`                                   | `0` = auto-detect the KPI goal; `> 0` pins the goal     |
 | `PORT` / `API_PORT`                         | `5173` / `4000`                                         |
 | `ARCHIVED_GOAL_ID_THRESHOLD`                | `77` (older goals → archived)                           |
 | `LOW_UTM_COVERAGE_RATIO`                    | `0.7` (low-UTM-coverage flag threshold)                 |

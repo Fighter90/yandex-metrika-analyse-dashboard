@@ -26,19 +26,19 @@ browser at `http://localhost:5173`.
 Global filters (header): date range (7d / 14d / since camp start / custom), channels,
 B2C / B2C+B2B / B2B toggle, show-archived-goals toggle, "Sync now" button.
 
-| Page           | What it shows                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Overview**   | KPI strip (target 300, actual, forecast), Daily Sales, channel mix, weak spots, hypotheses in progress, latest decisions |
-| **Traffic**    | channel bar chart + UTM breakdown table, low-UTM-coverage badge                                                          |
-| **Audience**   | country + device charts and tables: visits / users / applications / CR                                                   |
-| **Behavior**   | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR)                    |
-| **Trends**     | daily visits & applications line + week-over-week (WoW) comparison with arrows                                           |
-| **Funnel**     | «application ≠ payment» funnel: Visits → B2C applications → B2B tickets (pipeline) → B2B paid, stage-by-stage conversion |
-| **Report**     | build an immutable snapshot, optional AI analysis, export DOCX/PDF                                                       |
-| **B2B**        | deals CRUD table, pipeline by stage                                                                                      |
-| **Hypotheses** | Double Diamond + Voronkova hypothesis editor (below)                                                                     |
-| **Decisions**  | Decision Log: DL-{N} cards, timeline, filter by outcome                                                                  |
-| **Sources**    | "Where does this number come from?" — look up a raw Metrika response by `raw_response_id`                                |
+| Page           | What it shows                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Overview**   | auto-detected KPI-goal badge, KPI strip (target 300, actual, forecast), Daily Sales, channel mix, weak spots, hypotheses in progress, latest decisions |
+| **Traffic**    | channel bar chart + UTM breakdown table, low-UTM-coverage badge                                                                                        |
+| **Audience**   | country + device charts and tables: visits / users / applications / CR                                                                                 |
+| **Behavior**   | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR)                                                  |
+| **Trends**     | daily visits & applications line + week-over-week (WoW) comparison with arrows                                                                         |
+| **Funnel**     | «application ≠ payment» funnel: Visits → B2C applications → B2B tickets (pipeline) → B2B paid, stage-by-stage conversion                               |
+| **Report**     | build an immutable snapshot, optional AI analysis, export DOCX/PDF                                                                                     |
+| **B2B**        | deals CRUD table, pipeline by stage                                                                                                                    |
+| **Hypotheses** | Double Diamond + Voronkova hypothesis editor (below)                                                                                                   |
+| **Decisions**  | Decision Log: DL-{N} cards, timeline, filter by outcome                                                                                                |
+| **Sources**    | "Where does this number come from?" — look up a raw Metrika response by `raw_response_id`                                                              |
 
 ### Where does this number come from?
 

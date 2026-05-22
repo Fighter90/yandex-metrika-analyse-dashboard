@@ -43,6 +43,7 @@ cp .env.example .env
 | `YANDEX_OAUTH_TOKEN`                        | токен `metrika:read` (см. README → «Как получить токен») |
 | `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` | данные OAuth-приложения                                  |
 | `COUNTER_ID`                                | `54280963`                                               |
+| `GOAL_ID`                                   | `0` = авто-определение KPI-цели; `> 0` фиксирует цель    |
 | `PORT` / `API_PORT`                         | `5173` / `4000`                                          |
 | `ARCHIVED_GOAL_ID_THRESHOLD`                | `77` (цели старше — архивные)                            |
 | `LOW_UTM_COVERAGE_RATIO`                    | `0.7` (порог флага низкого покрытия UTM)                 |

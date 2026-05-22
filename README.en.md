@@ -43,11 +43,13 @@ pnpm install        # 1. dependencies
 
 - `ANTHROPIC_API_KEY` — key for AI report analysis (optional — the dashboard works without it);
 - `COUNTER_ID` — Yandex Metrika counter (default `54280963`);
-- `GOAL_ID` — the Metrika goal counted for the KPI (`0` = none);
+- `GOAL_ID` — the KPI goal id; `0` (default) = **auto-detect** the primary payment/purchase goal from
+  the counter's goals, any value `> 0` pins the goal explicitly;
 - and offers to set up **Yandex Metrika OAuth** right away (`pnpm auth`).
 
 **Step 3 — `./run.sh`** installs `pnpm` if missing, runs migrations, then: with a
-`YANDEX_OAUTH_TOKEN` it pulls live data (`pnpm sync --goalId=$GOAL_ID`), otherwise it seeds the
+`YANDEX_OAUTH_TOKEN` it pulls live data (`pnpm sync`; with `GOAL_ID=0` the goal is auto-detected,
+otherwise `--goalId=$GOAL_ID` is passed), otherwise it seeds the
 dashboard with **demo data** (`pnpm seed`), starts backend + frontend and opens
 `http://localhost:5173` (API on `http://localhost:4000`, proxied as `/api`).
 
