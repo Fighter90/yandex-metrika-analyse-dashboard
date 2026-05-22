@@ -8,6 +8,11 @@
 
 ### Added
 
+- Итерация 10 — генерация **PDF**: детерминированный print-HTML (`reportHtml`, тот же контент, что и
+  DOCX, с экранированием `& < >`), рендер в PDF через `puppeteer-core` (`buildPdf`, без скачивания
+  Chromium — нужен локальный Chrome через `PUPPETEER_EXECUTABLE_PATH`). Роут `POST /api/report/generate`
+  принимает `format: docx | pdf`, файл пишется как `data/reports/{id}.{format}`; кнопка **Export PDF**
+  на странице Report. 100% покрытие (рендерер браузера исключён из coverage как IO); e2e: build → export.
 - Итерация 9 — генерация **DOCX**: детерминированный контент отчёта (`reportSections`: cover,
   executive summary, methodology с атрибуцией Воронковой, define/develop гипотезы, deliver/Decision Log,
   data appendix), рендер через `docx` (`buildDocx`), роут `POST /api/report/generate` (формат docx) и

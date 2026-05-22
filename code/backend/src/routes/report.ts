@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { ReportSnapshot } from '@pca/shared';
 
 const SnapshotBody = z.object({ from: z.string(), to: z.string() });
-const GenerateBody = z.object({ snapshotId: z.string(), format: z.enum(['docx']) });
+const GenerateBody = z.object({ snapshotId: z.string(), format: z.enum(['docx', 'pdf']) });
 
 export type ReportFormat = z.infer<typeof GenerateBody>['format'];
 

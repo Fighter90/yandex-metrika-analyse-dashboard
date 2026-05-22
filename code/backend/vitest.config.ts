@@ -15,6 +15,7 @@ export default defineConfig({
         'src/metrika/cli-sync.ts',
         'src/metrika/production-sync.ts',
         'src/report/production-report.ts',
+        'src/report/pdf/renderer.ts',
         'src/utils/logger.ts',
         '**/*.test.ts',
       ],

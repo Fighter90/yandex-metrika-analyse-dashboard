@@ -62,6 +62,24 @@ pnpm test        # Vitest
 pnpm build       # сборка (артефакт frontend → code/frontend/dist)
 ```
 
+## 5a. Экспорт отчётов (DOCX / PDF)
+
+На странице **Report** соберите snapshot и нажмите **Export DOCX** или **Export PDF** —
+файл сохраняется в `data/reports/{id}.{docx|pdf}`.
+
+- **DOCX** работает «из коробки», ничего ставить не нужно.
+- **PDF** рендерится через `puppeteer-core`, который не скачивает Chromium (чтобы установка и CI были
+  быстрыми). Укажите путь к локальному Chrome в `.env`:
+
+  ```bash
+  # macOS
+  PUPPETEER_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  # Linux
+  PUPPETEER_EXECUTABLE_PATH="$(which google-chrome || which chromium-browser)"
+  ```
+
+  Без валидного `PUPPETEER_EXECUTABLE_PATH` экспорт PDF упадёт — используйте DOCX или установите Chrome.
+
 ## 6. Траблшутинг
 
 | Симптом                                   | Причина / решение                                                                  |

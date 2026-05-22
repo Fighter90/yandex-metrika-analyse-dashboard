@@ -6,12 +6,14 @@ import type { SnapshotBuilder } from './snapshot-builder';
 import type { SnapshotRepo } from '../db/repositories/snapshot-repo';
 import type { ReportRunner } from '../routes/report';
 import { buildDocx } from './docx/builder';
+import { buildPdf } from './pdf/renderer';
 
 const REPORTS_DIR = 'data/reports';
 
 /**
- * Production report runner: builds + persists snapshots and writes DOCX files to data/reports.
- * Excluded from coverage — IO + non-deterministic id/clock (SnapshotBuilder and buildDocx are tested).
+ * Production report runner: builds + persists snapshots and writes DOCX/PDF files to data/reports.
+ * Excluded from coverage — IO + non-deterministic id/clock (SnapshotBuilder, buildDocx and reportHtml
+ * are tested; buildPdf launches a real browser and is also coverage-excluded).
  */
 export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRepo): ReportRunner {
   return {
@@ -23,12 +25,13 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
       return snapshot;
     },
     get: (id) => snapshots.getById(id)?.payload as ReportSnapshot | undefined,
-    generate: async (snapshotId) => {
+    generate: async (snapshotId, format) => {
       const record = snapshots.getById(snapshotId);
       if (!record) return undefined;
-      const buf = await buildDocx(record.payload as ReportSnapshot);
+      const snapshot = record.payload as ReportSnapshot;
+      const buf = format === 'pdf' ? await buildPdf(snapshot) : await buildDocx(snapshot);
       mkdirSync(REPORTS_DIR, { recursive: true });
-      const filePath = join(REPORTS_DIR, `${snapshotId}.docx`);
+      const filePath = join(REPORTS_DIR, `${snapshotId}.${format}`);
       writeFileSync(filePath, buf);
       return { filePath };
     },

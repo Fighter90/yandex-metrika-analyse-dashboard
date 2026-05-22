@@ -52,13 +52,15 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       }),
     }),
   );
-  await page.route('**/api/report/generate', (route) =>
-    route.fulfill({
+  await page.route('**/api/report/generate', async (route) => {
+    const body = JSON.parse(route.request().postData() ?? '{}') as { format?: string };
+    const ext = body.format === 'pdf' ? 'pdf' : 'docx';
+    await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ filePath: 'data/reports/snap-e2e.docx' }),
-    }),
-  );
+      body: JSON.stringify({ filePath: `data/reports/snap-e2e.${ext}` }),
+    });
+  });
 
   await page.goto('/');
 
@@ -90,4 +92,6 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await expect(page.getByText(/snapshot snap-e2e/)).toBeVisible();
   await page.getByRole('button', { name: 'Export DOCX' }).click();
   await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.docx/)).toBeVisible();
+  await page.getByRole('button', { name: 'Export PDF' }).click();
+  await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.pdf/)).toBeVisible();
 });

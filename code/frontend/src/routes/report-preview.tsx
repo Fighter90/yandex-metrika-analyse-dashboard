@@ -19,7 +19,7 @@ export interface ReportPreviewProps {
   onBuild: () => void;
   exportPending: boolean;
   exportedPath: string | undefined;
-  onExport: (snapshotId: string) => void;
+  onExport: (snapshotId: string, format: 'docx' | 'pdf') => void;
 }
 
 /** Pure preview: the snapshot summary that DOCX/PDF render from, plus export. */
@@ -66,11 +66,19 @@ export function ReportPreviewView({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => onExport(snapshot.id)}
+              onClick={() => onExport(snapshot.id, 'docx')}
               disabled={exportPending}
               className="rounded border border-indigo-600 px-3 py-1 text-sm text-indigo-700 disabled:opacity-40"
             >
               {exportPending ? 'Экспорт…' : 'Export DOCX'}
+            </button>
+            <button
+              type="button"
+              onClick={() => onExport(snapshot.id, 'pdf')}
+              disabled={exportPending}
+              className="rounded border border-rose-600 px-3 py-1 text-sm text-rose-700 disabled:opacity-40"
+            >
+              {exportPending ? 'Экспорт…' : 'Export PDF'}
             </button>
             {exportedPath ? (
               <span className="text-xs text-green-700">Сохранено: {exportedPath}</span>
@@ -98,7 +106,7 @@ export function ReportPreview(): JSX.Element {
       onBuild={() => buildMut.mutate({ from, to })}
       exportPending={exportMut.isPending}
       exportedPath={exportMut.data?.filePath}
-      onExport={(snapshotId) => exportMut.mutate({ snapshotId, format: 'docx' })}
+      onExport={(snapshotId, format) => exportMut.mutate({ snapshotId, format })}
     />
   );
 }

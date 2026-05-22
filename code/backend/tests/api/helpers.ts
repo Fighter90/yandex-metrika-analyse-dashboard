@@ -39,8 +39,8 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
       return s;
     },
     get: (id) => snapshots.getById(id)?.payload as ReportSnapshot | undefined,
-    generate: async (id) =>
-      snapshots.getById(id) ? { filePath: `data/reports/${id}.docx` } : undefined,
+    generate: async (id, format) =>
+      snapshots.getById(id) ? { filePath: `data/reports/${id}.${format}` } : undefined,
   };
   const deps: AppDeps = {
     metrics,

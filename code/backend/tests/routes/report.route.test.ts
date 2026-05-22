@@ -67,8 +67,8 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn(),
-      generate: vi.fn(async (id: string) =>
-        id === 'snap-1' ? { filePath: 'data/reports/snap-1.docx' } : undefined,
+      generate: vi.fn(async (id: string, format: string) =>
+        id === 'snap-1' ? { filePath: `data/reports/snap-1.${format}` } : undefined,
       ),
     };
     const app = appWith(runner);
@@ -81,10 +81,18 @@ describe('report routes', () => {
     expect(ok.statusCode).toBe(200);
     expect(ok.json().filePath).toBe('data/reports/snap-1.docx');
 
-    const bad = await app.inject({
+    const pdf = await app.inject({
       method: 'POST',
       url: '/api/report/generate',
       payload: { snapshotId: 'snap-1', format: 'pdf' },
+    });
+    expect(pdf.statusCode).toBe(200);
+    expect(pdf.json().filePath).toBe('data/reports/snap-1.pdf');
+
+    const bad = await app.inject({
+      method: 'POST',
+      url: '/api/report/generate',
+      payload: { snapshotId: 'snap-1', format: 'xlsx' },
     });
     expect(bad.statusCode).toBe(400);
 

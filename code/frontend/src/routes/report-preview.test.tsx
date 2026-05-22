@@ -38,14 +38,16 @@ describe('ReportPreviewView', () => {
     expect(screen.getByRole('button', { name: 'Формирую…' })).toBeDisabled();
   });
 
-  it('shows the snapshot summary and triggers export', () => {
+  it('shows the snapshot summary and triggers DOCX + PDF export', () => {
     const onExport = vi.fn();
     render(<ReportPreviewView {...baseProps} snapshot={snapshot} onExport={onExport} />);
     expect(screen.getByText(/snapshot snap-1/)).toBeInTheDocument();
     expect(screen.getByText('Заявки B2C')).toBeInTheDocument();
     expect(screen.queryByText(/Сохранено/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Export DOCX' }));
-    expect(onExport).toHaveBeenCalledWith('snap-1');
+    expect(onExport).toHaveBeenCalledWith('snap-1', 'docx');
+    fireEvent.click(screen.getByRole('button', { name: 'Export PDF' }));
+    expect(onExport).toHaveBeenCalledWith('snap-1', 'pdf');
   });
 
   it('shows the exported path and disables export while pending', () => {
@@ -59,7 +61,9 @@ describe('ReportPreviewView', () => {
     expect(screen.getByText(/Сохранено: data\/reports\/snap-1\.docx/)).toBeInTheDocument();
 
     rerender(<ReportPreviewView {...baseProps} snapshot={snapshot} exportPending />);
-    expect(screen.getByRole('button', { name: 'Экспорт…' })).toBeDisabled();
+    const exporting = screen.getAllByRole('button', { name: 'Экспорт…' });
+    expect(exporting).toHaveLength(2);
+    exporting.forEach((btn) => expect(btn).toBeDisabled());
   });
 });
 
