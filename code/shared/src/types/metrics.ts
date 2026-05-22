@@ -42,6 +42,25 @@ export interface ChannelStat {
   readonly conversionRate: number;
 }
 
+/**
+ * UTM-source/medium/campaign breakdown, stored in its own table (`utm_stats`) — a different
+ * aggregation than channel_stats, so summing the two would double-count. Missing UTM values are
+ * normalised to the literal `(none)` so the (date, source, medium, campaign) key is well-defined.
+ */
+export interface UtmStat {
+  readonly date: string;
+  readonly utmSource: string;
+  readonly utmMedium: string;
+  readonly utmCampaign: string;
+  readonly visits: number;
+  readonly users: number;
+  readonly goalReaches: number;
+  readonly conversionRate: number;
+}
+
+/** Sentinel for a missing UTM dimension value. */
+export const UTM_NONE = '(none)';
+
 export type B2bStage = 'lead' | 'negotiation' | 'invoiced' | 'paid';
 
 export interface NewB2bDeal {

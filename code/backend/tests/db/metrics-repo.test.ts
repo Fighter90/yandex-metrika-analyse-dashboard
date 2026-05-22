@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { DB } from '../../src/db/connection';
 import { MetricsRepo } from '../../src/db/repositories/metrics-repo';
 import { freshDb } from './helpers';
-import type { ChannelStat, Goal } from '@pca/shared';
+import type { ChannelStat, Goal, UtmStat } from '@pca/shared';
 
 let db: DB;
 let repo: MetricsRepo;
@@ -93,5 +93,40 @@ describe('MetricsRepo — channel stats', () => {
     const ranged = repo.listChannelStats({ from: '2025-01-02', to: '2025-01-03' });
     expect(ranged.map((c) => c.date)).toEqual(['2025-01-02', '2025-01-03']);
     expect(ranged[0]?.utmSource).toBeNull();
+  });
+});
+
+const utm = (date: string, over: Partial<UtmStat> = {}): UtmStat => ({
+  date,
+  utmSource: 'vk',
+  utmMedium: 'cpc',
+  utmCampaign: 'spring',
+  visits: 100,
+  users: 90,
+  goalReaches: 7,
+  conversionRate: 0.07,
+  ...over,
+});
+
+describe('MetricsRepo — UTM stats', () => {
+  it('upserts and lists UTM stats, optionally filtered by date range', () => {
+    repo.upsertUtmStats([
+      utm('2025-01-01'),
+      utm('2025-01-02', { utmCampaign: 'summer' }),
+      utm('2025-01-03'),
+    ]);
+    expect(repo.listUtmStats()).toHaveLength(3);
+    const ranged = repo.listUtmStats({ from: '2025-01-02', to: '2025-01-03' });
+    expect(ranged.map((u) => u.date)).toEqual(['2025-01-02', '2025-01-03']);
+    expect(ranged[0]?.utmCampaign).toBe('summer');
+    expect(ranged[0]?.goalReaches).toBe(7);
+  });
+
+  it('replaces a row on the composite-key conflict', () => {
+    repo.upsertUtmStats([utm('2025-01-01', { visits: 100 })]);
+    repo.upsertUtmStats([utm('2025-01-01', { visits: 250 })]);
+    const rows = repo.listUtmStats();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.visits).toBe(250);
   });
 });

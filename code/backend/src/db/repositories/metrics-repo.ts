@@ -1,5 +1,5 @@
 import type { DB } from '../connection';
-import type { ChannelStat, Goal, NewRawResponse, RawResponse } from '@pca/shared';
+import type { ChannelStat, Goal, NewRawResponse, RawResponse, UtmStat } from '@pca/shared';
 
 interface GoalRow {
   id: number;
@@ -32,6 +32,30 @@ interface ChannelRow {
   avg_duration: number;
   goal_reaches: number;
   conversion_rate: number;
+}
+
+interface UtmRow {
+  date: string;
+  utm_source: string;
+  utm_medium: string;
+  utm_campaign: string;
+  visits: number;
+  users: number;
+  goal_reaches: number;
+  conversion_rate: number;
+}
+
+function toUtmStat(r: UtmRow): UtmStat {
+  return {
+    date: r.date,
+    utmSource: r.utm_source,
+    utmMedium: r.utm_medium,
+    utmCampaign: r.utm_campaign,
+    visits: r.visits,
+    users: r.users,
+    goalReaches: r.goal_reaches,
+    conversionRate: r.conversion_rate,
+  };
 }
 
 function toGoal(r: GoalRow): Goal {
@@ -166,5 +190,38 @@ export class MetricsRepo {
           .all(range.from, range.to) as ChannelRow[])
       : (this.db.prepare('SELECT * FROM channel_stats ORDER BY date').all() as ChannelRow[]);
     return rows.map(toChannelStat);
+  }
+
+  upsertUtmStats(rows: readonly UtmStat[]): void {
+    const stmt = this.db.prepare(
+      `INSERT OR REPLACE INTO utm_stats
+         (date, utm_source, utm_medium, utm_campaign, visits, users, goal_reaches, conversion_rate)
+       VALUES (@date, @utm_source, @utm_medium, @utm_campaign, @visits, @users,
+          @goal_reaches, @conversion_rate)`,
+    );
+    const tx = this.db.transaction((items: readonly UtmStat[]) => {
+      for (const u of items) {
+        stmt.run({
+          date: u.date,
+          utm_source: u.utmSource,
+          utm_medium: u.utmMedium,
+          utm_campaign: u.utmCampaign,
+          visits: u.visits,
+          users: u.users,
+          goal_reaches: u.goalReaches,
+          conversion_rate: u.conversionRate,
+        });
+      }
+    });
+    tx(rows);
+  }
+
+  listUtmStats(range?: { from: string; to: string }): UtmStat[] {
+    const rows = range
+      ? (this.db
+          .prepare('SELECT * FROM utm_stats WHERE date >= ? AND date <= ? ORDER BY date')
+          .all(range.from, range.to) as UtmRow[])
+      : (this.db.prepare('SELECT * FROM utm_stats ORDER BY date').all() as UtmRow[]);
+    return rows.map(toUtmStat);
   }
 }

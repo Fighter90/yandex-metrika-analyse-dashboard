@@ -37,6 +37,28 @@ beforeAll(() => {
       conversionRate: 0.04,
     },
   ]);
+  ctx.deps.metrics.upsertUtmStats([
+    {
+      date: '2025-01-01',
+      utmSource: 'vk',
+      utmMedium: 'cpc',
+      utmCampaign: 'spring',
+      visits: 80,
+      users: 70,
+      goalReaches: 4,
+      conversionRate: 0.05,
+    },
+    {
+      date: '2025-01-09',
+      utmSource: 'tg',
+      utmMedium: 'social',
+      utmCampaign: 'launch',
+      visits: 30,
+      users: 28,
+      goalReaches: 1,
+      conversionRate: 0.03,
+    },
+  ]);
 });
 afterAll(async () => {
   await ctx.app.close();
@@ -53,6 +75,18 @@ describe('GET /api/metrics', () => {
       url: '/api/metrics/channels?from=2025-01-01&to=2025-01-05',
     });
     expect(ranged.json()).toHaveLength(1);
+  });
+
+  it('returns all UTM stats, and a date-filtered subset', async () => {
+    const all = await ctx.app.inject({ method: 'GET', url: '/api/metrics/utm' });
+    expect(all.json()).toHaveLength(2);
+
+    const ranged = await ctx.app.inject({
+      method: 'GET',
+      url: '/api/metrics/utm?from=2025-01-01&to=2025-01-05',
+    });
+    expect(ranged.json()).toHaveLength(1);
+    expect(ranged.json()[0].utmSource).toBe('vk');
   });
 
   it('hides archived goals by default, includes them with ?archived=true', async () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { ChannelStat, B2bDeal } from '@pca/shared';
-import { buildFunnel, funnelOption, combineStatus } from './funnel';
+import { buildFunnel, funnelOption } from './funnel';
 
 const channel = (over: Partial<ChannelStat>): ChannelStat => ({
   date: '2025-01-01',
@@ -54,16 +54,6 @@ describe('buildFunnel', () => {
     expect(stages[0]?.fromPrev).toBe(1);
     expect(stages[1]?.fromPrev).toBe(0);
     expect(stages[3]?.fromPrev).toBe(0);
-  });
-});
-
-describe('combineStatus', () => {
-  it('returns error if either side errored, success only if both succeeded, else pending', () => {
-    expect(combineStatus('error', 'success')).toBe('error');
-    expect(combineStatus('success', 'error')).toBe('error');
-    expect(combineStatus('success', 'success')).toBe('success');
-    expect(combineStatus('success', 'pending')).toBe('pending');
-    expect(combineStatus('pending', 'pending')).toBe('pending');
   });
 });
 

@@ -15,6 +15,7 @@ describe('migrate', () => {
       '003_b2b_manual.sql',
       '004_snapshots.sql',
       '005_decisions.sql',
+      '006_utm_stats.sql',
     ]);
   });
 

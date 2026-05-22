@@ -64,9 +64,23 @@ describe('SyncService.syncTraffic', () => {
   });
 });
 
+describe('SyncService.syncUtm', () => {
+  it('caches raw + UTM stats per day chunk', async () => {
+    const { rows } = await svc.syncUtm('2025-01-01', '2025-01-03', 80);
+    expect(rows).toBe(1);
+    const utm = metrics.listUtmStats();
+    expect(utm).toHaveLength(1);
+    expect(utm[0]?.date).toBe('2025-01-01');
+    expect(utm[0]?.utmSource).toBe('podcast');
+    // The single-dimension fixture leaves medium/campaign missing → normalised to (none).
+    expect(utm[0]?.utmMedium).toBe('(none)');
+    expect(utm[0]?.utmCampaign).toBe('(none)');
+  });
+});
+
 describe('SyncService.syncAll', () => {
-  it('returns a combined summary', async () => {
+  it('returns a combined summary including UTM rows', async () => {
     const summary = await svc.syncAll('2025-01-01', '2025-01-07', 80);
-    expect(summary).toEqual({ goals: 2, days: 1, channelRows: 1 });
+    expect(summary).toEqual({ goals: 2, days: 1, channelRows: 1, utmRows: 1 });
   });
 });

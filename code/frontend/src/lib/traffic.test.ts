@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import type { ChannelStat } from '@pca/shared';
-import { utmCoverage, channelRows, channelBarOption } from './traffic';
+import type { ChannelStat, UtmStat } from '@pca/shared';
+import { utmCoverage, channelRows, channelBarOption, utmRows } from './traffic';
 
 function stat(over: Partial<ChannelStat>): ChannelStat {
   return {
@@ -54,6 +54,45 @@ describe('channelRows', () => {
     expect(rows[0]?.visits).toBe(40);
     expect(rows[0]?.conversionRate).toBeCloseTo(3 / 40);
     expect(rows.find((r) => r.channel === 'empty')?.conversionRate).toBe(0);
+  });
+});
+
+const utmStat = (over: Partial<UtmStat>): UtmStat => ({
+  date: '2025-01-01',
+  utmSource: 'vk',
+  utmMedium: 'cpc',
+  utmCampaign: 'spring',
+  visits: 10,
+  users: 9,
+  goalReaches: 1,
+  conversionRate: 0.1,
+  ...over,
+});
+
+describe('utmRows', () => {
+  it('aggregates by source/medium/campaign across days, sorts by visits desc, guards zero visits', () => {
+    const rows = utmRows([
+      utmStat({ date: '2025-01-01', visits: 10, goalReaches: 1 }),
+      utmStat({ date: '2025-01-02', visits: 30, goalReaches: 2 }), // same triple → merges
+      utmStat({
+        utmSource: 'tg',
+        utmMedium: 'social',
+        utmCampaign: 'launch',
+        visits: 5,
+        goalReaches: 1,
+      }),
+      utmStat({
+        utmSource: 'none',
+        utmMedium: 'none',
+        utmCampaign: 'none',
+        visits: 0,
+        goalReaches: 0,
+      }),
+    ]);
+    expect(rows[0]?.source).toBe('vk');
+    expect(rows[0]?.visits).toBe(40);
+    expect(rows[0]?.conversionRate).toBeCloseTo(3 / 40);
+    expect(rows.find((r) => r.source === 'none')?.conversionRate).toBe(0);
   });
 });
 

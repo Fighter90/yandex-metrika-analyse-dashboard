@@ -3,7 +3,8 @@ import type { ChannelStat, B2bDeal } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
-import { buildFunnel, funnelOption, combineStatus, type QueryStatus } from '../lib/funnel';
+import { buildFunnel, funnelOption } from '../lib/funnel';
+import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 
 /** Pure presentational Funnel — the «заявка ≠ оплата» conversion path across all states. */

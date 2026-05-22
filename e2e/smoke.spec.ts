@@ -28,6 +28,24 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       ]),
     }),
   );
+  await page.route('**/api/metrics/utm*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          date: '2025-01-01',
+          utmSource: 'vk',
+          utmMedium: 'cpc',
+          utmCampaign: 'spring',
+          visits: 80,
+          users: 70,
+          goalReaches: 4,
+          conversionRate: 0.05,
+        },
+      ]),
+    }),
+  );
   await page.route('**/api/b2b', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
@@ -73,6 +91,7 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   // Navigate to the Traffic page (same channel data) and confirm it renders.
   await page.getByRole('link', { name: 'Traffic' }).click();
   await expect(page.getByText('Каналы — визиты')).toBeVisible();
+  await expect(page.getByText('UTM-разбивка')).toBeVisible();
 
   // Navigate to the Funnel page and confirm the «заявка ≠ оплата» stages render.
   await page.getByRole('link', { name: 'Funnel' }).click();

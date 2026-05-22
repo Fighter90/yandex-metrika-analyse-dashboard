@@ -1,20 +1,21 @@
 # Модель данных (SQLite)
 
-> Источник истины — миграции `code/backend/src/db/migrations/001..005`. Доступ только через
+> Источник истины — миграции `code/backend/src/db/migrations/001..006`. Доступ только через
 > репозитории (`code/backend/src/db/repositories/`). История копится по дням (см. ADR-007).
 
 ## Таблицы
 
-| Таблица            | Назначение                          | Ключ / история                                                           |
-| ------------------ | ----------------------------------- | ------------------------------------------------------------------------ |
-| `goals`            | цели Метрики (seed)                 | PK `id`; `is_archived` если `id < ARCHIVED_GOAL_ID_THRESHOLD`            |
-| `raw_responses`    | сырые ответы API (прослеживаемость) | UNIQUE `(query_hash, date_from, date_to)` — идемпотентный кэш            |
-| `channel_stats`    | нормализованные метрики по каналам  | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням** |
-| `hypotheses`       | гипотезы в формате Воронковой       | `ice_score` GENERATED `impact*confidence*ease`                           |
-| `b2b_manual`       | ручной B2B-пайплайн                 | этапы lead/negotiation/invoiced/paid                                     |
-| `report_snapshots` | immutable снапшоты отчётов          | PK `id` (ulid)                                                           |
-| `decisions`        | Decision Log                        | FK → `hypotheses`; `number` UNIQUE (DL-NNN)                              |
-| `_migrations`      | трекинг применённых миграций        | PK `name`                                                                |
+| Таблица            | Назначение                             | Ключ / история                                                                                                                                |
+| ------------------ | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `goals`            | цели Метрики (seed)                    | PK `id`; `is_archived` если `id < ARCHIVED_GOAL_ID_THRESHOLD`                                                                                 |
+| `raw_responses`    | сырые ответы API (прослеживаемость)    | UNIQUE `(query_hash, date_from, date_to)` — идемпотентный кэш                                                                                 |
+| `channel_stats`    | нормализованные метрики по каналам     | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням**                                                                      |
+| `utm_stats`        | разбивка по UTM source/medium/campaign | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням**; пропуски → `(none)`, отдельно от `channel_stats` чтобы не дублировать визиты |
+| `hypotheses`       | гипотезы в формате Воронковой          | `ice_score` GENERATED `impact*confidence*ease`                                                                                                |
+| `b2b_manual`       | ручной B2B-пайплайн                    | этапы lead/negotiation/invoiced/paid                                                                                                          |
+| `report_snapshots` | immutable снапшоты отчётов             | PK `id` (ulid)                                                                                                                                |
+| `decisions`        | Decision Log                           | FK → `hypotheses`; `number` UNIQUE (DL-NNN)                                                                                                   |
+| `_migrations`      | трекинг применённых миграций           | PK `name`                                                                                                                                     |
 
 ## Связи и инварианты
 

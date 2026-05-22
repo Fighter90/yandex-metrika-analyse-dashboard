@@ -8,6 +8,13 @@
 
 ### Added
 
+- Итерация 12 — **UTM-разбивка** (расширение парсера): новый запрос Stat API `utm-breakdown`
+  (`ym:s:UTMSource/UTMMedium/UTMCampaign`), отдельная таблица `utm_stats` (migration 006) с историей
+  по дням и репозиторием (`upsertUtmStats`/`listUtmStats`), интеграция в `SyncService.syncUtm` +
+  `syncAll` (поле `utmRows` в `SyncSummary`), эндпоинт `GET /api/metrics/utm` и таблица «UTM-разбивка»
+  на странице Traffic. Хранится в своей таблице, чтобы не дублировать визиты с `channel_stats`
+  (NULL в составном ключе SQLite различимы). Вынесён общий чистый `combineStatus` в `lib/query-status`.
+  100% покрытие; e2e проверяет UTM-таблицу.
 - Итерация 11 — страница **Funnel** (воронка конверсии «заявка ≠ оплата»): этапы Визиты → Заявки B2C
   (goal reaches) → Билеты B2B (в работе) → Оплачено B2B с поэтапной конверсией и ECharts-воронкой.
   Считается детерминированно на клиенте из уже загруженных данных каналов + B2B (`buildFunnel`,

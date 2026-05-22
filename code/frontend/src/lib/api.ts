@@ -9,6 +9,7 @@ import type {
   NewDecision,
   NewHypothesis,
   ReportSnapshot,
+  UtmStat,
 } from '@pca/shared';
 
 const BASE = '/api';
@@ -33,6 +34,7 @@ export interface SyncSummary {
   goals: number;
   days: number;
   channelRows: number;
+  utmRows: number;
 }
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
@@ -49,6 +51,8 @@ export const api = {
   health: () => http<HealthInfo>('/health'),
   channels: (range?: { from: string; to: string }) =>
     http<ChannelStat[]>(`/metrics/channels${range ? `?from=${range.from}&to=${range.to}` : ''}`),
+  utm: (range?: { from: string; to: string }) =>
+    http<UtmStat[]>(`/metrics/utm${range ? `?from=${range.from}&to=${range.to}` : ''}`),
   goals: (archived = false) => http<Goal[]>(`/metrics/goals${archived ? '?archived=true' : ''}`),
   hypotheses: () => http<Hypothesis[]>('/hypotheses'),
   createHypothesis: (h: NewHypothesis) =>
