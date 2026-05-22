@@ -6,6 +6,11 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-05-22
+
+> Авто-определение основной KPI-цели — вместо ручного `GOAL_ID` инструмент сам выбирает цель оплаты
+> из списка целей Метрики, показывает её на дашборде и через API.
+
 ### Added
 
 - Итерация 35 — **авто-определение основной KPI-цели**: вместо ручного `GOAL_ID` инструмент сам
@@ -15,6 +20,16 @@
   задан (явный `GOAL_ID` всё ещё имеет приоритет); `SyncSummary.resolvedGoalId` показывает выбор.
   Новый эндпоинт `GET /api/metrics/primary-goal`. `run.sh`/`config` обновлены: `GOAL_ID=0` (по
   умолчанию) = авто-определение. 100% покрытие.
+- Итерация 36 — **авто-определённая цель видна в UI**: клиент `api.primaryGoal()` и бейдж на странице
+  Overview «KPI-цель определена автоматически: <имя>» (скрывается, если цель не найдена — `404`,
+  retry отключён; подсказывает задать `GOAL_ID` для ручной фиксации). Покрыто unit- и e2e-тестами.
+
+### Changed
+
+- Документация синхронизирована с авто-определением KPI-цели: README (RU+EN), runbook (RU+EN, `GOAL_ID`
+  в таблице env), user-guide (RU+EN, бейдж в строке Overview), `.env.example` и подсказка `cli-init`
+  («`0` = авто-определение» вместо «`0` = без цели»), QA-регресс-промпт (реалии авто-определения +
+  проверки `GET /api/metrics/primary-goal` и бейджа Overview).
 
 ## [0.8.0] - 2026-05-22
 
@@ -258,7 +273,8 @@
 - GitHub workflows: `ci.yml` (lint/typecheck/coverage/build), `e2e.yml`, `review.yml` (AI code review), `release.yml`.
 - Шаблоны PR и Issue (bug, hypothesis), `dependabot.yml`.
 
-[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/Fighter90/metrika_analyse_dashboard/compare/v0.5.0...v0.6.0
