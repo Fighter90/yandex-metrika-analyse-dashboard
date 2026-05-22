@@ -1,6 +1,56 @@
 import { describe, it, expect } from 'vitest';
-import type { Decision, Hypothesis, HypothesisStatus, ReportSnapshot } from './index';
+import type {
+  Decision,
+  Hypothesis,
+  HypothesisStatus,
+  ProblemHypothesis,
+  ReportSnapshot,
+  SolutionHypothesis,
+} from './index';
 import { reportSections } from './index';
+
+const genProblem = (over: Partial<ProblemHypothesis> = {}): ProblemHypothesis => ({
+  id: 'P01',
+  segment: 'мобильный пользователь',
+  trouble: 'не находит кнопку оплаты',
+  action: 'покупке билета',
+  barrier: 'кнопка скрыта под футером',
+  evidence: '7 заявок B2C при 100 визитах',
+  ...over,
+});
+
+const genSolution = (over: Partial<SolutionHypothesis> = {}): SolutionHypothesis => ({
+  id: 'S01',
+  problemId: 'P01',
+  action: 'вынесем кнопку оплаты в первый экран',
+  userBenefit: 'быстрее находить оплату',
+  businessResult: 'рост конверсии B2C',
+  successCriteria: 'CR +10%',
+  risks: [
+    { kind: 'value', note: 'может не повлиять' },
+    { kind: 'usability', note: 'перегрузим экран' },
+    { kind: 'feasibility', note: 'правка вёрстки' },
+    { kind: 'business', note: 'низкий риск' },
+    { kind: 'legal', note: 'нет' },
+  ],
+  validation: {
+    whatToVerify: 'ценность',
+    methods: ['A/B-тест', 'интервью'],
+    audience: 'мобильные посетители',
+    channel: 'tg',
+    successCriteria: '≥10% рост CR',
+  },
+  ice: {
+    impact: 8,
+    confidence: 6,
+    ease: 7,
+    impactRationale: 'высокий трафик',
+    confidenceRationale: 'есть данные',
+    easeRationale: 'простая правка',
+    score: 336,
+  },
+  ...over,
+});
 
 const hyp = (over: Partial<Hypothesis>): Hypothesis => ({
   id: 1,
@@ -338,5 +388,75 @@ describe('reportSections — breakdowns, AI and empty states', () => {
     const withAi = reportSections({ ...baseSnapshot, aiNarrative: 'Итог: рост.\n\nРиски: отвал.' });
     const ai = withAi.find((s) => s.heading.startsWith('AI-анализ'));
     expect(ai?.lines).toEqual(['Итог: рост.', 'Риски: отвал.']);
+  });
+});
+
+describe('reportSections — AI-generated hypotheses', () => {
+  it('adds no AI-hypothesis sections when generatedHypotheses is absent', () => {
+    const headings = reportSections(baseSnapshot).map((s) => s.heading);
+    expect(headings).not.toContain('Приоритизация AI-гипотез (по ICE)');
+    expect(headings).not.toContain('Проблемные гипотезы (AI)');
+  });
+
+  it('adds no AI-hypothesis sections when generatedHypotheses is empty', () => {
+    const snap = { ...baseSnapshot, generatedHypotheses: { problems: [], solutions: [] } };
+    const headings = reportSections(snap).map((s) => s.heading);
+    expect(headings).not.toContain('Решенческие гипотезы (AI)');
+  });
+
+  it('renders problem + solution cards (risks, validation, ICE) sorted by ICE desc', () => {
+    const snap: ReportSnapshot = {
+      ...baseSnapshot,
+      generatedHypotheses: {
+        problems: [genProblem(), genProblem({ id: 'P02' })],
+        solutions: [
+          genSolution({ id: 'S01', ice: { ...genSolution().ice, score: 100 } }),
+          genSolution({ id: 'S02', ice: { ...genSolution().ice, score: 500 } }),
+        ],
+      },
+    };
+    const sections = reportSections(snap);
+    const headings = sections.map((s) => s.heading);
+    expect(headings).toContain('Приоритизация AI-гипотез (по ICE)');
+    expect(headings).toContain('Проблемные гипотезы (AI)');
+    expect(headings).toContain('Решенческие гипотезы (AI)');
+    expect(headings).toContain('1. P01');
+
+    const prio = sections
+      .find((s) => s.heading === 'Приоритизация AI-гипотез (по ICE)')!
+      .lines.join('\n');
+    expect(prio.indexOf('S02')).toBeLessThan(prio.indexOf('S01')); // higher ICE first
+
+    const sol = sections.find((s) => s.heading === '1. S02')!.lines.join('\n');
+    expect(sol).toContain('Если');
+    expect(sol).toContain('Ценность:');
+    expect(sol).toContain('Юридический-репутационный:');
+    expect(sol).toContain('План проверки:');
+    expect(sol).toContain('= 500');
+
+    const prob = sections.find((s) => s.heading === '1. P01')!.lines.join('\n');
+    expect(prob).toContain('испытывает');
+    expect(prob).toContain('Обоснование (данные):');
+  });
+
+  it('shows empty-side messages (problems only / solutions only)', () => {
+    const solOnly = {
+      ...baseSnapshot,
+      generatedHypotheses: { problems: [], solutions: [genSolution()] },
+    };
+    expect(findSection(solOnly, (h) => h === 'Проблемные гипотезы (AI)').join(' ')).toContain(
+      'не сгенерированы',
+    );
+
+    const probOnly = {
+      ...baseSnapshot,
+      generatedHypotheses: { problems: [genProblem()], solutions: [] },
+    };
+    expect(findSection(probOnly, (h) => h === 'Решенческие гипотезы (AI)').join(' ')).toContain(
+      'не сгенерированы',
+    );
+    expect(
+      findSection(probOnly, (h) => h === 'Приоритизация AI-гипотез (по ICE)').join(' '),
+    ).toContain('ещё не сгенерированы');
   });
 });

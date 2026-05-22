@@ -26,6 +26,7 @@ import {
   priorityLine,
   utmLine,
   hypothesisStatement,
+  aiHypothesisSections,
 } from './report-section-helpers';
 
 export interface ReportSection {
@@ -246,6 +247,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
             ],
     },
     ...solutions.map((h, i) => hypothesisDetail(h, problems.length + i + 1)),
+    ...aiHypothesisSections(s.generatedHypotheses),
     {
       heading: 'Deliver — Decision Log (обзор)',
       lines:
