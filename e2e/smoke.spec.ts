@@ -28,6 +28,9 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       ]),
     }),
   );
+  await page.route('**/api/b2b', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  );
 
   await page.goto('/');
 
@@ -40,4 +43,8 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   // Navigate to the Traffic page (same channel data) and confirm it renders.
   await page.getByRole('link', { name: 'Traffic' }).click();
   await expect(page.getByText('Каналы — визиты')).toBeVisible();
+
+  // Navigate to the B2B page and confirm the CRUD form is present.
+  await page.getByRole('link', { name: 'B2B' }).click();
+  await expect(page.getByRole('button', { name: 'Добавить' })).toBeVisible();
 });

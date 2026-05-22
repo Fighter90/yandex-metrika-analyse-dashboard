@@ -57,6 +57,21 @@ describe('api client', () => {
     expect(String(seen[1]?.body)).toContain('goalId');
   });
 
+  it('B2B mutations use the right method, path and body', async () => {
+    const calls: { url: string; init?: RequestInit }[] = [];
+    mockFetch((url, init) => {
+      calls.push({ url, init });
+      return ok({ id: 1 });
+    });
+    await api.createB2b({ company: 'A', tickets: 5, stage: 'lead', dateAdded: '2025-01-01' });
+    await api.updateB2bStage({ id: 7, stage: 'paid', datePaid: '2025-01-05' });
+    await api.removeB2b(7);
+    expect(calls[0]).toMatchObject({ url: '/api/b2b', init: { method: 'POST' } });
+    expect(calls[1]).toMatchObject({ url: '/api/b2b/7', init: { method: 'PATCH' } });
+    expect(String(calls[1]?.init?.body)).toContain('paid');
+    expect(calls[2]).toMatchObject({ url: '/api/b2b/7', init: { method: 'DELETE' } });
+  });
+
   it('returns undefined for 204 and throws ApiError on non-2xx', async () => {
     mockFetch(() => ({ ok: true, status: 204, json: async () => ({}), text: async () => '' }));
     expect(await api.b2b()).toBeUndefined();

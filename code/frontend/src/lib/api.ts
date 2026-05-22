@@ -1,4 +1,13 @@
-import type { B2bDeal, ChannelStat, Decision, Goal, Hypothesis, NewHypothesis } from '@pca/shared';
+import type {
+  B2bDeal,
+  B2bStage,
+  ChannelStat,
+  Decision,
+  Goal,
+  Hypothesis,
+  NewB2bDeal,
+  NewHypothesis,
+} from '@pca/shared';
 
 const BASE = '/api';
 
@@ -44,6 +53,14 @@ export const api = {
     http<Hypothesis>('/hypotheses', { method: 'POST', body: JSON.stringify(h) }),
   decisions: () => http<Decision[]>('/decisions'),
   b2b: () => http<B2bDeal[]>('/b2b'),
+  createB2b: (deal: NewB2bDeal) =>
+    http<B2bDeal>('/b2b', { method: 'POST', body: JSON.stringify(deal) }),
+  updateB2bStage: (input: { id: number; stage: B2bStage; datePaid?: string }) =>
+    http<B2bDeal>(`/b2b/${input.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ stage: input.stage, datePaid: input.datePaid }),
+    }),
+  removeB2b: (id: number) => http<void>(`/b2b/${id}`, { method: 'DELETE' }),
   sync: (body: { from: string; to: string; goalId?: number }) =>
     http<SyncSummary>('/sync', { method: 'POST', body: JSON.stringify(body) }),
 };
