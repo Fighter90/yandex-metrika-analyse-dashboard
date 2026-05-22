@@ -1,12 +1,52 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { buildTestApp, type TestApp } from './helpers';
 
+describe('GET /api/metrics/primary-goal', () => {
+  it('returns the auto-detected purchase goal', async () => {
+    const ctx = buildTestApp();
+    ctx.deps.metrics.upsertGoals([
+      { id: 5, name: 'Заявка', type: 'action', isB2b: false, isArchived: false, syncedAt: 'x' },
+      {
+        id: 8,
+        name: 'Ecommerce: покупка',
+        type: 'action',
+        isB2b: false,
+        isArchived: false,
+        syncedAt: 'x',
+      },
+    ]);
+    const res = await ctx.app.inject({ method: 'GET', url: '/api/metrics/primary-goal' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().id).toBe(8);
+    await ctx.app.close();
+    ctx.db.close();
+  });
+
+  it('404s when no goal looks like a KPI', async () => {
+    const ctx = buildTestApp();
+    ctx.deps.metrics.upsertGoals([
+      {
+        id: 3,
+        name: 'Просмотр видео',
+        type: 'action',
+        isB2b: false,
+        isArchived: false,
+        syncedAt: 'x',
+      },
+    ]);
+    const res = await ctx.app.inject({ method: 'GET', url: '/api/metrics/primary-goal' });
+    expect(res.statusCode).toBe(404);
+    await ctx.app.close();
+    ctx.db.close();
+  });
+});
+
 let ctx: TestApp;
 
 beforeAll(() => {
   ctx = buildTestApp();
   ctx.deps.metrics.upsertGoals([
-    { id: 80, name: 'pay', type: 'action', isB2b: false, isArchived: false, syncedAt: 'x' },
+    { id: 80, name: 'Оплата', type: 'action', isB2b: false, isArchived: false, syncedAt: 'x' },
     { id: 10, name: 'old', type: 'action', isB2b: false, isArchived: true, syncedAt: 'x' },
   ]);
   ctx.deps.metrics.upsertChannelStats([

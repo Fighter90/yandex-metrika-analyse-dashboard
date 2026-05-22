@@ -1,4 +1,4 @@
-import type { Goal } from '@pca/shared';
+import { selectPrimaryGoal, type Goal } from '@pca/shared';
 import type { MetricsRepo } from '../db/repositories/metrics-repo';
 import { dayChunks } from '../utils/date-range';
 import { stableHash } from '../utils/hash';
@@ -23,6 +23,12 @@ export interface SyncDeps {
 
 export interface SyncSummary {
   readonly goals: number;
+  /**
+   * The goal id whose reaches were synced. Either the explicit goalId passed in, or — when none was
+   * given — the primary KPI goal auto-detected from the goals list ({@link selectPrimaryGoal}), or
+   * undefined if neither applies (no KPI-looking goal found → goal metrics skipped).
+   */
+  readonly resolvedGoalId: number | undefined;
   readonly days: number;
   readonly channelRows: number;
   readonly utmRows: number;
@@ -35,7 +41,7 @@ export interface SyncSummary {
 export class SyncService {
   constructor(private readonly deps: SyncDeps) {}
 
-  async syncGoals(): Promise<number> {
+  async syncGoals(): Promise<Goal[]> {
     const res = await this.deps.client.get(
       ENDPOINTS.goals(this.deps.counterId),
       {},
@@ -50,7 +56,7 @@ export class SyncService {
       syncedAt: this.deps.now(),
     }));
     this.deps.metrics.upsertGoals(goals);
-    return goals.length;
+    return goals;
   }
 
   async syncTraffic(
@@ -196,13 +202,19 @@ export class SyncService {
 
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
     const goals = await this.syncGoals();
-    const { days, rows } = await this.syncTraffic(from, to, goalId);
-    const utm = await this.best('utm', () => this.syncUtm(from, to, goalId));
-    const geo = await this.best('geo-device', () => this.syncGeoDevice(from, to, goalId));
-    const pages = await this.best('pages', () => this.syncPages(from, to, goalId));
-    const exitPages = await this.best('exit-pages', () => this.syncExitPages(from, to, goalId));
+    // Auto-detect the KPI goal when the caller didn't pin one — so the user never hand-picks a
+    // GOAL_ID. An explicit goalId always wins; otherwise pick the payment/purchase goal.
+    const resolvedGoalId = goalId ?? selectPrimaryGoal(goals)?.id;
+    const { days, rows } = await this.syncTraffic(from, to, resolvedGoalId);
+    const utm = await this.best('utm', () => this.syncUtm(from, to, resolvedGoalId));
+    const geo = await this.best('geo-device', () => this.syncGeoDevice(from, to, resolvedGoalId));
+    const pages = await this.best('pages', () => this.syncPages(from, to, resolvedGoalId));
+    const exitPages = await this.best('exit-pages', () =>
+      this.syncExitPages(from, to, resolvedGoalId),
+    );
     return {
-      goals,
+      goals: goals.length,
+      resolvedGoalId,
       days,
       channelRows: rows,
       utmRows: utm.rows,

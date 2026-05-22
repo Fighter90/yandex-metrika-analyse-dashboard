@@ -18,7 +18,8 @@ const EnvSchema = z.object({
   YANDEX_CLIENT_SECRET: z.string().default(''),
   OAUTH_REDIRECT_URI: z.string().default('https://oauth.yandex.ru/verification_code'),
   COUNTER_ID: z.coerce.number().int().positive().default(54280963),
-  // The Metrika goal that counts as a «заявка» for the KPI (0 = none → goal metrics skipped).
+  // The Metrika goal that counts for the KPI. 0 (default) = auto-detect the primary purchase/payment
+  // goal from the goals list at sync time (selectPrimaryGoal); set a specific id only to override.
   GOAL_ID: z.coerce.number().int().default(0),
   // AI report narrative (Anthropic). Empty key → AI analysis is unavailable, dashboard still works.
   ANTHROPIC_API_KEY: z.string().default(''),
