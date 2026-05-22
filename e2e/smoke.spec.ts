@@ -46,6 +46,23 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
       ]),
     }),
   );
+  await page.route('**/api/metrics/geo-device*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          date: '2025-01-01',
+          country: 'Россия',
+          device: 'mobile',
+          visits: 60,
+          users: 55,
+          goalReaches: 3,
+          conversionRate: 0.05,
+        },
+      ]),
+    }),
+  );
   await page.route('**/api/b2b', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
@@ -92,6 +109,11 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.getByRole('link', { name: 'Traffic' }).click();
   await expect(page.getByText('Каналы — визиты')).toBeVisible();
   await expect(page.getByText('UTM-разбивка')).toBeVisible();
+
+  // Navigate to the Audience page and confirm the geo + device tables render.
+  await page.getByRole('link', { name: 'Audience' }).click();
+  await expect(page.getByRole('heading', { name: 'Страна' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Устройство' })).toBeVisible();
 
   // Navigate to the Funnel page and confirm the «заявка ≠ оплата» stages render.
   await page.getByRole('link', { name: 'Funnel' }).click();

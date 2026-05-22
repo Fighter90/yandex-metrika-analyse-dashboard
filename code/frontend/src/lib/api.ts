@@ -10,6 +10,7 @@ import type {
   NewHypothesis,
   ReportSnapshot,
   UtmStat,
+  GeoDeviceStat,
 } from '@pca/shared';
 
 const BASE = '/api';
@@ -35,6 +36,7 @@ export interface SyncSummary {
   days: number;
   channelRows: number;
   utmRows: number;
+  geoDeviceRows: number;
 }
 
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
@@ -53,6 +55,10 @@ export const api = {
     http<ChannelStat[]>(`/metrics/channels${range ? `?from=${range.from}&to=${range.to}` : ''}`),
   utm: (range?: { from: string; to: string }) =>
     http<UtmStat[]>(`/metrics/utm${range ? `?from=${range.from}&to=${range.to}` : ''}`),
+  geoDevice: (range?: { from: string; to: string }) =>
+    http<GeoDeviceStat[]>(
+      `/metrics/geo-device${range ? `?from=${range.from}&to=${range.to}` : ''}`,
+    ),
   goals: (archived = false) => http<Goal[]>(`/metrics/goals${archived ? '?archived=true' : ''}`),
   hypotheses: () => http<Hypothesis[]>('/hypotheses'),
   createHypothesis: (h: NewHypothesis) =>

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { DB } from '../../src/db/connection';
 import { MetricsRepo } from '../../src/db/repositories/metrics-repo';
 import { freshDb } from './helpers';
-import type { ChannelStat, Goal, UtmStat } from '@pca/shared';
+import type { ChannelStat, GeoDeviceStat, Goal, UtmStat } from '@pca/shared';
 
 let db: DB;
 let repo: MetricsRepo;
@@ -128,5 +128,31 @@ describe('MetricsRepo — UTM stats', () => {
     const rows = repo.listUtmStats();
     expect(rows).toHaveLength(1);
     expect(rows[0]?.visits).toBe(250);
+  });
+});
+
+const geo = (date: string, over: Partial<GeoDeviceStat> = {}): GeoDeviceStat => ({
+  date,
+  country: 'Россия',
+  device: 'mobile',
+  visits: 100,
+  users: 90,
+  goalReaches: 6,
+  conversionRate: 0.06,
+  ...over,
+});
+
+describe('MetricsRepo — geo/device stats', () => {
+  it('upserts and lists geo/device stats, optionally filtered by date range', () => {
+    repo.upsertGeoDeviceStats([
+      geo('2025-01-01'),
+      geo('2025-01-02', { device: 'desktop' }),
+      geo('2025-01-03'),
+    ]);
+    expect(repo.listGeoDeviceStats()).toHaveLength(3);
+    const ranged = repo.listGeoDeviceStats({ from: '2025-01-02', to: '2025-01-03' });
+    expect(ranged.map((g) => g.date)).toEqual(['2025-01-02', '2025-01-03']);
+    expect(ranged[0]?.device).toBe('desktop');
+    expect(ranged[0]?.goalReaches).toBe(6);
   });
 });

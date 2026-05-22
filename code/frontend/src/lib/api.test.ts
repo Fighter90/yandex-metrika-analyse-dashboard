@@ -39,14 +39,18 @@ describe('api client', () => {
     await api.channels({ from: '2025-01-01', to: '2025-01-07' });
     await api.utm();
     await api.utm({ from: '2025-01-01', to: '2025-01-07' });
+    await api.geoDevice();
+    await api.geoDevice({ from: '2025-01-01', to: '2025-01-07' });
     await api.goals();
     await api.goals(true);
     expect(calls[0]).toBe('/api/metrics/channels');
     expect(calls[1]).toContain('from=2025-01-01&to=2025-01-07');
     expect(calls[2]).toBe('/api/metrics/utm');
     expect(calls[3]).toContain('/api/metrics/utm?from=2025-01-01&to=2025-01-07');
-    expect(calls[4]).toBe('/api/metrics/goals');
-    expect(calls[5]).toContain('archived=true');
+    expect(calls[4]).toBe('/api/metrics/geo-device');
+    expect(calls[5]).toContain('/api/metrics/geo-device?from=2025-01-01&to=2025-01-07');
+    expect(calls[6]).toBe('/api/metrics/goals');
+    expect(calls[7]).toContain('archived=true');
   });
 
   it('POSTs create-hypothesis and sync with JSON bodies', async () => {

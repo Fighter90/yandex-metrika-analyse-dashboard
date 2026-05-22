@@ -1,5 +1,12 @@
 import type { DB } from '../connection';
-import type { ChannelStat, Goal, NewRawResponse, RawResponse, UtmStat } from '@pca/shared';
+import type {
+  ChannelStat,
+  GeoDeviceStat,
+  Goal,
+  NewRawResponse,
+  RawResponse,
+  UtmStat,
+} from '@pca/shared';
 
 interface GoalRow {
   id: number;
@@ -51,6 +58,28 @@ function toUtmStat(r: UtmRow): UtmStat {
     utmSource: r.utm_source,
     utmMedium: r.utm_medium,
     utmCampaign: r.utm_campaign,
+    visits: r.visits,
+    users: r.users,
+    goalReaches: r.goal_reaches,
+    conversionRate: r.conversion_rate,
+  };
+}
+
+interface GeoDeviceRow {
+  date: string;
+  country: string;
+  device: string;
+  visits: number;
+  users: number;
+  goal_reaches: number;
+  conversion_rate: number;
+}
+
+function toGeoDeviceStat(r: GeoDeviceRow): GeoDeviceStat {
+  return {
+    date: r.date,
+    country: r.country,
+    device: r.device,
     visits: r.visits,
     users: r.users,
     goalReaches: r.goal_reaches,
@@ -223,5 +252,36 @@ export class MetricsRepo {
           .all(range.from, range.to) as UtmRow[])
       : (this.db.prepare('SELECT * FROM utm_stats ORDER BY date').all() as UtmRow[]);
     return rows.map(toUtmStat);
+  }
+
+  upsertGeoDeviceStats(rows: readonly GeoDeviceStat[]): void {
+    const stmt = this.db.prepare(
+      `INSERT OR REPLACE INTO geo_device_stats
+         (date, country, device, visits, users, goal_reaches, conversion_rate)
+       VALUES (@date, @country, @device, @visits, @users, @goal_reaches, @conversion_rate)`,
+    );
+    const tx = this.db.transaction((items: readonly GeoDeviceStat[]) => {
+      for (const g of items) {
+        stmt.run({
+          date: g.date,
+          country: g.country,
+          device: g.device,
+          visits: g.visits,
+          users: g.users,
+          goal_reaches: g.goalReaches,
+          conversion_rate: g.conversionRate,
+        });
+      }
+    });
+    tx(rows);
+  }
+
+  listGeoDeviceStats(range?: { from: string; to: string }): GeoDeviceStat[] {
+    const rows = range
+      ? (this.db
+          .prepare('SELECT * FROM geo_device_stats WHERE date >= ? AND date <= ? ORDER BY date')
+          .all(range.from, range.to) as GeoDeviceRow[])
+      : (this.db.prepare('SELECT * FROM geo_device_stats ORDER BY date').all() as GeoDeviceRow[]);
+    return rows.map(toGeoDeviceStat);
   }
 }

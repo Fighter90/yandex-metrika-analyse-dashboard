@@ -59,6 +59,26 @@ beforeAll(() => {
       conversionRate: 0.03,
     },
   ]);
+  ctx.deps.metrics.upsertGeoDeviceStats([
+    {
+      date: '2025-01-01',
+      country: 'Россия',
+      device: 'mobile',
+      visits: 60,
+      users: 55,
+      goalReaches: 3,
+      conversionRate: 0.05,
+    },
+    {
+      date: '2025-01-09',
+      country: 'Казахстан',
+      device: 'desktop',
+      visits: 20,
+      users: 18,
+      goalReaches: 1,
+      conversionRate: 0.05,
+    },
+  ]);
 });
 afterAll(async () => {
   await ctx.app.close();
@@ -87,6 +107,18 @@ describe('GET /api/metrics', () => {
     });
     expect(ranged.json()).toHaveLength(1);
     expect(ranged.json()[0].utmSource).toBe('vk');
+  });
+
+  it('returns all geo/device stats, and a date-filtered subset', async () => {
+    const all = await ctx.app.inject({ method: 'GET', url: '/api/metrics/geo-device' });
+    expect(all.json()).toHaveLength(2);
+
+    const ranged = await ctx.app.inject({
+      method: 'GET',
+      url: '/api/metrics/geo-device?from=2025-01-01&to=2025-01-05',
+    });
+    expect(ranged.json()).toHaveLength(1);
+    expect(ranged.json()[0].country).toBe('Россия');
   });
 
   it('hides archived goals by default, includes them with ?archived=true', async () => {

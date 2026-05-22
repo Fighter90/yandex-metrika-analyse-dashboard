@@ -47,7 +47,7 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
     hypotheses,
     decisions,
     b2b,
-    runSync: async () => ({ goals: 0, days: 0, channelRows: 0, utmRows: 0 }),
+    runSync: async () => ({ goals: 0, days: 0, channelRows: 0, utmRows: 0, geoDeviceRows: 0 }),
     report,
   };
   const app = logger === undefined ? buildServer(deps) : buildServer(deps, logger);
