@@ -21,7 +21,7 @@ describe('pageMetrics', () => {
 describe('pageBehavior', () => {
   it('maps entry-page rows without goal metrics', async () => {
     const client = fakeClient({
-      data: [{ dimensions: [{ name: '/lp' }], metrics: [100, 90, 0.3] }],
+      data: [{ dimensions: [{ name: '/lp' }], metrics: [100, 90, 30] }],
     });
     const { stats } = await pageBehavior(client, {
       counterId: 1,
@@ -41,7 +41,7 @@ describe('pageBehavior', () => {
 
   it('includes goal metrics when goalId is set', async () => {
     const client = fakeClient({
-      data: [{ dimensions: [{ name: '/lp' }], metrics: [100, 90, 0.3, 5, 0.05] }],
+      data: [{ dimensions: [{ name: '/lp' }], metrics: [100, 90, 30, 5, 5] }],
     });
     const { stats } = await pageBehavior(client, {
       counterId: 1,

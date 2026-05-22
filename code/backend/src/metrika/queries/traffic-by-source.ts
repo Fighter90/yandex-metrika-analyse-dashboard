@@ -2,6 +2,7 @@ import type { ChannelStat } from '@pca/shared';
 import type { MetrikaClient } from '../client';
 import { ENDPOINTS } from '../endpoints';
 import { StatDataResponseSchema, type StatDataResponse } from '../schemas';
+import { ratio } from './ratio';
 
 export interface TrafficQueryOptions {
   readonly counterId: number;
@@ -24,10 +25,10 @@ function mapRow(row: Row, opts: TrafficQueryOptions): ChannelStat {
     utmCampaign: null,
     visits: m[0] ?? 0,
     users: m[1] ?? 0,
-    bounceRate: m[2] ?? 0,
+    bounceRate: ratio(m[2]),
     avgDuration: m[3] ?? 0,
     goalReaches: hasGoal ? (m[4] ?? 0) : 0,
-    conversionRate: hasGoal ? (m[5] ?? 0) : 0,
+    conversionRate: hasGoal ? ratio(m[5]) : 0,
   };
 }
 

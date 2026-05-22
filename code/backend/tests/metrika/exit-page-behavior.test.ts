@@ -9,7 +9,7 @@ function fakeClient(fixture: unknown): MetrikaClient {
 describe('exitPageBehavior', () => {
   it('maps exit-page rows without goal metrics', async () => {
     const client = fakeClient({
-      data: [{ dimensions: [{ name: '/checkout' }], metrics: [40, 35, 0.6] }],
+      data: [{ dimensions: [{ name: '/checkout' }], metrics: [40, 35, 60] }],
     });
     const { stats } = await exitPageBehavior(client, {
       counterId: 1,
@@ -29,7 +29,7 @@ describe('exitPageBehavior', () => {
 
   it('includes goal metrics when goalId is set', async () => {
     const client = fakeClient({
-      data: [{ dimensions: [{ name: '/checkout' }], metrics: [40, 35, 0.6, 2, 0.05] }],
+      data: [{ dimensions: [{ name: '/checkout' }], metrics: [40, 35, 60, 2, 5] }],
     });
     const { stats } = await exitPageBehavior(client, {
       counterId: 1,
