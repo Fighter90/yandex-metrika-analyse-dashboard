@@ -8,6 +8,11 @@
 
 ### Added
 
+- Итерация 8 (старт) — отчётность (бэкенд): `SnapshotBuilder` собирает неизменяемый `ReportSnapshot`
+  из БД (KPI «заявка ≠ оплата»: b2cApplications vs b2bPaidTickets, gap; каналы за период; гипотезы
+  problem/solution; решения) — детерминированно (id + generatedAt на входе). Роуты
+  `POST /api/report/snapshot` и `GET /api/report/snapshot/:id`. Тип `ReportSnapshot` в `@pca/shared`.
+  100% покрытие. DOCX/PDF и страница Report Preview — следующие итерации.
 - Итерация 7 — страница **Decisions** (Decision Log): список карточек DL-{N} (исход-бейдж, ссылка на
   гипотезу) и редактор записи с обязательным выбором гипотезы и доказательной базой (evidence). При
   создании бэкенд атомарно обновляет статус связанной гипотезы; клиент инвалидирует и решения, и

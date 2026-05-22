@@ -1,0 +1,69 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import type { DB } from '../../src/db/connection';
+import { MetricsRepo } from '../../src/db/repositories/metrics-repo';
+import { HypothesesRepo } from '../../src/db/repositories/hypotheses-repo';
+import { DecisionsRepo } from '../../src/db/repositories/decisions-repo';
+import { B2bRepo } from '../../src/db/repositories/b2b-repo';
+import { SnapshotBuilder } from '../../src/report/snapshot-builder';
+import { freshDb, validHypothesis } from '../db/helpers';
+
+let db: DB;
+let builder: SnapshotBuilder;
+let metrics: MetricsRepo;
+
+beforeEach(() => {
+  db = freshDb();
+  metrics = new MetricsRepo(db);
+  const hypotheses = new HypothesesRepo(db);
+  const b2b = new B2bRepo(db);
+  builder = new SnapshotBuilder({ metrics, hypotheses, decisions: new DecisionsRepo(db), b2b });
+
+  metrics.upsertChannelStats([
+    {
+      date: '2025-01-02',
+      channel: 'podcast',
+      utmSource: null,
+      utmMedium: null,
+      utmCampaign: null,
+      visits: 100,
+      users: 90,
+      bounceRate: 0.2,
+      avgDuration: 60,
+      goalReaches: 7,
+      conversionRate: 0.07,
+    },
+  ]);
+  hypotheses.create(validHypothesis({ kind: 'problem' }));
+  hypotheses.create(validHypothesis({ kind: 'solution', diamondPhase: 'develop' }));
+  b2b.create({ company: 'BigCorp', tickets: 20, stage: 'paid', dateAdded: '2025-01-01' });
+  b2b.create({ company: 'SmallCo', tickets: 3, stage: 'lead', dateAdded: '2025-01-01' });
+});
+afterEach(() => db.close());
+
+describe('SnapshotBuilder', () => {
+  it('assembles KPI, channels, hypotheses split and decisions from the DB', () => {
+    const snap = builder.build({
+      id: 'snap-1',
+      generatedAt: 'T',
+      from: '2025-01-01',
+      to: '2025-01-07',
+    });
+    expect(snap.id).toBe('snap-1');
+    expect(snap.kpi).toEqual({ target: 300, b2cApplications: 7, b2bPaidTickets: 20, gap: 280 });
+    expect(snap.channels).toHaveLength(1);
+    expect(snap.hypotheses.problems).toHaveLength(1);
+    expect(snap.hypotheses.solutions).toHaveLength(1);
+    expect(snap.period).toEqual({ from: '2025-01-01', to: '2025-01-07' });
+  });
+
+  it('is deterministic — same inputs + data yield an identical snapshot', () => {
+    const opts = { id: 'x', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' };
+    expect(JSON.stringify(builder.build(opts))).toBe(JSON.stringify(builder.build(opts)));
+  });
+
+  it('excludes channel rows outside the requested period', () => {
+    const snap = builder.build({ id: 'x', generatedAt: 'T', from: '2025-02-01', to: '2025-02-07' });
+    expect(snap.channels).toHaveLength(0);
+    expect(snap.kpi.b2cApplications).toBe(0);
+  });
+});

@@ -6,12 +6,14 @@ import type { HypothesesRepo } from './db/repositories/hypotheses-repo';
 import type { DecisionsRepo } from './db/repositories/decisions-repo';
 import type { B2bRepo } from './db/repositories/b2b-repo';
 import type { SyncRunner } from './routes/sync';
+import type { ReportRunner } from './routes/report';
 import { healthRoutes } from './routes/health';
 import { metricsRoutes } from './routes/metrics';
 import { hypothesesRoutes } from './routes/hypotheses';
 import { decisionsRoutes } from './routes/decisions';
 import { b2bRoutes } from './routes/b2b';
 import { syncRoutes } from './routes/sync';
+import { reportRoutes } from './routes/report';
 
 export interface AppDeps {
   readonly metrics: MetricsRepo;
@@ -19,6 +21,7 @@ export interface AppDeps {
   readonly decisions: DecisionsRepo;
   readonly b2b: B2bRepo;
   readonly runSync: SyncRunner;
+  readonly report: ReportRunner;
 }
 
 /**
@@ -42,6 +45,7 @@ export function buildServer(
   app.register(decisionsRoutes, { prefix: '/api', repo: deps.decisions });
   app.register(b2bRoutes, { prefix: '/api', repo: deps.b2b });
   app.register(syncRoutes, { prefix: '/api', runSync: deps.runSync });
+  app.register(reportRoutes, { prefix: '/api', runner: deps.report });
 
   return app;
 }

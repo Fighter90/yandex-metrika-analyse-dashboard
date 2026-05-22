@@ -6,19 +6,28 @@ import { MetricsRepo } from './db/repositories/metrics-repo';
 import { HypothesesRepo } from './db/repositories/hypotheses-repo';
 import { DecisionsRepo } from './db/repositories/decisions-repo';
 import { B2bRepo } from './db/repositories/b2b-repo';
+import { SnapshotRepo } from './db/repositories/snapshot-repo';
+import { SnapshotBuilder } from './report/snapshot-builder';
 import { makeSyncRunner } from './metrika/production-sync';
+import { makeReportRunner } from './report/production-report';
 
 /** Entry point. Excluded from coverage — opens the real DB and binds the port. */
 async function main(): Promise<void> {
   const db = openDb(config.DB_PATH);
   migrate(db);
+  const metrics = new MetricsRepo(db);
+  const hypotheses = new HypothesesRepo(db);
+  const decisions = new DecisionsRepo(db);
+  const b2b = new B2bRepo(db);
+  const builder = new SnapshotBuilder({ metrics, hypotheses, decisions, b2b });
   const app = buildServer(
     {
-      metrics: new MetricsRepo(db),
-      hypotheses: new HypothesesRepo(db),
-      decisions: new DecisionsRepo(db),
-      b2b: new B2bRepo(db),
+      metrics,
+      hypotheses,
+      decisions,
+      b2b,
       runSync: makeSyncRunner(),
+      report: makeReportRunner(builder, new SnapshotRepo(db)),
     },
     true,
   );
