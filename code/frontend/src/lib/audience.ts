@@ -1,5 +1,5 @@
 import type { GeoDeviceStat } from '@pca/shared';
-import { intTooltip } from './echart-format';
+import { intTooltip, intBarLabel } from './echart-format';
 
 export interface AudienceRow {
   readonly label: string;
@@ -51,7 +51,7 @@ export function audienceBarOption(rows: AudienceRow[], title: string): object {
     grid: { left: 120, right: 16, top: 32, bottom: 24 },
     xAxis: { type: 'value' },
     yAxis: { type: 'category', data: top.map((r) => r.label) },
-    series: [{ type: 'bar', data: top.map((r) => r.visits) }],
+    series: [{ type: 'bar', data: top.map((r) => r.visits), label: intBarLabel('right') }],
   };
 }
 
