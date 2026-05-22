@@ -37,6 +37,28 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.route('**/api/decisions', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
+  await page.route('**/api/report/snapshot', (route) =>
+    route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 'snap-e2e',
+        generatedAt: 'T',
+        period: { from: '2025-01-01', to: '2025-01-07' },
+        kpi: { target: 300, b2cApplications: 7, b2bPaidTickets: 20, gap: 280 },
+        channels: [],
+        hypotheses: { problems: [], solutions: [] },
+        decisions: [],
+      }),
+    }),
+  );
+  await page.route('**/api/report/generate', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ filePath: 'data/reports/snap-e2e.docx' }),
+    }),
+  );
 
   await page.goto('/');
 
@@ -62,7 +84,10 @@ test('dashboard shell renders nav + Overview KPI', async ({ page }) => {
   await page.getByRole('link', { name: 'Decisions' }).click();
   await expect(page.getByRole('button', { name: /Сохранить решение/ })).toBeDisabled();
 
-  // Navigate to Report preview and confirm the build prompt.
+  // Report: build a snapshot, then export DOCX (both backend calls mocked).
   await page.getByRole('link', { name: 'Report' }).click();
-  await expect(page.getByRole('button', { name: 'Сформировать snapshot' })).toBeVisible();
+  await page.getByRole('button', { name: 'Сформировать snapshot' }).click();
+  await expect(page.getByText(/snapshot snap-e2e/)).toBeVisible();
+  await page.getByRole('button', { name: 'Export DOCX' }).click();
+  await expect(page.getByText(/Сохранено: data\/reports\/snap-e2e\.docx/)).toBeVisible();
 });

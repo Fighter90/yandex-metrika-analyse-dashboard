@@ -54,12 +54,13 @@ describe('api client', () => {
     await api.createHypothesis({ title: 'x' } as never);
     await api.createDecision({ scope: 'd' } as never);
     await api.buildSnapshot({ from: 'a', to: 'b' });
+    await api.generateReport({ snapshotId: 'x', format: 'docx' });
     await api.sync({ from: 'a', to: 'b', goalId: 80 });
     expect(seen[0]?.method).toBe('POST');
     expect(seen[1]?.method).toBe('POST');
     expect(seen[2]?.method).toBe('POST');
-    expect(String(seen[2]?.body)).toContain('from');
-    expect(String(seen[3]?.body)).toContain('goalId');
+    expect(String(seen[3]?.body)).toContain('docx');
+    expect(String(seen[4]?.body)).toContain('goalId');
   });
 
   it('B2B mutations use the right method, path and body', async () => {

@@ -21,7 +21,11 @@ function appWith(runner: ReportRunner): FastifyInstance {
 
 describe('report routes', () => {
   it('POST /api/report/snapshot builds and returns a snapshot', async () => {
-    const runner: ReportRunner = { build: vi.fn().mockReturnValue(snap), get: vi.fn() };
+    const runner: ReportRunner = {
+      build: vi.fn().mockReturnValue(snap),
+      get: vi.fn(),
+      generate: vi.fn(),
+    };
     const app = appWith(runner);
     const res = await app.inject({
       method: 'POST',
@@ -35,7 +39,7 @@ describe('report routes', () => {
   });
 
   it('POST rejects an invalid body with 400', async () => {
-    const app = appWith({ build: vi.fn(), get: vi.fn() } as unknown as ReportRunner);
+    const app = appWith({ build: vi.fn(), get: vi.fn(), generate: vi.fn() } as ReportRunner);
     const res = await app.inject({
       method: 'POST',
       url: '/api/report/snapshot',
@@ -49,11 +53,46 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn((id: string) => (id === 'snap-1' ? snap : undefined)),
+      generate: vi.fn(),
     };
     const app = appWith(runner);
     const found = await app.inject({ method: 'GET', url: '/api/report/snapshot/snap-1' });
     expect(found.statusCode).toBe(200);
     const missing = await app.inject({ method: 'GET', url: '/api/report/snapshot/none' });
+    expect(missing.statusCode).toBe(404);
+    await app.close();
+  });
+
+  it('POST /api/report/generate returns a file path, 400 on bad body, 404 on missing snapshot', async () => {
+    const runner: ReportRunner = {
+      build: vi.fn(),
+      get: vi.fn(),
+      generate: vi.fn(async (id: string) =>
+        id === 'snap-1' ? { filePath: 'data/reports/snap-1.docx' } : undefined,
+      ),
+    };
+    const app = appWith(runner);
+
+    const ok = await app.inject({
+      method: 'POST',
+      url: '/api/report/generate',
+      payload: { snapshotId: 'snap-1', format: 'docx' },
+    });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json().filePath).toBe('data/reports/snap-1.docx');
+
+    const bad = await app.inject({
+      method: 'POST',
+      url: '/api/report/generate',
+      payload: { snapshotId: 'snap-1', format: 'pdf' },
+    });
+    expect(bad.statusCode).toBe(400);
+
+    const missing = await app.inject({
+      method: 'POST',
+      url: '/api/report/generate',
+      payload: { snapshotId: 'none', format: 'docx' },
+    });
     expect(missing.statusCode).toBe(404);
     await app.close();
   });
