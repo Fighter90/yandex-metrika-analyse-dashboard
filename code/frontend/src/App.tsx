@@ -8,7 +8,7 @@ import { B2b } from './routes/b2b';
 import { Hypotheses } from './routes/hypotheses';
 import { Decisions } from './routes/decisions';
 import { ReportPreview } from './routes/report-preview';
-import { Funnel } from './routes/placeholders';
+import { Funnel } from './routes/funnel';
 
 export function App(): JSX.Element {
   return (

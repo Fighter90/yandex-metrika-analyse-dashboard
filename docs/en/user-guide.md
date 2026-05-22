@@ -31,7 +31,7 @@ B2C / B2C+B2B / B2B toggle, show-archived-goals toggle, "Sync now" button.
 | -------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **Overview**   | KPI strip (target 300, actual, forecast), Daily Sales, channel mix, weak spots, hypotheses in progress, latest decisions |
 | **Traffic**    | UTM Sankey, UTM table with CSV export, low-coverage badge, WoW                                                           |
-| **Funnel**     | visit → registration → form → payment, drill-down by channel                                                             |
+| **Funnel**     | «application ≠ payment» funnel: Visits → B2C applications → B2B tickets (pipeline) → B2B paid, stage-by-stage conversion |
 | **Behavior**   | page dropoff, hour heatmap, top-20 cities                                                                                |
 | **Forms**      | per form: opens / started / submitted / biggest-dropout field                                                            |
 | **B2B**        | deals CRUD table, pipeline by stage, forecast                                                                            |
