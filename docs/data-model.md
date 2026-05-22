@@ -1,6 +1,6 @@
 # Модель данных (SQLite)
 
-> Источник истины — миграции `code/backend/src/db/migrations/001..008`. Доступ только через
+> Источник истины — миграции `code/backend/src/db/migrations/001..009`. Доступ только через
 > репозитории (`code/backend/src/db/repositories/`). История копится по дням (см. ADR-007).
 
 ## Таблицы
@@ -13,6 +13,7 @@
 | `utm_stats`        | разбивка по UTM source/medium/campaign | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням**; пропуски → `(none)`, отдельно от `channel_stats` чтобы не дублировать визиты |
 | `geo_device_stats` | разбивка по стране + типу устройства   | PK `(date, country, device)` — **по дням**; пропуски → `(none)`, отдельная таблица чтобы не дублировать визиты                                |
 | `page_stats`       | поведение страниц входа (startURL)     | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
+| `exit_page_stats`  | поведение страниц выхода (exitURL)     | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
 | `hypotheses`       | гипотезы в формате Воронковой          | `ice_score` GENERATED `impact*confidence*ease`                                                                                                |
 | `b2b_manual`       | ручной B2B-пайплайн                    | этапы lead/negotiation/invoiced/paid                                                                                                          |
 | `report_snapshots` | immutable снапшоты отчётов             | PK `id` (ulid)                                                                                                                                |

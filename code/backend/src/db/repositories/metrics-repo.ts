@@ -338,4 +338,35 @@ export class MetricsRepo {
       : (this.db.prepare('SELECT * FROM page_stats ORDER BY date').all() as PageRow[]);
     return rows.map(toPageStat);
   }
+
+  upsertExitPageStats(rows: readonly PageStat[]): void {
+    const stmt = this.db.prepare(
+      `INSERT OR REPLACE INTO exit_page_stats
+         (date, page, visits, users, bounce_rate, goal_reaches, conversion_rate)
+       VALUES (@date, @page, @visits, @users, @bounce_rate, @goal_reaches, @conversion_rate)`,
+    );
+    const tx = this.db.transaction((items: readonly PageStat[]) => {
+      for (const p of items) {
+        stmt.run({
+          date: p.date,
+          page: p.page,
+          visits: p.visits,
+          users: p.users,
+          bounce_rate: p.bounceRate,
+          goal_reaches: p.goalReaches,
+          conversion_rate: p.conversionRate,
+        });
+      }
+    });
+    tx(rows);
+  }
+
+  listExitPageStats(range?: { from: string; to: string }): PageStat[] {
+    const rows = range
+      ? (this.db
+          .prepare('SELECT * FROM exit_page_stats WHERE date >= ? AND date <= ? ORDER BY date')
+          .all(range.from, range.to) as PageRow[])
+      : (this.db.prepare('SELECT * FROM exit_page_stats ORDER BY date').all() as PageRow[]);
+    return rows.map(toPageStat);
+  }
 }

@@ -8,6 +8,13 @@
 
 ### Added
 
+- Итерация 16 — **страницы выхода** (расширение парсера): новый запрос Stat API `exit-page-behavior`
+  (`ym:s:exitURL`), отдельная таблица `exit_page_stats` (migration 009) + методы репозитория
+  (`upsertExitPageStats`/`listExitPageStats`), интеграция в `SyncService.syncExitPages` + `syncAll`
+  (поле `exitPageRows` в `SyncSummary`), эндпоинт `GET /api/metrics/exit-pages`, клиент
+  `api.exitPages()`. Страница **Behavior** теперь показывает две таблицы — «Страницы входа» и
+  «Страницы выхода» (общий агрегатор `pageRows`, два запроса через `combineStatus`). Переиспользует
+  тип `PageStat`. 100% покрытие; e2e проверяет обе таблицы.
 - Итерация 15 — **поведение страниц** (расширение парсера) и страница **Behavior**: новый запрос Stat
   API `page-behavior` (`ym:s:startURL` + `ym:s:bounceRate`), отдельная таблица `page_stats`
   (migration 008) с историей по дням и репозиторием (`upsertPageStats`/`listPageStats`), интеграция

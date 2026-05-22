@@ -17,6 +17,7 @@ describe('POST /api/sync', () => {
       utmRows: 1,
       geoDeviceRows: 1,
       pageRows: 1,
+      exitPageRows: 1,
     });
     const app = appWith(runSync as unknown as SyncRunner);
     const res = await app.inject({
@@ -32,6 +33,7 @@ describe('POST /api/sync', () => {
       utmRows: 1,
       geoDeviceRows: 1,
       pageRows: 1,
+      exitPageRows: 1,
     });
     expect(runSync).toHaveBeenCalledWith({ from: '2025-01-01', to: '2025-01-07', goalId: 80 });
     await app.close();

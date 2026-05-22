@@ -33,7 +33,7 @@ B2C / B2C+B2B / B2B toggle, show-archived-goals toggle, "Sync now" button.
 | **Traffic**    | UTM Sankey, UTM table with CSV export, low-coverage badge, WoW                                                           |
 | **Audience**   | traffic split by country and device category: visits / users / applications / CR                                         |
 | **Funnel**     | «application ≠ payment» funnel: Visits → B2C applications → B2B tickets (pipeline) → B2B paid, stage-by-stage conversion |
-| **Behavior**   | entry pages (startURL): visits / users / bounce rate / applications / CR                                                 |
+| **Behavior**   | entry (startURL) and exit (exitURL) pages: visits / users / bounce rate / applications / CR                              |
 | **Forms**      | per form: opens / started / submitted / biggest-dropout field                                                            |
 | **B2B**        | deals CRUD table, pipeline by stage, forecast                                                                            |
 | **Hypotheses** | Double Diamond + Voronkova hypothesis editor (below)                                                                     |
