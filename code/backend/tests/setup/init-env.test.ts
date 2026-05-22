@@ -3,7 +3,7 @@ import { applyInitValues } from '../../src/setup/init-env';
 
 const ENV = [
   'YANDEX_OAUTH_TOKEN=',
-  'COUNTER_ID=54280963',
+  'COUNTER_ID=12345678',
   'GOAL_ID=0',
   'ANTHROPIC_API_KEY=YOUR_ANTHROPIC_API_KEY_HERE',
   'ANTHROPIC_MODEL=claude-sonnet-4-6',

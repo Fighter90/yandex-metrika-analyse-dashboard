@@ -28,7 +28,7 @@ console.log('\n=== Инициализация ProductCamp Analytics ===');
 console.log('Пустой ввод оставляет текущее значение.\n');
 
 const anthropicKey = await ask('Anthropic API key (для AI-анализа; можно пропустить)');
-const counterId = await ask('ID счётчика Яндекс.Метрики', '54280963');
+const counterId = await ask('ID счётчика Яндекс.Метрики (обязательно для живого sync)');
 const goalId = await ask('ID цели KPI (0 = авто-определение основной цели оплаты)', '0');
 rl.close();
 

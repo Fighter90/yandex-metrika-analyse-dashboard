@@ -127,6 +127,6 @@ describe('schemas + endpoints', () => {
   it('validates a goals response and builds the goals endpoint', () => {
     const parsed = GoalsResponseSchema.parse({ goals: [{ id: 80, name: 'pay', type: 'action' }] });
     expect(parsed.goals[0]?.id).toBe(80);
-    expect(ENDPOINTS.goals(54280963)).toBe('/management/v1/counter/54280963/goals');
+    expect(ENDPOINTS.goals(12345678)).toBe('/management/v1/counter/12345678/goals');
   });
 });

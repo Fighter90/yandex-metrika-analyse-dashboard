@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { config, hasMetrikaToken, hasAnthropicKey } from '../src/config';
+import { config, hasMetrikaToken, hasAnthropicKey, hasCounterId } from '../src/config';
 
 describe('hasMetrikaToken', () => {
   it('is false for an empty token', () => {
@@ -36,10 +36,21 @@ describe('hasAnthropicKey', () => {
   });
 });
 
+describe('hasCounterId', () => {
+  it('is false when unset (0) and true for a real counter id', () => {
+    expect(hasCounterId(0)).toBe(false);
+    expect(hasCounterId(12345678)).toBe(true);
+  });
+
+  it('falls back to the configured counter id when no argument is given', () => {
+    expect(hasCounterId()).toBe(config.COUNTER_ID > 0);
+  });
+});
+
 describe('config', () => {
-  it('coerces COUNTER_ID to a positive number', () => {
+  it('coerces COUNTER_ID to a non-negative number (0 = not configured)', () => {
     expect(typeof config.COUNTER_ID).toBe('number');
-    expect(config.COUNTER_ID).toBeGreaterThan(0);
+    expect(config.COUNTER_ID).toBeGreaterThanOrEqual(0);
   });
 
   it('provides sane runtime defaults', () => {

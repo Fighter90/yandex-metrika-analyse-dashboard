@@ -7,7 +7,7 @@
 > [🇷🇺 Русский](README.md) · 🇬🇧 English
 
 A locally-run analytics tool for ProductCamp's **"Conversions & lead-gen"** track.
-It connects to Yandex Metrika (counter `54280963`) over OAuth, caches data in SQLite,
+It connects to Yandex Metrika (counter set in `.env`) over OAuth, caches data in SQLite,
 serves an interactive dashboard, and helps run product hypotheses using the Voronkova
 methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation.
 
@@ -17,7 +17,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 > sync + demo data), an 11-page dashboard (Overview, Traffic, Audience, Behavior, Trends, Funnel,
 > B2B, Hypotheses, Decisions, Report, Sources), Voronkova hypotheses + Decision Log, deterministic
 > DOCX/PDF with an optional **AI analysis** (Anthropic), one-command deploy, 100% test coverage and
-> full CI/CD. Verified against live data of counter `54280963`.
+> full CI/CD. Verified against live data of the ProductCamp counter.
 
 ## Quickstart
 
@@ -42,7 +42,7 @@ pnpm install        # 1. dependencies
 **Step 2 — `./init.sh`** interactively creates `.env` (from `.env.example`) and asks for:
 
 - `ANTHROPIC_API_KEY` — key for AI report analysis (optional — the dashboard works without it);
-- `COUNTER_ID` — Yandex Metrika counter (default `54280963`);
+- `COUNTER_ID` — your Yandex Metrika counter (required for a live sync; set in `.env`);
 - `GOAL_ID` — the KPI goal id; `0` (default) = **auto-detect** the primary payment/purchase goal from
   the counter's goals, any value `> 0` pins the goal explicitly;
 - and offers to set up **Yandex Metrika OAuth** right away (`pnpm auth`).

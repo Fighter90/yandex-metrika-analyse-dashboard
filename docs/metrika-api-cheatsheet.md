@@ -29,7 +29,7 @@ Base URL: `https://api-metrika.yandex.net`
 
 ## Параметры Stat API (основное)
 
-- `ids` — id счётчика (`54280963`).
+- `ids` — id счётчика (`<COUNTER_ID>`).
 - `dimensions` — измерения, напр. `ym:s:lastTrafficSource,ym:s:lastSourceEngine`.
 - `metrics` — метрики, напр. `ym:s:visits,ym:s:users,ym:s:bounceRate,ym:s:avgVisitDurationSeconds`.
 - Цели: `ym:s:goal<ID>reaches`, `ym:s:goal<ID>conversionRate` (подставляется id цели).

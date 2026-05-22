@@ -1,4 +1,4 @@
-import { config } from '../config';
+import { config, hasCounterId } from '../config';
 import { openDb } from '../db/connection';
 import { migrate } from '../db/migrate';
 import { MetricsRepo } from '../db/repositories/metrics-repo';
@@ -13,6 +13,11 @@ import type { SyncRunner } from '../routes/sync';
 export function makeSyncRunner(): SyncRunner {
   let svc: SyncService | undefined;
   return async (body) => {
+    if (!hasCounterId()) {
+      throw new Error(
+        'COUNTER_ID is not set — add your Yandex Metrika counter id to .env (./init.sh).',
+      );
+    }
     if (!svc) {
       const db = openDb(config.DB_PATH);
       migrate(db);

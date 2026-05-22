@@ -31,7 +31,7 @@ beforeEach(() => {
   svc = new SyncService({
     client: fakeClient(),
     metrics,
-    counterId: 54280963,
+    counterId: 12345678,
     archivedThreshold: 77,
     now: () => '2025-01-20T00:00:00.000Z',
   });
