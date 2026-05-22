@@ -8,14 +8,20 @@ import { reportSections } from './sections';
  */
 export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
   const children: Paragraph[] = [];
-  for (const section of reportSections(snapshot)) {
+  reportSections(snapshot).forEach((section, i) => {
+    // Each top-level section starts on a new page (except the cover) — keeps the report readable
+    // across its many sections and gives it a proper paginated, document-like structure.
     children.push(
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun(section.heading)] }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        pageBreakBefore: i > 0,
+        children: [new TextRun(section.heading)],
+      }),
     );
     for (const line of section.lines) {
       children.push(new Paragraph({ children: [new TextRun(line)] }));
     }
-  }
+  });
   const doc = new Document({
     creator: 'ProductCamp Analytics',
     title: `ProductCamp report ${snapshot.id}`,

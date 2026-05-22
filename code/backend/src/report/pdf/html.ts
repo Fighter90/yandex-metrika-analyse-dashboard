@@ -14,9 +14,9 @@ function esc(s: string): string {
 export function reportHtml(snapshot: ReportSnapshot): string {
   const sections = reportSections(snapshot)
     .map(
-      (sec) =>
-        `<section><h1>${esc(sec.heading)}</h1>${sec.lines
-          .map((l) => `<p>${esc(l)}</p>`)
+      (sec, i) =>
+        `<section${i > 0 ? ' class="brk"' : ''}><h1>${esc(sec.heading)}</h1>${sec.lines
+          .map((l) => (l === '' ? '<p class="sp"></p>' : `<p>${esc(l)}</p>`))
           .join('')}</section>`,
     )
     .join('');
@@ -26,7 +26,9 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     `<title>ProductCamp report ${esc(snapshot.id)}</title>`,
     '<style>body{font-family:Arial,sans-serif;padding:24px;color:#0f172a}',
     'h1{font-size:15px;border-bottom:1px solid #cbd5e1;margin-top:18px}',
-    'p{font-size:12px;margin:3px 0}header{font-size:11px;color:#64748b}</style>',
+    // Each section starts on a new printed page (except the cover) for a paginated report.
+    'section.brk{page-break-before:always}p.sp{height:8px;margin:0}',
+    'p{font-size:12px;margin:3px 0;white-space:pre-wrap}header{font-size:11px;color:#64748b}</style>',
     '</head><body>',
     `<header>ProductCamp · Конверсии и лидген · ${esc(snapshot.period.from)} — ${esc(snapshot.period.to)}</header>`,
     sections,

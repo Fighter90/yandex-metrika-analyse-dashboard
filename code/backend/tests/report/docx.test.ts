@@ -75,54 +75,17 @@ const snapshot: ReportSnapshot = {
   breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
 };
 
-describe('reportSections', () => {
-  it('produces the expected section headings with content', () => {
+// reportSections content is exhaustively tested in @pca/shared (report-sections.test.ts);
+// here we only smoke-test the re-export the DOCX/PDF backend renderers consume.
+describe('reportSections re-export', () => {
+  it('renders the expanded report with cover, full hypothesis cards and decision detail', () => {
     const sections = reportSections(snapshot);
-    expect(sections.map((s) => s.heading)).toEqual([
-      'ProductCamp · Конверсии и лидген',
-      'Executive Summary',
-      'Methodology',
-      'Define — Problem Hypotheses',
-      'Develop — Solution Hypotheses',
-      'Deliver — Decision Log',
-      'Топ источников UTM',
-      'Топ гео + устройства',
-      'Топ страниц входа',
-      'Топ страниц выхода',
-      'Data Appendix',
-    ]);
-    expect(sections[2]?.lines.join(' ')).toContain('Voronik1801');
-    expect(sections.find((s) => s.heading.startsWith('Deliver'))?.lines[0]).toContain('DL-001');
-    expect(sections.find((s) => s.heading.startsWith('Define'))?.lines[0]).toContain('ICE 336');
-  });
-
-  it('renders the breakdown lines when present (UTM, geo/device, entry + exit pages)', () => {
-    const sections = reportSections({
-      ...snapshot,
-      breakdowns: {
-        utm: [{ source: 'vk', medium: 'cpc', campaign: 'spring', visits: 80, goalReaches: 4 }],
-        geoDevice: [{ country: 'Россия', device: 'mobile', visits: 60, goalReaches: 3 }],
-        entryPages: [{ page: '/lp', visits: 70, bounceRate: 0.25, goalReaches: 4 }],
-        exitPages: [{ page: '/checkout', visits: 40, bounceRate: 0.6, goalReaches: 2 }],
-      },
-    });
-    const line = (h: string): string => sections.find((s) => s.heading === h)?.lines[0] ?? '';
-    expect(line('Топ источников UTM')).toContain('vk / cpc / spring');
-    expect(line('Топ гео + устройства')).toContain('Россия · mobile');
-    expect(line('Топ страниц входа')).toContain('/lp');
-    expect(line('Топ страниц входа')).toContain('25.0%');
-    expect(line('Топ страниц выхода')).toContain('/checkout');
-  });
-
-  it('is deterministic — same snapshot yields identical content', () => {
-    expect(reportSections(snapshot)).toEqual(reportSections(snapshot));
-  });
-
-  it('includes an AI-анализ section only when aiNarrative is present', () => {
-    expect(reportSections(snapshot).some((s) => s.heading.startsWith('AI-анализ'))).toBe(false);
-    const withAi = reportSections({ ...snapshot, aiNarrative: 'Итог: рост.\n\nРиски: отвал.' });
-    const ai = withAi.find((s) => s.heading.startsWith('AI-анализ'));
-    expect(ai?.lines).toEqual(['Итог: рост.', 'Риски: отвал.']); // blank lines dropped
+    const headings = sections.map((s) => s.heading);
+    expect(headings).toContain('ProductCamp · Конверсии и лидген');
+    expect(headings).toContain('Приоритизация гипотез (по ICE)');
+    expect(headings.some((h) => h.startsWith('DL-001'))).toBe(true);
+    const methodology = sections.find((s) => s.heading === 'Методология');
+    expect(methodology?.lines.join(' ')).toContain('Voronik1801');
   });
 });
 
