@@ -27,6 +27,7 @@ export interface ReportDownload {
 export interface ReportRunner {
   build: (opts: { from: string; to: string }) => ReportSnapshot;
   get: (id: string) => ReportSnapshot | undefined;
+  list: () => Array<{ id: string; generatedAt: string; dateFrom: string; dateTo: string }>;
   generate: (snapshotId: string, format: ReportFormat) => Promise<{ filePath: string } | undefined>;
   /** Render a snapshot to DOCX/PDF bytes for download (undefined when the snapshot is missing). */
   download: (snapshotId: string, format: ReportFormat) => Promise<ReportDownload | undefined>;
@@ -52,6 +53,9 @@ export async function reportRoutes(app: FastifyInstance, opts: ReportRouteOption
     const snap = opts.runner.get((req.params as { id: string }).id);
     return snap ?? reply.code(404).send({ error: 'not found' });
   });
+
+  /** List all report snapshots (for the "History" page). */
+  app.get('/report/snapshots', async () => opts.runner.list());
 
   app.post('/report/generate', async (req, reply) => {
     const parsed = GenerateBody.safeParse(req.body);

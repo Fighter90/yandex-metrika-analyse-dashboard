@@ -11,8 +11,9 @@ import { B2b } from './routes/b2b';
 import { Hypotheses } from './routes/hypotheses';
 import { Decisions } from './routes/decisions';
 import { ReportPreview } from './routes/report-preview';
-import { Sources } from './routes/sources';
 import { Funnel } from './routes/funnel';
+import { Settings } from './routes/settings';
+import { History } from './routes/history';
 
 export function App(): JSX.Element {
   return (
@@ -25,12 +26,13 @@ export function App(): JSX.Element {
             <Route path="audience" element={<Audience />} />
             <Route path="behavior" element={<Behavior />} />
             <Route path="trends" element={<Trends />} />
-            <Route path="b2b" element={<B2b />} />
             <Route path="funnel" element={<Funnel />} />
+            <Route path="b2b" element={<B2b />} />
             <Route path="hypotheses" element={<Hypotheses />} />
             <Route path="decisions" element={<Decisions />} />
             <Route path="report" element={<ReportPreview />} />
-            <Route path="sources" element={<Sources />} />
+            <Route path="history" element={<History />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>

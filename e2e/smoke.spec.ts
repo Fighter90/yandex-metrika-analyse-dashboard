@@ -39,6 +39,9 @@ test('dashboard shell renders nav and every page is reachable', async ({ page })
   await page.getByRole('link', { name: 'Report' }).click();
   await expect(page.getByRole('button', { name: 'Сформировать snapshot' })).toBeVisible();
 
-  await page.getByRole('link', { name: 'Sources' }).click();
-  await expect(page.getByRole('heading', { name: 'Откуда эта цифра?' })).toBeVisible();
+  await page.getByRole('link', { name: 'История' }).click();
+  await expect(page.getByText(/Отчётов пока нет|Всего отчётов/)).toBeVisible();
+
+  await page.getByRole('link', { name: 'Настройки' }).click();
+  await expect(page.getByRole('heading', { name: 'Настройки' })).toBeVisible();
 });

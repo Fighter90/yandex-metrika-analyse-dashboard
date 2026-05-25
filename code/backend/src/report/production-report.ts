@@ -28,6 +28,13 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
       return snapshot;
     },
     get: (id) => snapshots.getById(id)?.payload as ReportSnapshot | undefined,
+    list: () =>
+      snapshots.list().map((r) => ({
+        id: r.id,
+        generatedAt: r.generatedAt,
+        dateFrom: r.dateFrom,
+        dateTo: r.dateTo,
+      })),
     generate: async (snapshotId, format) => {
       const record = snapshots.getById(snapshotId);
       if (!record) return undefined;

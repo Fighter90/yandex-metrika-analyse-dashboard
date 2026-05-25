@@ -60,6 +60,7 @@ export function deviceShareOption(rows: AudienceRow[]): object {
   return {
     title: { text: 'Доля устройств (визиты)', left: 'center', textStyle: { fontSize: 13 } },
     tooltip: { trigger: 'item', ...intTooltip },
+    legend: { data: rows.map((r) => r.label), bottom: 0 },
     series: [
       {
         type: 'pie',

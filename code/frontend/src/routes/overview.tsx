@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { ChannelStat } from '@pca/shared';
+import type { ChannelStat, GeoDeviceStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
+import { EmptyState } from '../components/EmptyState';
 import {
   channelMixOption,
   dailyReachesOption,
@@ -11,6 +12,7 @@ import {
   weakSpots,
 } from '../lib/overview';
 import { dailySeries, trendsOption } from '../lib/trends';
+import { byCountry, byDevice, audienceBarOption, deviceShareOption } from '../lib/audience';
 import { EChart } from '../components/charts/EChart';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
@@ -20,10 +22,12 @@ export function OverviewView({
   status,
   stats,
   primaryGoalName,
+  geoDevice,
 }: {
   status: QueryStatus;
   stats: ChannelStat[];
   primaryGoalName?: string;
+  geoDevice?: GeoDeviceStat[];
 }): JSX.Element {
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
@@ -33,8 +37,13 @@ export function OverviewView({
       </p>
     );
 
+  if (stats.length === 0) return <EmptyState />;
+
   const kpi = summarizeChannels(stats);
   const weak = weakSpots(stats);
+  const geoRows = geoDevice ? byCountry(geoDevice) : [];
+  const devRows = geoDevice ? byDevice(geoDevice) : [];
+  const hasGeo = geoRows.length > 0 && devRows.length > 0;
   return (
     <section className="space-y-6">
       {primaryGoalName ? (
@@ -57,6 +66,16 @@ export function OverviewView({
       <Card title="Микс каналов (визиты)">
         <EChart option={channelMixOption(stats)} />
       </Card>
+      {hasGeo ? (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card title="Топ стран по визитам">
+            <EChart option={audienceBarOption(geoRows, '')} />
+          </Card>
+          <Card title="Доля устройств (визиты)">
+            <EChart option={deviceShareOption(devRows)} />
+          </Card>
+        </div>
+      ) : null}
       <Card title="Слабые места (трафик есть, конверсия ниже средней)">
         {weak.length === 0 ? (
           <p className="text-sm text-slate-500">Нет слабых мест по текущим данным.</p>
@@ -86,7 +105,18 @@ export function Overview(): JSX.Element {
   });
   // The auto-detected KPI goal — independent of the date range. Absent (404) → badge hidden.
   const goal = useQuery({ queryKey: ['primary-goal'], queryFn: api.primaryGoal, retry: false });
-  return <OverviewView status={q.status} stats={q.data ?? []} primaryGoalName={goal.data?.name} />;
+  const geoDevice = useQuery({
+    queryKey: ['geo-device', from, to],
+    queryFn: () => api.geoDevice({ from, to }),
+  });
+  return (
+    <OverviewView
+      status={q.status}
+      stats={q.data ?? []}
+      primaryGoalName={goal.data?.name}
+      geoDevice={geoDevice.data}
+    />
+  );
 }
 
 function Kpi({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {

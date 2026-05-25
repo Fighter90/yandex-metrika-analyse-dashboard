@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { installMocks } from './fixtures';
 
 test.describe('Read-only dashboard pages render their data', () => {
-  test('Overview: KPI strip + weak spots + charts + auto-detected KPI goal badge', async ({
+  test('Overview: KPI strip + weak spots + charts + geo/device + auto-detected KPI goal badge', async ({
     page,
   }) => {
     await installMocks(page);
@@ -10,7 +10,11 @@ test.describe('Read-only dashboard pages render their data', () => {
     await expect(page.getByText('Цель (платных билетов)')).toBeVisible();
     await expect(page.getByText(/Заявок/)).toBeVisible();
     await expect(page.getByText(/Слабые места/)).toBeVisible();
-    await expect(page.locator('canvas').first()).toBeVisible();
+    // Charts: trends, daily reaches, channel mix, geo bar, device donut
+    await expect(page.locator('canvas')).toHaveCount(5);
+    // Geo/device mini-charts on Overview
+    await expect(page.getByText('Топ стран по визитам')).toBeVisible();
+    await expect(page.getByText('Доля устройств (визиты)')).toBeVisible();
     // The auto-detected KPI goal is surfaced (no manual GOAL_ID needed).
     await expect(page.getByText(/KPI-цель определена автоматически/)).toBeVisible();
     await expect(page.getByText('Ecommerce: покупка')).toBeVisible();
@@ -24,6 +28,13 @@ test.describe('Read-only dashboard pages render their data', () => {
     await expect(page.getByText('UTM-разбивка')).toBeVisible();
     await expect(page.getByRole('cell', { name: 'podcast' })).toBeVisible();
     await expect(page.locator('canvas').first()).toBeVisible();
+  });
+
+  test('Traffic: grouped-bar chart has legend', async ({ page }) => {
+    await installMocks(page);
+    await page.goto('/traffic');
+    // The «визиты vs заявки» grouped bar includes a legend
+    await expect(page.locator('canvas').nth(1)).toBeVisible();
   });
 
   test('Audience: country + device charts', async ({ page }) => {

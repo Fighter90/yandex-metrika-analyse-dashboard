@@ -59,6 +59,15 @@ describe('channelMixOption', () => {
       ]),
     );
   });
+
+  it('includes a legend with channel names', () => {
+    const o = channelMixOption([
+      stat({ channel: 'podcast', visits: 10 }),
+      stat({ channel: 'direct', visits: 2 }),
+    ]) as { legend: { data: string[] } };
+    expect(o.legend.data).toContain('podcast');
+    expect(o.legend.data).toContain('direct');
+  });
 });
 
 describe('dailyReachesOption', () => {

@@ -22,7 +22,8 @@ describe('Layout', () => {
     expect(screen.getByRole('link', { name: 'B2B' })).toBeInTheDocument();
     expect(screen.getByText('Decisions')).toBeInTheDocument();
     expect(screen.getByText('Report')).toBeInTheDocument();
-    expect(screen.getByText('Sources')).toBeInTheDocument();
+    expect(screen.getByText('История')).toBeInTheDocument();
+    expect(screen.getByText('Настройки')).toBeInTheDocument();
     expect(screen.getByText('HOME CONTENT')).toBeInTheDocument();
   });
 });

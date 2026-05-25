@@ -6,6 +6,7 @@ import { formatInt, formatPercent } from '../lib/format';
 import { buildFunnel, funnelOption } from '../lib/funnel';
 import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
+import { EmptyState } from '../components/EmptyState';
 
 /** Pure presentational Funnel — the «заявка ≠ оплата» conversion path across all states. */
 export function FunnelView({
@@ -24,6 +25,10 @@ export function FunnelView({
         Не удалось загрузить данные. Запустите sync и проверьте backend.
       </p>
     );
+
+  const totalVisits = stats.reduce((a, s) => a + s.visits, 0);
+  const totalDeals = deals.length;
+  if (totalVisits === 0 && totalDeals === 0) return <EmptyState />;
 
   const stages = buildFunnel(stats, deals);
   return (

@@ -15,9 +15,9 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > ✅ **Status: working product (releases v0.1.0–v0.10.0).** Available: the Metrika parser (live OAuth
 > sync + demo data), an 11-page dashboard (Overview, Traffic, Audience, Behavior, Trends, Funnel,
-> B2B, Hypotheses, Decisions, Report, Sources), structured hypotheses + Decision Log, deterministic
-> DOCX/PDF with an optional **AI analysis** (Anthropic), one-command deploy, 100% test coverage and
-> full CI/CD. Verified against live data of the ProductCamp counter.
+> B2B, Hypotheses, Decisions, Report, History, Settings), structured hypotheses + Decision Log,
+> deterministic DOCX/PDF with an optional **AI analysis** (Anthropic), one-command deploy, 100% test
+> coverage and full CI/CD. Verified against live data of the ProductCamp counter.
 
 ## Quickstart
 
@@ -155,8 +155,7 @@ curl -s -X POST localhost:4000/api/report/generate -H 'content-type: application
   -d "{\"snapshotId\":\"$SID\",\"format\":\"docx\"}"
 ```
 
-Every number in the report traces back to `raw_responses` in SQLite (on the dashboard — the
-**Sources** page, by `raw_response_id`).
+Every number in the report traces back to `raw_responses` in SQLite (anti-hallucination invariant).
 
 ## Architecture
 
@@ -247,7 +246,7 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 - [x] Skeleton, SQLite + migrations, repository pattern, tests, CI/CD, versioning.
 - [x] Metrika client (OAuth, Zod, rate limiter, retry) + `POST /api/sync`, CLIs `pnpm auth`/`sync`/`seed`.
 - [x] Backend API (metrics/hypotheses/decisions/b2b/report) + Swagger `/docs`.
-- [x] Dashboard: Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses, Decisions, Report, Sources.
+- [x] Dashboard: Overview, Traffic, Audience, Behavior, Trends, Funnel, B2B, Hypotheses, Decisions, Report, History, Settings.
 - [x] Structured hypotheses (format + validation + ICE-product) and Decision Log with status auto-update.
 - [x] Snapshot + Report Preview + deterministic DOCX/PDF + optional AI analysis (Anthropic).
 - [x] Charts (grouped tooltips, value labels on bars), empty states, one-command deploy.

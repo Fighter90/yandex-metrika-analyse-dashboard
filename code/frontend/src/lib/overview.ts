@@ -54,6 +54,7 @@ export function channelMixOption(stats: ChannelStat[]): object {
   for (const s of stats) byChannel.set(s.channel, (byChannel.get(s.channel) ?? 0) + s.visits);
   return {
     tooltip: { trigger: 'item', ...intTooltip },
+    legend: { data: [...byChannel.keys()], bottom: 0 },
     series: [
       {
         type: 'pie',

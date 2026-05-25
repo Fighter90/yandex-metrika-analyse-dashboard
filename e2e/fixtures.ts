@@ -170,6 +170,35 @@ export async function installMocks(page: Page, opts: MockOptions = {}): Promise<
     });
   });
 
+  // Report snapshots list (for History page).
+  await page.route('**/api/report/snapshots', (r) => json(r, []));
+
+  // Settings — read/write (stateful in-closure).
+  let settingsState = {
+    YANDEX_OAUTH_TOKEN: 'test-token-xxxx',
+    YANDEX_CLIENT_ID: 'test-client-id',
+    YANDEX_CLIENT_SECRET: 'test-secret-xxxx',
+    COUNTER_ID: 12345,
+    GOAL_ID: 0,
+    ANTHROPIC_API_KEY: 'sk-test-xxxx',
+  };
+  await page.route('**/api/settings', async (r) => {
+    if (r.request().method() === 'POST') {
+      const body = JSON.parse(r.request().postData() ?? '{}') as Record<string, string | number>;
+      settingsState = { ...settingsState, ...body };
+      return json(r, { ok: true, message: 'Настройки сохранены.' });
+    }
+    return json(r, {
+      YANDEX_OAUTH_TOKEN: 'test****xx',
+      YANDEX_CLIENT_ID: settingsState.YANDEX_CLIENT_ID,
+      YANDEX_CLIENT_SECRET: 'test****xx',
+      COUNTER_ID: settingsState.COUNTER_ID,
+      GOAL_ID: settingsState.GOAL_ID,
+      ANTHROPIC_API_KEY: 'sk-t****xx',
+    });
+  });
+  await page.route('**/api/settings/refresh', (r) => json(r, { ok: true }));
+
   // B2B — stateful CRUD.
   await page.route('**/api/b2b', async (r) => {
     if (r.request().method() === 'POST') {

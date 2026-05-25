@@ -14,6 +14,7 @@ import { decisionsRoutes } from './routes/decisions';
 import { b2bRoutes } from './routes/b2b';
 import { syncRoutes } from './routes/sync';
 import { reportRoutes } from './routes/report';
+import { settingsRoutes } from './routes/settings';
 
 export interface AppDeps {
   readonly metrics: MetricsRepo;
@@ -46,6 +47,7 @@ export function buildServer(
   app.register(b2bRoutes, { prefix: '/api', repo: deps.b2b });
   app.register(syncRoutes, { prefix: '/api', runSync: deps.runSync });
   app.register(reportRoutes, { prefix: '/api', runner: deps.report });
+  app.register(settingsRoutes, { prefix: '/api' });
 
   return app;
 }

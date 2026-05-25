@@ -37,6 +37,11 @@ describe('FunnelView', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
+  it('renders empty state when no data is available', () => {
+    render(<FunnelView status="success" stats={[]} deals={[]} />);
+    expect(screen.getByText(/Нет данных за выбранный период/)).toBeInTheDocument();
+  });
+
   it('renders the funnel stages + chart on success', () => {
     render(<FunnelView status="success" stats={stats} deals={deals} />);
     expect(screen.getByText('Визиты')).toBeInTheDocument();

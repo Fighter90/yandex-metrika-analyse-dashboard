@@ -67,4 +67,13 @@ describe('deviceShareOption', () => {
     expect(o.series[0]?.type).toBe('pie');
     expect(o.series[0]?.data[0]).toEqual({ name: 'mobile', value: 10 });
   });
+
+  it('includes a legend with device names', () => {
+    const o = deviceShareOption(byDevice([
+      geo({ device: 'mobile', visits: 10 }),
+      geo({ device: 'desktop', visits: 5 }),
+    ])) as { legend: { data: string[] } };
+    expect(o.legend.data).toContain('mobile');
+    expect(o.legend.data).toContain('desktop');
+  });
 });

@@ -24,6 +24,7 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn().mockReturnValue(snap),
       get: vi.fn(),
+      list: vi.fn().mockReturnValue([]),
       generate: vi.fn(),
       download: vi.fn(),
       insights: vi.fn(),
@@ -45,6 +46,7 @@ describe('report routes', () => {
     const app = appWith({
       build: vi.fn(),
       get: vi.fn(),
+      list: vi.fn(),
       generate: vi.fn(),
       download: vi.fn(),
       insights: vi.fn(),
@@ -63,6 +65,7 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn((id: string) => (id === 'snap-1' ? snap : undefined)),
+      list: vi.fn(),
       generate: vi.fn(),
       download: vi.fn(),
       insights: vi.fn(),
@@ -76,10 +79,32 @@ describe('report routes', () => {
     await app.close();
   });
 
+  it('GET /api/report/snapshots lists all snapshots', async () => {
+    const summaries = [
+      { id: 'snap-1', generatedAt: 'T1', dateFrom: '2025-01-01', dateTo: '2025-01-07' },
+      { id: 'snap-2', generatedAt: 'T2', dateFrom: '2025-01-08', dateTo: '2025-01-14' },
+    ];
+    const runner: ReportRunner = {
+      build: vi.fn(),
+      get: vi.fn(),
+      list: vi.fn().mockReturnValue(summaries),
+      generate: vi.fn(),
+      download: vi.fn(),
+      insights: vi.fn(),
+      hypotheses: vi.fn(),
+    };
+    const app = appWith(runner);
+    const res = await app.inject({ method: 'GET', url: '/api/report/snapshots' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual(summaries);
+    await app.close();
+  });
+
   it('POST /api/report/generate returns a file path, 400 on bad body, 404 on missing snapshot', async () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn(),
+      list: vi.fn(),
       generate: vi.fn(async (id: string, format: string) =>
         id === 'snap-1' ? { filePath: `data/reports/snap-1.${format}` } : undefined,
       ),
@@ -125,6 +150,7 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn(),
+      list: vi.fn(),
       generate: vi.fn(),
       download: vi.fn(),
       insights: vi.fn(async (id: string) => {
@@ -169,6 +195,7 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn(),
+      list: vi.fn(),
       generate: vi.fn(),
       download: vi.fn(),
       insights: vi.fn(),
@@ -212,6 +239,7 @@ describe('report routes', () => {
     const runner: ReportRunner = {
       build: vi.fn(),
       get: vi.fn(),
+      list: vi.fn(),
       generate: vi.fn(),
       download: vi.fn(async (id: string, format: 'docx' | 'pdf') =>
         id === 'snap-1'

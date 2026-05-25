@@ -39,6 +39,13 @@ export function buildTestApp(logger?: FastifyServerOptions['logger']): TestApp {
       return s;
     },
     get: (id) => snapshots.getById(id)?.payload as ReportSnapshot | undefined,
+    list: () =>
+      snapshots.list().map((r) => ({
+        id: r.id,
+        generatedAt: r.generatedAt,
+        dateFrom: r.dateFrom,
+        dateTo: r.dateTo,
+      })),
     generate: async (id, format) =>
       snapshots.getById(id) ? { filePath: `data/reports/${id}.${format}` } : undefined,
     download: async (id, format) =>

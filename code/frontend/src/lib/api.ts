@@ -44,6 +44,22 @@ export interface SyncSummary {
   exitPageRows: number;
 }
 
+export interface SnapshotSummary {
+  id: string;
+  generatedAt: string;
+  dateFrom: string;
+  dateTo: string;
+}
+
+export interface SettingsStatus {
+  YANDEX_OAUTH_TOKEN: string;
+  YANDEX_CLIENT_ID: string;
+  YANDEX_CLIENT_SECRET: string;
+  COUNTER_ID: number;
+  GOAL_ID: number;
+  ANTHROPIC_API_KEY: string;
+}
+
 async function http<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'content-type': 'application/json' },
@@ -102,4 +118,17 @@ export const api = {
     }),
   sync: (body: { from: string; to: string; goalId?: number }) =>
     http<SyncSummary>('/sync', { method: 'POST', body: JSON.stringify(body) }),
+  /** List all report snapshots (for the History page). */
+  listSnapshots: () => http<SnapshotSummary[]>('/report/snapshots'),
+  /** Get current settings (secrets are masked). */
+  getSettings: () => http<SettingsStatus>('/settings'),
+  /** Save settings to .env. */
+  saveSettings: (body: Partial<SettingsStatus>) =>
+    http<{ ok: true; message: string }>('/settings', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  /** Trigger a refresh (re-sync from Metrika). */
+  refreshData: () =>
+    http<{ ok: true }>('/settings/refresh', { method: 'POST' }),
 };

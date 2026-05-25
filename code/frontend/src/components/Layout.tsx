@@ -12,7 +12,8 @@ const NAV = [
   ['/hypotheses', 'Hypotheses'],
   ['/decisions', 'Decisions'],
   ['/report', 'Report'],
-  ['/sources', 'Sources'],
+  ['/history', 'История'],
+  ['/settings', 'Настройки'],
 ] as const;
 
 /** App shell: top nav + sticky filters + routed content. */

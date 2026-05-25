@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import type { ChannelStat } from '@pca/shared';
+import type { ChannelStat, GeoDeviceStat } from '@pca/shared';
 import { renderWithProviders } from '../test/utils';
 
 vi.mock('../lib/api', () => ({
-  api: { channels: vi.fn(), primaryGoal: vi.fn() },
+  api: { channels: vi.fn(), primaryGoal: vi.fn(), geoDevice: vi.fn() },
 }));
 import { api } from '../lib/api';
 import { OverviewView, Overview } from './overview';
@@ -19,6 +19,16 @@ const sample: ChannelStat = {
   users: 90,
   bounceRate: 0.2,
   avgDuration: 60,
+  goalReaches: 5,
+  conversionRate: 0.05,
+};
+
+const geoSample: GeoDeviceStat = {
+  date: '2025-01-01',
+  country: 'Россия',
+  device: 'desktop',
+  visits: 100,
+  users: 90,
   goalReaches: 5,
   conversionRate: 0.05,
 };
@@ -50,6 +60,20 @@ describe('OverviewView', () => {
     expect(screen.getByText('Ecommerce: покупка')).toBeInTheDocument();
   });
 
+  it('renders empty state when no stats are available', () => {
+    render(<OverviewView status="success" stats={[]} />);
+    expect(screen.getByText(/Нет данных за выбранный период/)).toBeInTheDocument();
+  });
+
+  it('renders geo/device charts when geoDevice data is provided', () => {
+    render(
+      <OverviewView status="success" stats={[sample]} geoDevice={[geoSample]} />,
+    );
+    expect(screen.getByText('Топ стран по визитам')).toBeInTheDocument();
+    expect(screen.getByText('Доля устройств (визиты)')).toBeInTheDocument();
+    expect(screen.getAllByTestId('echart')).toHaveLength(5);
+  });
+
   it('lists weak spots when a channel converts below the overall rate', () => {
     render(
       <OverviewView
@@ -79,6 +103,7 @@ describe('Overview (data wrapper)', () => {
       isArchived: false,
       syncedAt: 'x',
     });
+    vi.mocked(api.geoDevice).mockResolvedValue([]);
     renderWithProviders(<Overview />);
     expect(await screen.findByText(/KPI-цель определена автоматически/)).toBeInTheDocument();
     expect(screen.getByText('Ecommerce: покупка')).toBeInTheDocument();
@@ -87,6 +112,7 @@ describe('Overview (data wrapper)', () => {
   it('hides the badge when no primary goal is detected (404)', async () => {
     vi.mocked(api.channels).mockResolvedValue([sample]);
     vi.mocked(api.primaryGoal).mockRejectedValue(new Error('404'));
+    vi.mocked(api.geoDevice).mockResolvedValue([]);
     renderWithProviders(<Overview />);
     expect(await screen.findByText('Цель (платных билетов)')).toBeInTheDocument();
     expect(screen.queryByText(/KPI-цель определена автоматически/)).not.toBeInTheDocument();
