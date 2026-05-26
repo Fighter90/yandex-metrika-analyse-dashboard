@@ -10,6 +10,7 @@ import { Goals } from './routes/goals';
 import { ReportPreview } from './routes/report-preview';
 import { History } from './routes/history';
 import { Settings } from './routes/settings';
+import { Help } from './routes/help';
 
 export function App(): JSX.Element {
   return (
@@ -25,6 +26,7 @@ export function App(): JSX.Element {
             <Route path="report" element={<ReportPreview />} />
             <Route path="history" element={<History />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="help" element={<Help />} />
           </Route>
         </Routes>
       </BrowserRouter>

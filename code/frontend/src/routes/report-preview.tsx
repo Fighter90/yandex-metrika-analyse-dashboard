@@ -6,7 +6,6 @@ import { formatInt, formatPercent } from '../lib/format';
 import { errorMessage } from '../lib/error-message';
 import { downloadFile, reportDownloadUrl } from '../lib/download';
 import { useState, useEffect, useRef } from 'react';
-import { REBUILD_REPORT_EVENT } from '../components/FilterBar';
 
 function Stat({
   label,
@@ -328,16 +327,6 @@ export function ReportPreview(): JSX.Element {
   const { from, to } = useFilters();
   const buildMut = useMutation({ mutationFn: api.buildSnapshot });
   const insightsMut = useMutation({ mutationFn: api.generateInsights });
-
-  // Listen for rebuild report event from FilterBar
-  useEffect(() => {
-    const handler = () => {
-      buildMut.mutate({ from, to });
-    };
-    window.addEventListener(REBUILD_REPORT_EVENT, handler);
-    return () => window.removeEventListener(REBUILD_REPORT_EVENT, handler);
-  }, [from, to, buildMut]);
-
   return (
     <ReportPreviewView
       snapshot={buildMut.data}
