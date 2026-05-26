@@ -395,12 +395,13 @@ export function Settings(): JSX.Element {
 
   const settings: SettingsForm | undefined = q.data
     ? {
-        YANDEX_OAUTH_TOKEN: q.data.YANDEX_OAUTH_TOKEN,
+        // Don't use masked values from API — keep secrets empty so they aren't overwritten
+        YANDEX_OAUTH_TOKEN: q.data.YANDEX_OAUTH_TOKEN.includes('****') ? '' : q.data.YANDEX_OAUTH_TOKEN,
         YANDEX_CLIENT_ID: q.data.YANDEX_CLIENT_ID,
-        YANDEX_CLIENT_SECRET: q.data.YANDEX_CLIENT_SECRET,
+        YANDEX_CLIENT_SECRET: q.data.YANDEX_CLIENT_SECRET.includes('****') ? '' : q.data.YANDEX_CLIENT_SECRET,
         COUNTER_ID: String(q.data.COUNTER_ID),
         GOAL_ID: String(q.data.GOAL_ID),
-        ANTHROPIC_API_KEY: q.data.ANTHROPIC_API_KEY,
+        ANTHROPIC_API_KEY: q.data.ANTHROPIC_API_KEY.includes('****') ? '' : q.data.ANTHROPIC_API_KEY,
       }
     : undefined;
 
@@ -411,16 +412,18 @@ export function Settings(): JSX.Element {
       healthCounterId={healthQ.data?.counterId}
       goals={goalsQ.data}
       archivedGoals={archivedGoalsQ.data}
-      onSave={(form) =>
+      onSave={(form) => {
+        // Don't send masked or empty secret values back to the server
+        const isMasked = (v: string) => v.includes('****');
         saveMut.mutate({
-          YANDEX_OAUTH_TOKEN: form.YANDEX_OAUTH_TOKEN || undefined,
+          YANDEX_OAUTH_TOKEN: (form.YANDEX_OAUTH_TOKEN && !isMasked(form.YANDEX_OAUTH_TOKEN)) ? form.YANDEX_OAUTH_TOKEN : undefined,
           YANDEX_CLIENT_ID: form.YANDEX_CLIENT_ID || undefined,
-          YANDEX_CLIENT_SECRET: form.YANDEX_CLIENT_SECRET || undefined,
+          YANDEX_CLIENT_SECRET: (form.YANDEX_CLIENT_SECRET && !isMasked(form.YANDEX_CLIENT_SECRET)) ? form.YANDEX_CLIENT_SECRET : undefined,
           COUNTER_ID: form.COUNTER_ID ? Number(form.COUNTER_ID) : undefined,
           GOAL_ID: form.GOAL_ID ? Number(form.GOAL_ID) : undefined,
-          ANTHROPIC_API_KEY: form.ANTHROPIC_API_KEY || undefined,
-        })
-      }
+          ANTHROPIC_API_KEY: (form.ANTHROPIC_API_KEY && !isMasked(form.ANTHROPIC_API_KEY)) ? form.ANTHROPIC_API_KEY : undefined,
+        });
+      }}
       onClear={() => clearMut.mutate()}
       onRefresh={() => refreshMut.mutate()}
       onSaveError={errorMessage(saveMut.error)}

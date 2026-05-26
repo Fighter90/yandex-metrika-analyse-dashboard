@@ -56,7 +56,7 @@ describe('OverviewView', () => {
     expect(screen.getByText('Цель (платных билетов)')).toBeInTheDocument();
     expect(screen.getByText(/Заявок/)).toBeInTheDocument();
     expect(screen.getByText('Визиты и заявки по дням')).toBeInTheDocument();
-    expect(screen.getAllByTestId('echart')).toHaveLength(3);
+    expect(screen.getAllByTestId('echart')).toHaveLength(2);
     expect(screen.getByText(/Нет слабых мест/)).toBeInTheDocument();
     expect(screen.queryByText(/KPI-цель определена автоматически/)).not.toBeInTheDocument();
   });
@@ -76,7 +76,8 @@ describe('OverviewView', () => {
     render(<OverviewView status="success" stats={[sample]} geoDevice={[geoSample]} />);
     expect(screen.getByText('Топ стран по визитам')).toBeInTheDocument();
     expect(screen.getByText('Доля устройств (визиты)')).toBeInTheDocument();
-    expect(screen.getAllByTestId('echart')).toHaveLength(5);
+    // 2 base charts (visits+applications, channel mix) + 2 geo/device charts = 4
+    expect(screen.getAllByTestId('echart')).toHaveLength(4);
   });
 
   it('lists weak spots when a channel converts below the overall rate', () => {

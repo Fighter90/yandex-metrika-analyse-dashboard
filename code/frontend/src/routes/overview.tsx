@@ -268,10 +268,6 @@ export function OverviewView({
         )}
       </Card>
 
-      <Card title="Заявки по дням">
-        <EChart option={dailyReachesOption(stats)} />
-      </Card>
-
       <Card title="Микс каналов (визиты)">
         <EChart option={channelMixOption(stats)} />
       </Card>
