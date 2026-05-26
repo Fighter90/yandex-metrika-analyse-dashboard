@@ -6,7 +6,6 @@ import {
   parseInsights,
   generateInsights,
   ANTHROPIC_URL,
-  type AnthropicFetch,
 } from '../../src/report/ai-insights';
 
 const snapshot: ReportSnapshot = {
@@ -26,10 +25,6 @@ const snapshot: ReportSnapshot = {
     exitPages: [],
   },
 };
-
-function fakeFetch(res: { ok: boolean; status: number; body: string }): AnthropicFetch {
-  return vi.fn(async () => ({ ok: res.ok, status: res.status, text: async () => res.body }));
-}
 
 describe('snapshotFacts', () => {
   it('includes the KPI numbers and the top breakdown rows', () => {
