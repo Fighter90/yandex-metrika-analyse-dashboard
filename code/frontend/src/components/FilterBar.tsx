@@ -1,7 +1,15 @@
 import { useFilters, type Segment, formatDateLabel } from '../store/filters';
 import { useState } from 'react';
 
-const PRESETS = [7, 14, 30] as const;
+const PRESETS = [7, 14, 30, 90, 365] as const;
+const MAX_DAYS = 365; // Maximum allowed period: 1 year
+
+/** Calculate days between two dates. */
+function daysBetween(from: string, to: string): number {
+  const d1 = new Date(from);
+  const d2 = new Date(to);
+  return Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+}
 
 /** Sticky global filter header: period presets, custom date picker, segment toggle, archived toggle. */
 export function FilterBar(): JSX.Element {
@@ -10,8 +18,19 @@ export function FilterBar(): JSX.Element {
   const [showCustom, setShowCustom] = useState(false);
   const [customFrom, setCustomFrom] = useState(from);
   const [customTo, setCustomTo] = useState(to);
+  const [dateError, setDateError] = useState('');
 
   const handleCustomApply = () => {
+    const days = daysBetween(customFrom, customTo);
+    if (days > MAX_DAYS) {
+      setDateError(`Максимальный период — ${MAX_DAYS} дней (1 год).`);
+      return;
+    }
+    if (days < 1) {
+      setDateError('Дата окончания должна быть позже даты начала.');
+      return;
+    }
+    setDateError('');
     setRange(customFrom, customTo);
     setShowCustom(false);
   };
@@ -30,47 +49,63 @@ export function FilterBar(): JSX.Element {
           type="button"
           onClick={() => {
             setShowCustom(false);
+            setDateError('');
             preset(d);
           }}
           className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
-          title={`Показать данные за последние ${d} дней`}
+          title={d === 365 ? 'Показать данные за последний год' : `Показать данные за последние ${d} дней`}
         >
-          {d}д
+          {d === 365 ? '1г' : `${d}д`}
         </button>
       ))}
 
       {/* Custom date picker */}
       <button
         type="button"
-        onClick={() => setShowCustom(!showCustom)}
+        onClick={() => {
+          setShowCustom(!showCustom);
+          setDateError('');
+        }}
         className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
-        title="Выбрать произвольный период"
+        title="Выбрать произвольный период (макс. 365 дней)"
       >
         📅 Даты
       </button>
       {showCustom && (
-        <div className="flex w-full items-center gap-2 rounded border border-indigo-200 bg-indigo-50 px-3 py-2 sm:w-auto">
-          <label className="text-xs text-indigo-700">От:</label>
-          <input
-            type="date"
-            value={customFrom}
-            onChange={(e) => setCustomFrom(e.target.value)}
-            className="rounded border border-indigo-300 px-2 py-1 text-sm"
-          />
-          <label className="text-xs text-indigo-700">До:</label>
-          <input
-            type="date"
-            value={customTo}
-            onChange={(e) => setCustomTo(e.target.value)}
-            className="rounded border border-indigo-300 px-2 py-1 text-sm"
-          />
-          <button
-            type="button"
-            onClick={handleCustomApply}
-            className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-700"
-          >
-            Применить
-          </button>
+        <div className="flex w-full flex-col gap-2 rounded border border-indigo-200 bg-indigo-50 px-3 py-2 sm:w-auto sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-indigo-700">От:</label>
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => {
+                setCustomFrom(e.target.value);
+                setDateError('');
+              }}
+              className="rounded border border-indigo-300 px-2 py-1 text-sm"
+            />
+            <label className="text-xs text-indigo-700">До:</label>
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => {
+                setCustomTo(e.target.value);
+                setDateError('');
+              }}
+              className="rounded border border-indigo-300 px-2 py-1 text-sm"
+            />
+            <button
+              type="button"
+              onClick={handleCustomApply}
+              className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-700"
+            >
+              Применить
+            </button>
+          </div>
+          {dateError && (
+            <p className="text-xs text-red-600">{dateError}</p>
+          )}
+          <p className="text-xs text-indigo-400">Макс. период: 365 дней (1 год)</p>
           <button
             type="button"
             onClick={() => setShowCustom(false)}
