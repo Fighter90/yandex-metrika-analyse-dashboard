@@ -13,11 +13,12 @@ describe('Layout', () => {
         </Route>
       </Routes>,
     );
-    expect(screen.getByText('Overview')).toBeInTheDocument();
-    expect(screen.getByText('Traffic')).toBeInTheDocument();
-    expect(screen.getByText('Behavior')).toBeInTheDocument();
-    expect(screen.getByText('Funnel')).toBeInTheDocument();
-    expect(screen.getByText('Report')).toBeInTheDocument();
+    expect(screen.getByText('Обзор')).toBeInTheDocument();
+    expect(screen.getByText('Трафик')).toBeInTheDocument();
+    expect(screen.getByText('Поведение')).toBeInTheDocument();
+    expect(screen.getByText('Воронка')).toBeInTheDocument();
+    expect(screen.getByText('Цели')).toBeInTheDocument();
+    expect(screen.getByText('Отчёт')).toBeInTheDocument();
     expect(screen.getByText('История')).toBeInTheDocument();
     expect(screen.getByText('Настройки')).toBeInTheDocument();
     expect(screen.getByText('HOME CONTENT')).toBeInTheDocument();

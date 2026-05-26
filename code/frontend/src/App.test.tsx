@@ -35,10 +35,10 @@ import { queryClient } from './lib/query';
 afterEach(() => queryClient.clear());
 
 describe('<App>', () => {
-  it('renders the shell (nav) and the Overview page', async () => {
+  it('renders the shell (nav) and the Обзор page', async () => {
     render(<App />);
-    expect(screen.getByText('Overview')).toBeInTheDocument();
-    // Overview resolves with data → KPI strip renders.
+    expect(screen.getByText('Обзор')).toBeInTheDocument();
+    // Обзор resolves with data → KPI strip renders.
     expect(await screen.findByText(/Заявок/)).toBeInTheDocument();
   });
 });

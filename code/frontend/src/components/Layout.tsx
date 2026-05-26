@@ -2,12 +2,12 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { FilterBar } from './FilterBar';
 
 const NAV = [
-  ['/', 'Overview'],
-  ['/traffic', 'Traffic'],
-  ['/behavior', 'Behavior'],
-  ['/funnel', 'Funnel'],
+  ['/', 'Обзор'],
+  ['/traffic', 'Трафик'],
+  ['/behavior', 'Поведение'],
+  ['/funnel', 'Воронка'],
   ['/goals', 'Цели'],
-  ['/report', 'Report'],
+  ['/report', 'Отчёт'],
   ['/history', 'История'],
   ['/settings', 'Настройки'],
 ] as const;
