@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { reportSections, type ReportSnapshot } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
@@ -6,6 +6,7 @@ import { formatInt, formatPercent } from '../lib/format';
 import { errorMessage } from '../lib/error-message';
 import { downloadFile, reportDownloadUrl } from '../lib/download';
 import { useState, useEffect, useRef } from 'react';
+import { mdToHtml } from '../lib/md-to-html';
 
 function Stat({
   label,
@@ -56,6 +57,21 @@ export function ReportFullView({ snapshot }: { snapshot: ReportSnapshot }): JSX.
         </section>
       ))}
     </article>
+  );
+}
+
+/** Render AI analysis narrative as formatted HTML. */
+function AINarrativeView({ narrative }: { narrative: string }): JSX.Element {
+  return (
+    <div className="space-y-1">
+      <p className="text-xs text-violet-700">
+        AI-анализ (интерпретация поверх точных цифр — проверяйте по данным):
+      </p>
+      <div
+        className="ai-narrative max-h-[60vh] overflow-auto rounded bg-slate-50 p-4 text-sm text-slate-700"
+        dangerouslySetInnerHTML={{ __html: mdToHtml(narrative) }}
+      />
+    </div>
   );
 }
 
@@ -298,17 +314,7 @@ export function ReportPreviewView({
                 AI-анализ недоступен: {insightsError}
               </p>
             ) : null}
-            {narrative ? (
-              <div className="space-y-1">
-                <p className="text-xs text-violet-700">
-                  AI-анализ (интерпретация поверх точных цифр — проверяйте по данным):
-                </p>
-                <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-slate-50 p-3 text-xs text-slate-700">
-                  {narrative}
-                </pre>
-              </div>
-            ) : null}
-          </div>
+            {narrative ? <AINarrativeView narrative={narrative} /> : null}
 
           <ReportFullView snapshot={snapshot} />
         </div>
@@ -327,9 +333,22 @@ export function ReportPreview(): JSX.Element {
   const { from, to } = useFilters();
   const buildMut = useMutation({ mutationFn: api.buildSnapshot });
   const insightsMut = useMutation({ mutationFn: api.generateInsights });
+
+  // Check for existing snapshot ID in URL (from History page)
+  const searchParams = new URLSearchParams(window.location.search);
+  const snapshotId = searchParams.get('snapshot');
+
+  const existingSnapshot = useQuery({
+    queryKey: ['snapshot', snapshotId],
+    queryFn: () => api.getSnapshot(snapshotId!),
+    enabled: !!snapshotId,
+  });
+
+  const snapshot = existingSnapshot.data ?? buildMut.data;
+
   return (
     <ReportPreviewView
-      snapshot={buildMut.data}
+      snapshot={snapshot}
       isPending={buildMut.isPending}
       onBuild={() => buildMut.mutate({ from, to })}
       onExport={(snapshotId, format) => downloadFile(reportDownloadUrl(snapshotId, format))}

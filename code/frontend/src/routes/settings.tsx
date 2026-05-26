@@ -65,6 +65,7 @@ const SYNC_STAGES = [
 export function SettingsView({
   status,
   settings,
+  healthCounterId,
   onSave,
   onClear,
   onRefresh,
@@ -76,6 +77,7 @@ export function SettingsView({
 }: {
   status: 'pending' | 'error' | 'success';
   settings: SettingsForm | undefined;
+  healthCounterId: number | undefined;
   onSave: (form: SettingsForm) => void;
   onClear: () => void;
   onRefresh: () => void;
@@ -140,9 +142,28 @@ export function SettingsView({
   const set = (field: keyof SettingsForm, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
+  // Display counter ID: prefer settings value, fallback to health endpoint
+  const displayCounterId = form.COUNTER_ID && form.COUNTER_ID !== '0'
+    ? form.COUNTER_ID
+    : healthCounterId
+      ? String(healthCounterId)
+      : form.COUNTER_ID;
+
   return (
     <section className="space-y-6">
       <h2 className="text-lg font-semibold">Настройки</h2>
+
+      {/* Current counter ID display */}
+      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <h3 className="text-sm font-semibold text-slate-700">Текущий счётчик</h3>
+        <p className="mt-1 text-lg font-mono text-indigo-600">
+          {displayCounterId || 'Не установлен'}
+        </p>
+        <p className="text-xs text-slate-500">
+          ID счётчика Яндекс.Метрики, из которого загружаются данные.
+          {healthCounterId && ` (из сервера: ${healthCounterId})`}
+        </p>
+      </div>
 
       {onSaveError ? (
         <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -225,7 +246,7 @@ export function SettingsView({
           onChange={(v) => set('COUNTER_ID', v)}
           placeholder="12345678"
           type="number"
-          hint="0 = демо-режим (seed-данные)"
+          hint={`0 = демо-режим (seed-данные). Текущий: ${displayCounterId || 'не установлен'}`}
         />
         <Field
           label="Цель KPI (GOAL_ID)"
@@ -303,6 +324,7 @@ function Field({
 export function Settings(): JSX.Element {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ['settings'], queryFn: api.getSettings });
+  const healthQ = useQuery({ queryKey: ['health'], queryFn: api.health });
   const saveMut = useMutation({
     mutationFn: api.saveSettings,
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['settings'] }),
@@ -352,6 +374,7 @@ export function Settings(): JSX.Element {
     <SettingsView
       status={q.status}
       settings={settings}
+      healthCounterId={healthQ.data?.counterId}
       onSave={(form) =>
         saveMut.mutate({
           YANDEX_OAUTH_TOKEN: form.YANDEX_OAUTH_TOKEN || undefined,
