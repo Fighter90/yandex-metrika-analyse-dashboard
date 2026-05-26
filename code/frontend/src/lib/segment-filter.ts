@@ -47,7 +47,8 @@ export function filterUtmBySegment(
   const activeSources = new Set(
     filteredChannels.map((c) => c.utmSource).filter(Boolean),
   );
-  if (activeSources.size === 0) return data;
+  // If no active sources for this segment, return empty array
+  if (activeSources.size === 0) return [];
   return data.filter((u) => activeSources.has(u.source));
 }
 

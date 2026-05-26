@@ -16,7 +16,7 @@ describe('FilterBar', () => {
     fireEvent.change(screen.getByLabelText('Сегмент'), { target: { value: 'b2b' } });
     expect(useFilters.getState().segment).toBe('b2b');
 
-    fireEvent.click(screen.getByLabelText(/архивные/));
+    fireEvent.click(screen.getByLabelText(/архивные/i));
     expect(useFilters.getState().showArchived).toBe(true);
   });
 });

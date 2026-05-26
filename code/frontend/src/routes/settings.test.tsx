@@ -67,7 +67,7 @@ describe('SettingsView', () => {
 
   it('shows refresh result when provided', () => {
     render(<SettingsView {...baseProps} refreshResult={{ goals: 3, days: 14, channelRows: 50 }} />);
-    expect(screen.getByText(/За 14 дн./)).toBeInTheDocument();
+    expect(screen.getByText(/обновлено за 14 дн\./i)).toBeInTheDocument();
   });
 
   it('calls onSave with the form when the save button is clicked', () => {

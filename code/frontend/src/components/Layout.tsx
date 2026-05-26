@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useState } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
 import { FilterBar } from './FilterBar';
 
 const NAV = [

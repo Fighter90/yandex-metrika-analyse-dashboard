@@ -35,10 +35,11 @@ import { queryClient } from './lib/query';
 afterEach(() => queryClient.clear());
 
 describe('<App>', () => {
-  it('renders the shell (nav) and the Обзор page', async () => {
+  it('renders the shell (nav) and the Overview page', async () => {
     render(<App />);
-    expect(screen.getByText('Обзор')).toBeInTheDocument();
-    // Обзор resolves with data → KPI strip renders.
+    // Nav hamburger button should be present
+    expect(screen.getByRole('button', { name: /открыть меню/i })).toBeInTheDocument();
+    // Overview resolves with data → KPI strip renders.
     expect(await screen.findByText(/Заявок/)).toBeInTheDocument();
   });
 });

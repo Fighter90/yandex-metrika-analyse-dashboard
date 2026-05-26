@@ -51,7 +51,8 @@ describe('BehaviorView', () => {
     expect(screen.getByRole('heading', { name: 'Страницы выхода' })).toBeInTheDocument();
     expect(screen.getByText('/lp')).toBeInTheDocument();
     expect(screen.getByText('/checkout')).toBeInTheDocument();
-    expect(screen.getAllByTestId('echart')).toHaveLength(2); // entry + exit bars
+    // 3 charts: CR bar, bounce bar, exit bounce bar
+    expect(screen.getAllByTestId('echart')).toHaveLength(3);
   });
 });
 
