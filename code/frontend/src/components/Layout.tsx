@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { FilterBar } from './FilterBar';
 
 const NAV = [
@@ -14,9 +14,14 @@ const NAV = [
   ['/help', 'Справка'],
 ] as const;
 
-/** App shell: top nav + sticky filters + routed content. */
+/** Pages where the FilterBar should be hidden. */
+const NO_FILTER_PAGES = new Set(['/help', '/settings']);
+
+/** App shell: top nav + conditional filters + routed content. */
 export function Layout(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const showFilters = !NO_FILTER_PAGES.has(location.pathname);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -80,7 +85,7 @@ export function Layout(): JSX.Element {
         </div>
       )}
 
-      <FilterBar />
+      {showFilters && <FilterBar />}
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         <Outlet />
       </main>
