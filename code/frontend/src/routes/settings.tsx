@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { errorMessage } from '../lib/error-message';
@@ -53,6 +53,11 @@ export function SettingsView({
 }): JSX.Element {
   const [form, setForm] = useState<SettingsForm>(settings ?? emptyForm());
 
+  // Sync form state when settings data arrives from server
+  useEffect(() => {
+    if (settings) setForm(settings);
+  }, [settings]);
+
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
     return (
@@ -96,8 +101,8 @@ export function SettingsView({
         </button>
         {refreshResult ? (
           <p className="mt-2 text-sm text-indigo-700">
-            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей, {refreshResult.channelRows}{' '}
-            строк каналов.
+            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей,{' '}
+            {refreshResult.channelRows} строк каналов.
           </p>
         ) : null}
         <p className="mt-1 text-xs text-indigo-400">
@@ -247,12 +252,12 @@ export function Settings(): JSX.Element {
 
   const settings: SettingsForm | undefined = q.data
     ? {
-        YANDEX_OAUTH_TOKEN: '',
+        YANDEX_OAUTH_TOKEN: q.data.YANDEX_OAUTH_TOKEN,
         YANDEX_CLIENT_ID: q.data.YANDEX_CLIENT_ID,
-        YANDEX_CLIENT_SECRET: '',
+        YANDEX_CLIENT_SECRET: q.data.YANDEX_CLIENT_SECRET,
         COUNTER_ID: String(q.data.COUNTER_ID),
         GOAL_ID: String(q.data.GOAL_ID),
-        ANTHROPIC_API_KEY: '',
+        ANTHROPIC_API_KEY: q.data.ANTHROPIC_API_KEY,
       }
     : undefined;
 
