@@ -1,9 +1,5 @@
 # ProductCamp Conversion Analytics Dashboard
 
-[![CI](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml)
-[![E2E](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml)
-[![Security](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml)
-
 > [🇷🇺 Русский](README.md) · 🇬🇧 English
 
 A locally-run analytics tool for ProductCamp's **"Conversions & lead-gen"** track.

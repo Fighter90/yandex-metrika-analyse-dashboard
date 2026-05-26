@@ -1,9 +1,5 @@
 # ProductCamp Conversion Analytics Dashboard
 
-[![CI](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/ci.yml)
-[![E2E](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/e2e.yml)
-[![Security](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml/badge.svg)](https://github.com/Fighter90/metrika_analyse_dashboard/actions/workflows/security.yml)
-
 > 🇷🇺 Русский · [🇬🇧 English](README.en.md)
 
 Локально запускаемый аналитический инструмент для трека **«Конверсии и лидген» ProductCamp**.

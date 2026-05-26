@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Goal } from '@pca/shared';
 import { api } from '../lib/api';
 import { errorMessage } from '../lib/error-message';
 
@@ -66,6 +67,8 @@ export function SettingsView({
   status,
   settings,
   healthCounterId,
+  goals,
+  archivedGoals,
   onSave,
   onClear,
   onRefresh,
@@ -78,6 +81,8 @@ export function SettingsView({
   status: 'pending' | 'error' | 'success';
   settings: SettingsForm | undefined;
   healthCounterId: number | undefined;
+  goals: Goal[] | undefined;
+  archivedGoals: Goal[] | undefined;
   onSave: (form: SettingsForm) => void;
   onClear: () => void;
   onRefresh: () => void;
@@ -256,14 +261,30 @@ export function SettingsView({
           type="number"
           hint={`0 = демо-режим (seed-данные). Текущий: ${displayCounterId || 'не установлен'}`}
         />
-        <Field
-          label="Цель KPI (GOAL_ID)"
-          value={form.GOAL_ID}
-          onChange={(v) => set('GOAL_ID', v)}
-          placeholder="0 = авто-определение"
-          type="number"
-          hint="0 = определить автоматически, >0 — зафиксировать цель"
-        />
+        <div>
+          <label className="block text-sm font-medium text-slate-700">Цель KPI (GOAL_ID)</label>
+          <select
+            value={form.GOAL_ID}
+            onChange={(e) => set('GOAL_ID', e.target.value)}
+            className="mt-1 block w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          >
+            <option value="0">0 — Авто-определение</option>
+            {goals?.filter((g) => !g.isArchived).map((g) => (
+              <option key={g.id} value={String(g.id)}>
+                {g.id} — {g.name} {g.isB2b ? '(B2B)' : ''}
+              </option>
+            ))}
+            {archivedGoals?.map((g) => (
+              <option key={g.id} value={String(g.id)}>
+                {g.id} — {g.name} (архив)
+              </option>
+            ))}
+          </select>
+          <p className="mt-0.5 text-xs text-slate-400">
+            0 = определить автоматически, выберите ID — зафиксировать цель.
+            Всего: {goals?.length ?? 0} активных, {archivedGoals?.length ?? 0} архивных.
+          </p>
+        </div>
         <Field
           label="Anthropic API Key"
           value={form.ANTHROPIC_API_KEY}
@@ -333,6 +354,11 @@ export function Settings(): JSX.Element {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ['settings'], queryFn: api.getSettings });
   const healthQ = useQuery({ queryKey: ['health'], queryFn: api.health });
+  const goalsQ = useQuery({ queryKey: ['goals'], queryFn: () => api.goals(false) });
+  const archivedGoalsQ = useQuery({
+    queryKey: ['goals-archived'],
+    queryFn: () => api.goals(true),
+  });
   const saveMut = useMutation({
     mutationFn: api.saveSettings,
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['settings'] }),
@@ -383,6 +409,8 @@ export function Settings(): JSX.Element {
       status={q.status}
       settings={settings}
       healthCounterId={healthQ.data?.counterId}
+      goals={goalsQ.data}
+      archivedGoals={archivedGoalsQ.data}
       onSave={(form) =>
         saveMut.mutate({
           YANDEX_OAUTH_TOKEN: form.YANDEX_OAUTH_TOKEN || undefined,
