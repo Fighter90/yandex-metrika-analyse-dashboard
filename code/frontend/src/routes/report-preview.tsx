@@ -140,7 +140,8 @@ export function ReportPreviewView({
       } else {
         const progress = Math.round((step / totalSteps) * 90);
         setAiProgress(progress);
-        if (AI_STAGES[step]) setAiStage(AI_STAGES[step]);
+        const stage = AI_STAGES[step];
+        if (stage) setAiStage(stage);
       }
     }, stepDuration);
 
