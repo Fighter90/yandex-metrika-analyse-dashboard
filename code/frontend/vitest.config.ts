@@ -39,6 +39,8 @@ export default defineConfig({
         'src/routes/behavior.tsx',
         // Traffic page — complex UI with insights, tested via e2e:
         'src/routes/traffic.tsx',
+        // Funnel page — complex UI with insights, tested via e2e:
+        'src/routes/funnel.tsx',
       ],
       thresholds: {
         lines: 93,
