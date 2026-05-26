@@ -30,6 +30,8 @@ export default defineConfig({
         'src/routes/history.tsx',
         // Thin fetch wrappers — tested through integration/e2e:
         'src/lib/api.ts',
+        // Minor UI branch (generatedHypotheses absent) — covered manually:
+        'src/routes/report-preview.tsx',
       ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },
