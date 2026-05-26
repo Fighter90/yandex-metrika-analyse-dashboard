@@ -136,4 +136,16 @@ describe('SnapshotBuilder', () => {
     expect(snap.funnel.b2bPipelineTickets).toBe(3);
     expect(snap.funnel.b2bPaidTickets).toBe(20);
   });
+
+  it('groups B2B deals by same stage (exercises the merge branch in computeB2bSummary)', () => {
+    // Create a third deal with the same 'paid' stage to exercise the "key exists" ?? branch
+    const b2b = new B2bRepo(db);
+    b2b.create({ company: 'AnotherCorp', tickets: 10, stage: 'paid', dateAdded: '2025-01-02' });
+    const snap = builder.build({ id: 'y', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' });
+    // paid stage now has 2 deals: BigCorp (20) + AnotherCorp (10) = 30 tickets
+    expect(snap.b2bSummary.paidTickets).toBe(30);
+    const paidStage = snap.b2bSummary.byStage.find((s) => s.stage === 'paid');
+    expect(paidStage?.tickets).toBe(30);
+    expect(paidStage?.deals).toBe(2); // two deals with 'paid' stage
+  });
 });

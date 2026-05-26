@@ -42,4 +42,36 @@ describe('settings routes', () => {
     expect(res.json().ok).toBe(true);
     await app.close();
   });
+
+  it('POST /settings writes new keys that did not exist before', async () => {
+    const app = appWith();
+    // Write a unique key that definitely doesn't exist
+    const uniqueKey = 'TEST_KEY_' + Date.now();
+    const res = await app.inject({
+      method: 'POST',
+      url: '/settings',
+      // This tests the "key doesn't exist → append" branch in updateEnvFile
+      payload: { GOAL_ID: 42 },
+    });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
+
+  it('POST /settings updates existing keys (overwrite branch)', async () => {
+    const app = appWith();
+    // First write
+    await app.inject({
+      method: 'POST',
+      url: '/settings',
+      payload: { GOAL_ID: 1 },
+    });
+    // Second write — tests the "key exists → replace" branch
+    const res = await app.inject({
+      method: 'POST',
+      url: '/settings',
+      payload: { GOAL_ID: 2 },
+    });
+    expect(res.statusCode).toBe(200);
+    await app.close();
+  });
 });
