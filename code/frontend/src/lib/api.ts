@@ -104,6 +104,8 @@ export const api = {
   removeB2b: (id: number) => http<void>(`/b2b/${id}`, { method: 'DELETE' }),
   buildSnapshot: (body: { from: string; to: string }) =>
     http<ReportSnapshot>('/report/snapshot', { method: 'POST', body: JSON.stringify(body) }),
+  /** Get an existing snapshot by ID (from History page). */
+  getSnapshot: (id: string) => http<ReportSnapshot>(`/report/snapshot/${id}`),
   generateReport: (body: { snapshotId: string; format: 'docx' | 'pdf' }) =>
     http<{ filePath: string }>('/report/generate', { method: 'POST', body: JSON.stringify(body) }),
   generateInsights: (snapshotId: string) =>
