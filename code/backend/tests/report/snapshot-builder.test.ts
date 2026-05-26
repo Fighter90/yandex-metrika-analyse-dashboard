@@ -119,4 +119,21 @@ describe('SnapshotBuilder', () => {
     expect(snap.channels).toHaveLength(0);
     expect(snap.kpi.b2cApplications).toBe(0);
   });
+
+  it('includes b2bSummary with deals, totals and byStage breakdown', () => {
+    const snap = builder.build({ id: 'x', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' });
+    expect(snap.b2bSummary.totalTickets).toBe(23);
+    expect(snap.b2bSummary.paidTickets).toBe(20);
+    expect(snap.b2bSummary.dealsCount).toBe(2);
+    expect(snap.b2bSummary.deals).toHaveLength(2);
+    expect(snap.b2bSummary.byStage).toHaveLength(2);
+  });
+
+  it('includes funnel data (visits → applications → B2B pipeline → B2B paid)', () => {
+    const snap = builder.build({ id: 'x', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' });
+    expect(snap.funnel.visits).toBe(100);
+    expect(snap.funnel.b2cApplications).toBe(7);
+    expect(snap.funnel.b2bPipelineTickets).toBe(3);
+    expect(snap.funnel.b2bPaidTickets).toBe(20);
+  });
 });
