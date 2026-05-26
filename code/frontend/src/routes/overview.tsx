@@ -14,6 +14,7 @@ import {
 import { dailySeries, trendsOption } from '../lib/trends';
 import { byCountry, byDevice, audienceBarOption, deviceShareOption } from '../lib/audience';
 import { EChart } from '../components/charts/EChart';
+import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -406,7 +407,7 @@ export function OverviewView({
 
 /** Data wrapper: binds the channel query to the presentational view. */
 export function Overview(): JSX.Element {
-  const { from, to } = useFilters();
+  const { from, to, segment } = useFilters();
   const q = useQuery({
     queryKey: ['channels', from, to],
     queryFn: () => api.channels({ from, to }),
@@ -429,13 +430,19 @@ export function Overview(): JSX.Element {
     queryKey: ['exit-pages', from, to],
     queryFn: () => api.exitPages({ from, to }),
   });
+
+  // Apply segment filter
+  const allChannels = q.data ?? [];
+  const filteredChannels = filterBySegment(allChannels, segment);
+  const filteredUtm = filterUtmBySegment(utm.data ?? [], segment, allChannels);
+
   return (
     <OverviewView
       status={q.status}
-      stats={q.data ?? []}
+      stats={filteredChannels}
       primaryGoalName={goal.data?.name}
       geoDevice={geoDevice.data}
-      utm={utm.data}
+      utm={filteredUtm}
       entryPages={entryPages.data}
       exitPages={exitPages.data}
     />

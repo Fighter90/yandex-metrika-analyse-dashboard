@@ -3,7 +3,10 @@ import { useState } from 'react';
 
 const PRESETS = [7, 14, 30] as const;
 
-/** Sticky global filter header: period presets, custom date picker, segment toggle, archived toggle. */
+/** Event name for triggering report rebuild from filter bar. */
+export const REBUILD_REPORT_EVENT = 'rebuild-report';
+
+/** Sticky global filter header: period presets, custom date picker, segment toggle, archived toggle, report rebuild. */
 export function FilterBar(): JSX.Element {
   const { from, to, segment, showArchived, setRange, setSegment, toggleArchived, preset } =
     useFilters();
@@ -14,6 +17,10 @@ export function FilterBar(): JSX.Element {
   const handleCustomApply = () => {
     setRange(customFrom, customTo);
     setShowCustom(false);
+  };
+
+  const handleRebuildReport = () => {
+    window.dispatchEvent(new CustomEvent(REBUILD_REPORT_EVENT));
   };
 
   return (
@@ -86,6 +93,14 @@ export function FilterBar(): JSX.Element {
       <label className="flex items-center gap-1 text-sm text-slate-600">
         <input type="checkbox" checked={showArchived} onChange={toggleArchived} /> архивные цели
       </label>
+      <button
+        type="button"
+        onClick={handleRebuildReport}
+        className="rounded bg-emerald-600 px-3 py-1 text-sm text-white hover:bg-emerald-700"
+        title="Перестроить отчёт с текущими фильтрами"
+      >
+        🔄 Перестроить отчёт
+      </button>
     </header>
   );
 }

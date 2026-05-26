@@ -13,6 +13,7 @@ import {
 import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
+import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
 
 /** Insight badge with green/red indicator */
 function InsightBadge({
@@ -222,12 +223,18 @@ export function TrafficView({
 
 /** Data wrapper: channel + UTM queries combined into one status. */
 export function Traffic(): JSX.Element {
-  const { from, to } = useFilters();
+  const { from, to, segment } = useFilters();
   const channels = useQuery({
     queryKey: ['channels', from, to],
     queryFn: () => api.channels({ from, to }),
   });
   const utm = useQuery({ queryKey: ['utm', from, to], queryFn: () => api.utm({ from, to }) });
   const status = combineStatus(channels.status, utm.status);
-  return <TrafficView status={status} stats={channels.data ?? []} utm={utm.data ?? []} />;
+
+  // Apply segment filter
+  const allChannels = channels.data ?? [];
+  const filteredChannels = filterBySegment(allChannels, segment);
+  const filteredUtm = filterUtmBySegment(utm.data ?? [], segment, allChannels);
+
+  return <TrafficView status={status} stats={filteredChannels} utm={filteredUtm} />;
 }
