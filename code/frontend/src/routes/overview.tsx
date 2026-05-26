@@ -17,6 +17,166 @@ import { EChart } from '../components/charts/EChart';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
 
+/** Insight badge with green/red indicator */
+function InsightBadge({
+  type,
+  text,
+}: {
+  type: 'good' | 'warning' | 'info';
+  text: string;
+}): JSX.Element {
+  const colors =
+    type === 'good'
+      ? 'bg-green-100 text-green-800'
+      : type === 'warning'
+        ? 'bg-red-100 text-red-800'
+        : 'bg-blue-100 text-blue-800';
+  const icon = type === 'good' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+  return (
+    <span className={`inline-block rounded-full px-2 py-0.5 text-xs ${colors}`}>
+      {icon} {text}
+    </span>
+  );
+}
+
+/** Compute insights from channel data */
+function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
+  const insights: JSX.Element[] = [];
+  const kpi = summarizeChannels(stats);
+  const overallCR = kpi.visits > 0 ? kpi.reaches / kpi.visits : 0;
+
+  // Overall conversion assessment
+  if (overallCR > 0.05) {
+    insights.push(
+      <InsightBadge key="cr-good" type="good" text={`Общий CR ${formatPercent(overallCR)} — выше 5% (хорошо)`} />,
+    );
+  } else if (overallCR < 0.02) {
+    insights.push(
+      <InsightBadge key="cr-bad" type="warning" text={`Общий CR ${formatPercent(overallCR)} — ниже 2% (проблема)`} />,
+    );
+  }
+
+  // Find best and worst channels
+  const channelCRs = stats
+    .reduce<Map<string, { visits: number; reaches: number }>>((acc, c) => {
+      const cur = acc.get(c.channel) ?? { visits: 0, reaches: 0 };
+      acc.set(c.channel, { visits: cur.visits + c.visits, reaches: cur.reaches + c.goalReaches });
+      return acc;
+    }, new Map());
+
+  for (const [channel, data] of channelCRs) {
+    const cr = data.visits > 0 ? data.reaches / data.visits : 0;
+    if (cr > overallCR * 1.5 && data.visits > 50) {
+      insights.push(
+        <InsightBadge
+          key={`good-${channel}`}
+          type="good"
+          text={`${channel}: CR ${formatPercent(cr)} — значительно выше среднего (масштабировать)`}
+        />,
+      );
+    } else if (cr < overallCR * 0.5 && data.visits > 50) {
+      insights.push(
+        <InsightBadge
+          key={`bad-${channel}`}
+          type="warning"
+          text={`${channel}: CR ${formatPercent(cr)} — значительно ниже среднего (проверить качество)`}
+        />,
+      );
+    }
+  }
+
+  return insights;
+}
+
+/** Compute UTM insights */
+function computeUtmInsights(utm: UtmStat[] | undefined): JSX.Element[] {
+  const insights: JSX.Element[] = [];
+  if (!utm || utm.length === 0) return insights;
+
+  const utmWithSource = utm.filter((u) => u.utmSource && u.utmSource !== '(none)');
+  const coverage = (utmWithSource.length / utm.length) * 100;
+
+  if (coverage >= 70) {
+    insights.push(
+      <InsightBadge key="utm-good" type="good" text={`UTM покрытие ${coverage.toFixed(0)}% — хорошая атрибуция`} />,
+    );
+  } else {
+    insights.push(
+      <InsightBadge key="utm-bad" type="warning" text={`UTM покрытие ${coverage.toFixed(0)}% — часть трафика не атрибутирована`} />,
+    );
+  }
+
+  return insights;
+}
+
+/** Compute page insights */
+function computePageInsights(pages: PageStat[] | undefined, type: 'entry' | 'exit'): JSX.Element[] {
+  const insights: JSX.Element[] = [];
+  if (!pages || pages.length === 0) return insights;
+
+  const avgBounce = pages.reduce((a, p) => a + p.bounceRate, 0) / pages.length;
+
+  for (const p of pages.slice(0, 5)) {
+    if (p.bounceRate > 0.7 && p.visits > 50) {
+      insights.push(
+        <InsightBadge
+          key={`bounce-${type}-${p.page}`}
+          type="warning"
+          text={`Высокий bounce ${formatPercent(p.bounceRate)} на ${p.page} (${p.visits} визитов)`}
+        />,
+      );
+    } else if (p.bounceRate < 0.3 && p.visits > 50) {
+      insights.push(
+        <InsightBadge
+          key={`good-${type}-${p.page}`}
+          type="good"
+          text={`Низкий bounce ${formatPercent(p.bounceRate)} на ${p.page} — хорошо удерживает`}
+        />,
+      );
+    }
+  }
+
+  return insights;
+}
+
+/** Compute geo insights */
+function computeGeoInsights(geoDevice: GeoDeviceStat[] | undefined): JSX.Element[] {
+  const insights: JSX.Element[] = [];
+  if (!geoDevice || geoDevice.length === 0) return insights;
+
+  const byCountry = geoDevice.reduce<Map<string, { visits: number; reaches: number }>>(
+    (acc, g) => {
+      const cur = acc.get(g.country) ?? { visits: 0, reaches: 0 };
+      acc.set(g.country, { visits: cur.visits + g.visits, reaches: cur.reaches + g.goalReaches });
+      return acc;
+    },
+    new Map(),
+  );
+
+  for (const [country, data] of byCountry) {
+    const cr = data.visits > 0 ? data.reaches / data.visits : 0;
+    if (cr > 0.1 && data.visits > 50) {
+      insights.push(
+        <InsightBadge
+          key={`geo-good-${country}`}
+          type="good"
+          text={`${country}: CR ${formatPercent(cr)} — высокая конверсия`}
+        />,
+      );
+    } else if (cr < 0.02 && data.visits > 100) {
+      insights.push(
+        <InsightBadge
+          key={`geo-bad-${country}`}
+          type="warning"
+          text={`${country}: CR ${formatPercent(cr)} — низкая конверсия при большом трафике`}
+        />,
+      );
+    }
+  }
+
+  return insights;
+}
+
 /** Pure presentational Overview — testable across all states without the data layer. */
 export function OverviewView({
   status,
@@ -61,6 +221,13 @@ export function OverviewView({
   const topEntry = (entryPages ?? []).sort((a, b) => b.visits - a.visits).slice(0, 5);
   const topExit = (exitPages ?? []).sort((a, b) => b.visits - a.visits).slice(0, 5);
 
+  // Compute insights
+  const channelInsights = computeChannelInsights(stats);
+  const utmInsights = computeUtmInsights(utm);
+  const entryInsights = computePageInsights(entryPages, 'entry');
+  const exitInsights = computePageInsights(exitPages, 'exit');
+  const geoInsights = computeGeoInsights(geoDevice);
+
   return (
     <section className="space-y-6">
       {primaryGoalName ? (
@@ -84,6 +251,9 @@ export function OverviewView({
 
       <Card title="Визиты и заявки по дням">
         <EChart option={trendsOption(dailySeries(stats))} />
+        {channelInsights.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">{channelInsights}</div>
+        )}
       </Card>
 
       <Card title="Заявки по дням">
@@ -98,6 +268,9 @@ export function OverviewView({
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card title="Топ стран по визитам">
             <EChart option={audienceBarOption(geoRows, '')} />
+            {geoInsights.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">{geoInsights}</div>
+            )}
           </Card>
           <Card title="Доля устройств (визиты)">
             <EChart option={deviceShareOption(devRows)} />
@@ -138,6 +311,9 @@ export function OverviewView({
                 ))}
             </tbody>
           </table>
+          {utmInsights.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">{utmInsights}</div>
+          )}
         </Card>
       )}
 
@@ -164,6 +340,9 @@ export function OverviewView({
               ))}
             </tbody>
           </table>
+          {entryInsights.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">{entryInsights}</div>
+          )}
         </Card>
       )}
 
@@ -190,6 +369,9 @@ export function OverviewView({
               ))}
             </tbody>
           </table>
+          {exitInsights.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">{exitInsights}</div>
+          )}
         </Card>
       )}
 
