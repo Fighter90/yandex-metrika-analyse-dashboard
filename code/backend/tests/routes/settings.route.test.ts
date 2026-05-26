@@ -45,8 +45,6 @@ describe('settings routes', () => {
 
   it('POST /settings writes new keys that did not exist before', async () => {
     const app = appWith();
-    // Write a unique key that definitely doesn't exist
-    const uniqueKey = 'TEST_KEY_' + Date.now();
     const res = await app.inject({
       method: 'POST',
       url: '/settings',
