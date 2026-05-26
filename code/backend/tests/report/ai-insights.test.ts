@@ -89,10 +89,9 @@ describe('generateInsights', () => {
     expect(out).toContain('## Section');
     expect(out).toContain('анализ');
     expect(doFetch).toHaveBeenCalledTimes(10);
-    const call = doFetch.mock.calls[0];
-    expect(call?.[0]).toBe(ANTHROPIC_URL);
-    expect(call?.[1].headers['x-api-key']).toBe('sk-test');
-    expect(call?.[1].headers['anthropic-version']).toBeTruthy();
+    expect(doFetch.mock.calls[0]?.[0]).toBe(ANTHROPIC_URL);
+    expect(doFetch.mock.calls[0]?.[1].headers['x-api-key']).toBe('sk-test');
+    expect(doFetch.mock.calls[0]?.[1].headers['anthropic-version']).toBeTruthy();
   });
 
   it('handles partial failures (some chunks fail, others succeed)', async () => {
