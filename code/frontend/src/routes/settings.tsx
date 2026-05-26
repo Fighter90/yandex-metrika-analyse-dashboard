@@ -93,9 +93,17 @@ export function SettingsView({
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Sync form state when settings data arrives from server
+  // If COUNTER_ID is 0 or missing, use health counter ID
   useEffect(() => {
-    if (settings) setForm(settings);
-  }, [settings]);
+    if (settings) {
+      const counterId = settings.COUNTER_ID && settings.COUNTER_ID !== '0'
+        ? settings.COUNTER_ID
+        : healthCounterId
+          ? String(healthCounterId)
+          : settings.COUNTER_ID;
+      setForm({ ...settings, COUNTER_ID: counterId });
+    }
+  }, [settings, healthCounterId]);
 
   // Progress simulation during sync
   useEffect(() => {
