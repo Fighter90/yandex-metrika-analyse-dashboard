@@ -474,7 +474,6 @@ describe('reportSections — AI-generated hypotheses', () => {
 
 describe('reportSections — new sections', () => {
   it('renders B2B section when b2bSummary is present', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const s = {
       ...baseSnapshot,
       b2bSummary: {
