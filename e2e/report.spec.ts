@@ -15,7 +15,7 @@ test.describe('Report — snapshot, on-screen render, export, AI', () => {
     await expect(
       full.getByRole('heading', { name: 'Воронка: визит → заявка → оплата' }),
     ).toBeVisible();
-    await expect(full.getByRole('heading', { name: 'Анализ по каналам' })).toBeVisible();
+    await expect(full.getByRole('heading', { name: 'Анализ по каналам (детальный)' })).toBeVisible();
     await expect(full.getByRole('heading', { name: 'Глоссарий и принципы' })).toBeVisible();
     await expect(full.getByRole('heading', { name: 'Data Appendix' })).toBeVisible();
   });
