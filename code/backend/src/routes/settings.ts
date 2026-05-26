@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { z } from 'zod';
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../..');
-const ENV_PATH = join(REPO_ROOT, '.env');
+export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../..');
+export const ENV_PATH = join(REPO_ROOT, '.env');
 
 /** Keys that are written to .env. */
 const SETTINGS_KEYS = [

@@ -1,13 +1,9 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import * as fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-import { settingsRoutes, mask, readEnvFile, updateEnvFile } from '../../src/routes/settings';
+import { settingsRoutes, mask, readEnvFile, updateEnvFile, ENV_PATH } from '../../src/routes/settings';
 
-const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
-const ENV_PATH = join(REPO_ROOT, '.env');
-const ENV_BACKUP = join(REPO_ROOT, '.env.backup');
+const ENV_BACKUP = ENV_PATH + '.backup';
 
 function appWith(): FastifyInstance {
   const app = Fastify();
