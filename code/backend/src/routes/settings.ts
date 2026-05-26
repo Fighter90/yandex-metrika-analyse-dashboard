@@ -50,7 +50,7 @@ export function readEnvFile(): Record<string, string> {
 }
 
 /** Update .env with new values, preserving comments and other lines. */
-function updateEnvFile(updates: Record<string, string>): void {
+export function updateEnvFile(updates: Record<string, string>): void {
   let content = existsSync(ENV_PATH) ? readFileSync(ENV_PATH, 'utf-8') : '';
   // Ensure trailing newline
   if (content && !content.endsWith('\n')) content += '\n';

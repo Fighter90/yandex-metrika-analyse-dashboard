@@ -3,7 +3,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { settingsRoutes, mask, readEnvFile } from '../../src/routes/settings';
+import { settingsRoutes, mask, readEnvFile, updateEnvFile } from '../../src/routes/settings';
 
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../..');
 const ENV_PATH = join(REPO_ROOT, '.env');
@@ -133,6 +133,43 @@ describe('readEnvFile (unit)', () => {
     expect(result).toEqual({ VALID_KEY: 'value', ANOTHER: '123' });
 
     // Restore original .env
+    fs.unlinkSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_BACKUP, ENV_PATH);
+  });
+});
+
+describe('updateEnvFile (unit)', () => {
+  afterEach(() => {
+    // Restore original .env if we backed it up
+    if (fs.existsSync(ENV_BACKUP)) {
+      fs.renameSync(ENV_BACKUP, ENV_PATH);
+    }
+    // Clean up test .env if it exists
+    if (fs.existsSync(ENV_PATH) && !fs.existsSync(ENV_BACKUP)) {
+      // Only delete if it was created by this test suite
+      const content = fs.readFileSync(ENV_PATH, 'utf-8');
+      if (content.includes('TEST_KEY') || content.includes('VALID_KEY')) {
+        fs.unlinkSync(ENV_PATH);
+      }
+    }
+  });
+
+  it('adds trailing newline when content does not end with one', () => {
+    // Save original .env
+    const hadEnv = fs.existsSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_PATH, ENV_BACKUP);
+
+    // Write .env WITHOUT trailing newline
+    fs.writeFileSync(ENV_PATH, 'EXISTING=value', 'utf-8');
+
+    updateEnvFile({ NEW_KEY: 'newval' });
+
+    const content = fs.readFileSync(ENV_PATH, 'utf-8');
+    expect(content).toContain('EXISTING=value\n');
+    expect(content).toContain('NEW_KEY=newval\n');
+    expect(content.endsWith('\n')).toBe(true);
+
+    // Restore
     fs.unlinkSync(ENV_PATH);
     if (hadEnv) fs.renameSync(ENV_BACKUP, ENV_PATH);
   });
