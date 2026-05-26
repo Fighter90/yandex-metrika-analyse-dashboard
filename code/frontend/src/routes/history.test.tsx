@@ -35,7 +35,8 @@ describe('HistoryView', () => {
         dateTo: '2025-01-07',
       },
     ];
-    render(<HistoryView status="success" snapshots={snapshots} />);
+    // Use renderWithProviders since HistoryView now uses Link from react-router-dom
+    renderWithProviders(<HistoryView status="success" snapshots={snapshots} />);
     expect(screen.getByText('История отчётов')).toBeInTheDocument();
     expect(screen.getByText('snap-1')).toBeInTheDocument();
     expect(screen.getByText('Всего отчётов: 1')).toBeInTheDocument();

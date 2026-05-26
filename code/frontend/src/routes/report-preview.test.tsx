@@ -71,8 +71,8 @@ describe('ReportPreviewView', () => {
   it('shows the snapshot summary and triggers DOCX + PDF export', () => {
     const onExport = vi.fn();
     render(<ReportPreviewView {...baseProps} snapshot={snapshot} onExport={onExport} />);
-    // Check for "Срез данных: snap-1" instead of "snapshot snap-1"
-    expect(screen.getByText(/Срез данных: snap-1/)).toBeInTheDocument();
+    // Use getAllByText since "Срез данных: snap-1" appears in both header and full report
+    expect(screen.getAllByText(/Срез данных: snap-1/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Заявки B2C')).toBeInTheDocument();
     expect(screen.getByText(/не сгенерированы/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Export DOCX' }));
