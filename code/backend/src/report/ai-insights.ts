@@ -75,8 +75,13 @@ export function snapshotFacts(s: ReportSnapshot): string {
 
   if (topChannels) lines.push(`Топ каналов: ${topChannels}.`);
 
-  const utmFmt = (u: { source: string; medium: string; campaign: string; visits: number; goalReaches: number }) =>
-    `${u.source}/${u.medium}/${u.campaign} — ${u.visits} виз., ${u.goalReaches} заяв.`;
+  const utmFmt = (u: {
+    source: string;
+    medium: string;
+    campaign: string;
+    visits: number;
+    goalReaches: number;
+  }) => `${u.source}/${u.medium}/${u.campaign} — ${u.visits} виз., ${u.goalReaches} заяв.`;
   const geoFmt = (g: { country: string; device: string; visits: number; goalReaches: number }) =>
     `${g.country}/${g.device} — ${g.visits} виз., ${g.goalReaches} заяв.`;
   const pageFmt = (p: { page: string; visits: number; bounceRate: number; goalReaches: number }) =>
@@ -89,8 +94,9 @@ export function snapshotFacts(s: ReportSnapshot): string {
 
   if (b2bDeals.length > 0) {
     const dealsStr = b2bDeals
-      .map((d: { company: string; tickets: number; stage: string }) =>
-        `${d.company} — ${d.tickets} билетов (${d.stage})`,
+      .map(
+        (d: { company: string; tickets: number; stage: string }) =>
+          `${d.company} — ${d.tickets} билетов (${d.stage})`,
       )
       .join('; ');
     lines.push(`B2B сделки: ${dealsStr}. Всего B2B: ${b2bTotal} билетов.`);
@@ -110,19 +116,22 @@ export function snapshotFacts(s: ReportSnapshot): string {
   if (genHyp && genHyp.problems.length > 0) {
     const probStr = genHyp.problems
       .slice(0, 5)
-      .map((p: { id: string; segment: string; trouble: string }) =>
-        `${p.id}: ${p.segment} — ${p.trouble}`,
+      .map(
+        (p: { id: string; segment: string; trouble: string }) =>
+          `${p.id}: ${p.segment} — ${p.trouble}`,
       )
       .join('; ');
     lines.push(`AI проблемные гипотезы: ${probStr}.`);
   }
   if (genHyp && genHyp.solutions.length > 0) {
     const topSol = [...genHyp.solutions]
-      .sort((a: { ice: { score: number } }, b: { ice: { score: number } }) => b.ice.score - a.ice.score)
+      .sort(
+        (a: { ice: { score: number } }, b: { ice: { score: number } }) => b.ice.score - a.ice.score,
+      )
       .slice(0, 3);
-    const solStr = topSol.map((s: { id: string; ice: { score: number } }) =>
-      `${s.id} [ICE ${s.ice.score}]`,
-    ).join('; ');
+    const solStr = topSol
+      .map((s: { id: string; ice: { score: number } }) => `${s.id} [ICE ${s.ice.score}]`)
+      .join('; ');
     lines.push(`AI решения (топ-3 по ICE): ${solStr}.`);
   }
 
@@ -130,10 +139,7 @@ export function snapshotFacts(s: ReportSnapshot): string {
 }
 
 /** Build the Anthropic request from the snapshot. Pure, deterministic given the snapshot. */
-export function buildInsightsRequest(
-  snapshot: ReportSnapshot,
-  model: string,
-): AnthropicRequest {
+export function buildInsightsRequest(snapshot: ReportSnapshot, model: string): AnthropicRequest {
   const system =
     'Ты — старший продуктовый аналитик ProductCamp. ' +
     'Пиши по-русски, развёрнуто и детально. ' +
@@ -166,8 +172,7 @@ const ResponseSchema = z.object({
 /** Extract the plain-text narrative from an Anthropic Messages response body. */
 export function parseInsights(raw: string): string {
   const parsed = ResponseSchema.safeParse(JSON.parse(raw));
-  if (!parsed.success)
-    throw new Error('Anthropic response did not match the expected schema');
+  if (!parsed.success) throw new Error('Anthropic response did not match the expected schema');
   return parsed.data.content
     .filter((b) => b.type === 'text')
     .map((b) => b.text ?? '')
@@ -190,7 +195,6 @@ export async function generateInsights(
     body: JSON.stringify(buildInsightsRequest(input.snapshot, input.model)),
   });
   const raw = await res.text();
-  if (!res.ok)
-    throw new Error(`Anthropic request failed (HTTP ${res.status}): ${raw}`);
+  if (!res.ok) throw new Error(`Anthropic request failed (HTTP ${res.status}): ${raw}`);
   return parseInsights(raw);
 }

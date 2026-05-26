@@ -104,8 +104,8 @@ export function SettingsView({
         </button>
         {refreshResult ? (
           <p className="mt-2 text-sm text-indigo-700">
-            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей,{' '}
-            {refreshResult.channelRows} строк каналов.
+            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей, {refreshResult.channelRows}{' '}
+            строк каналов.
           </p>
         ) : null}
         <p className="mt-1 text-xs text-indigo-400">
