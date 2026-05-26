@@ -129,7 +129,8 @@ export function ReportPreviewView({
       step++;
       const progress = Math.min(Math.round((step / stages.length) * 100), 99);
       setAiProgress(progress);
-      setAiStage(stages[Math.min(step, stages.length - 1)]);
+      const stageIdx = Math.min(step, stages.length - 1);
+      if (stages[stageIdx]) setAiStage(stages[stageIdx]);
     }, 1500);
 
     return () => clearInterval(interval);

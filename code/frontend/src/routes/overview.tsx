@@ -43,7 +43,8 @@ function InsightBadge({
 function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
   const insights: JSX.Element[] = [];
   const kpi = summarizeChannels(stats);
-  const overallCR = kpi.visits > 0 ? kpi.reaches / kpi.visits : 0;
+  const totalVisits = stats.reduce((a, c) => a + c.visits, 0);
+  const overallCR = totalVisits > 0 ? kpi.reaches / totalVisits : 0;
 
   // Overall conversion assessment
   if (overallCR > 0.05) {
@@ -113,8 +114,6 @@ function computeUtmInsights(utm: UtmStat[] | undefined): JSX.Element[] {
 function computePageInsights(pages: PageStat[] | undefined, type: 'entry' | 'exit'): JSX.Element[] {
   const insights: JSX.Element[] = [];
   if (!pages || pages.length === 0) return insights;
-
-  const avgBounce = pages.reduce((a, p) => a + p.bounceRate, 0) / pages.length;
 
   for (const p of pages.slice(0, 5)) {
     if (p.bounceRate > 0.7 && p.visits > 50) {

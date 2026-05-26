@@ -19,10 +19,6 @@ function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 }
 
-function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
 /** Global dashboard filters (sticky header). */
 export const useFilters = create<FiltersState>((set) => ({
   from: isoDaysAgo(13),
@@ -60,7 +56,7 @@ export function parseDateInput(value: string): string {
   if (!value) return isoDaysAgo(0);
   // Ensure YYYY-MM-DD format
   const parts = value.split('-');
-  if (parts.length === 3) {
+  if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
     return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
   }
   return value;

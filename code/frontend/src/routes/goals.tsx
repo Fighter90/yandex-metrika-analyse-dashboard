@@ -2,8 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
-import { EChart } from '../components/charts/EChart';
-import { EmptyState } from '../components/EmptyState';
 import { summarizeChannels } from '../lib/overview';
 
 type QueryStatus = 'pending' | 'error' | 'success';

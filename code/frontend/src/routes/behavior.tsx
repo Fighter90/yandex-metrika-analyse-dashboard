@@ -35,7 +35,6 @@ function computePageInsights(pages: PageStat[], type: 'entry' | 'exit'): JSX.Ele
   const insights: JSX.Element[] = [];
   if (pages.length === 0) return insights;
 
-  const avgBounce = pages.reduce((a, p) => a + p.bounceRate, 0) / pages.length;
   const avgCR = pages.reduce((a, p) => a + p.conversionRate, 0) / pages.length;
 
   for (const p of pages.slice(0, 10)) {
