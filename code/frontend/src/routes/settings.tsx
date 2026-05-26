@@ -55,7 +55,11 @@ export function SettingsView({
 
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
-    return <p role="alert" className="text-red-600">Не удалось загрузить настройки.</p>;
+    return (
+      <p role="alert" className="text-red-600">
+        Не удалось загрузить настройки.
+      </p>
+    );
 
   const set = (field: keyof SettingsForm, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
@@ -92,8 +96,8 @@ export function SettingsView({
         </button>
         {refreshResult ? (
           <p className="mt-2 text-sm text-indigo-700">
-            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей,{' '}
-            {refreshResult.channelRows} строк каналов.
+            ✅ За {refreshResult.days} дн.: {refreshResult.goals} целей, {refreshResult.channelRows}{' '}
+            строк каналов.
           </p>
         ) : null}
         <p className="mt-1 text-xs text-indigo-400">

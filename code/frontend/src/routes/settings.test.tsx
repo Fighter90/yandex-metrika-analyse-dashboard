@@ -66,12 +66,7 @@ describe('SettingsView', () => {
   });
 
   it('shows refresh result when provided', () => {
-    render(
-      <SettingsView
-        {...baseProps}
-        refreshResult={{ goals: 3, days: 14, channelRows: 50 }}
-      />,
-    );
+    render(<SettingsView {...baseProps} refreshResult={{ goals: 3, days: 14, channelRows: 50 }} />);
     expect(screen.getByText(/За 14 дн./)).toBeInTheDocument();
   });
 

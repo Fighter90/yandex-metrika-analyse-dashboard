@@ -14,7 +14,11 @@ export function HistoryView({
 }): JSX.Element {
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
-    return <p role="alert" className="text-red-600">Не удалось загрузить историю отчётов.</p>;
+    return (
+      <p role="alert" className="text-red-600">
+        Не удалось загрузить историю отчётов.
+      </p>
+    );
 
   if (snapshots.length === 0)
     return (

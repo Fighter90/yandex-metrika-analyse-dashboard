@@ -69,10 +69,9 @@ describe('deviceShareOption', () => {
   });
 
   it('includes a legend with device names', () => {
-    const o = deviceShareOption(byDevice([
-      geo({ device: 'mobile', visits: 10 }),
-      geo({ device: 'desktop', visits: 5 }),
-    ])) as { legend: { data: string[] } };
+    const o = deviceShareOption(
+      byDevice([geo({ device: 'mobile', visits: 10 }), geo({ device: 'desktop', visits: 5 })]),
+    ) as { legend: { data: string[] } };
     expect(o.legend.data).toContain('mobile');
     expect(o.legend.data).toContain('desktop');
   });

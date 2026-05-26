@@ -66,9 +66,7 @@ describe('OverviewView', () => {
   });
 
   it('renders geo/device charts when geoDevice data is provided', () => {
-    render(
-      <OverviewView status="success" stats={[sample]} geoDevice={[geoSample]} />,
-    );
+    render(<OverviewView status="success" stats={[sample]} geoDevice={[geoSample]} />);
     expect(screen.getByText('Топ стран по визитам')).toBeInTheDocument();
     expect(screen.getByText('Доля устройств (визиты)')).toBeInTheDocument();
     expect(screen.getAllByTestId('echart')).toHaveLength(5);

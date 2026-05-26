@@ -129,6 +129,5 @@ export const api = {
       body: JSON.stringify(body),
     }),
   /** Trigger a refresh (re-sync from Metrika). */
-  refreshData: () =>
-    http<{ ok: true }>('/settings/refresh', { method: 'POST' }),
+  refreshData: () => http<{ ok: true }>('/settings/refresh', { method: 'POST' }),
 };

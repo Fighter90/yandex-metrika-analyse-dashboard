@@ -20,10 +20,7 @@ const REPORTS_DIR = 'data/reports';
  *
  * Auto-generates AI hypotheses during build (if ANTHROPIC_API_KEY is set).
  */
-export function makeReportRunner(
-  builder: SnapshotBuilder,
-  snapshots: SnapshotRepo,
-): ReportRunner {
+export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRepo): ReportRunner {
   return {
     build: async ({ from, to }) => {
       const id = randomUUID();

@@ -8,14 +8,14 @@
 
 ## 1. Обзор продукта
 
-| Поле | Значение |
-|---|---|
-| **Название** | ProductCamp Conversion Analytics Dashboard |
-| **Что делает** | Локальный аналитический инструмент: подключается к Яндекс.Метрике по OAuth → кэширует данные в SQLite → поднимает интерактивный дашборд → помогает формулировать и проверять продуктовые гипотезы → генерирует DOCX/PDF-отчёты |
-| **KPI кампании** | 300+ **платных** билетов |
-| **Стадия** | v0.11.0 — рабочий продукт, фазы A–D завершены |
-| **ЦА** | Команда трека «Конверсии и лидген» ProductCamp: Лиза (лидирует направление), Сергей (аналитик/инженер), волонтёры команды маркетинга |
-| **Запуск** | `./run.sh` — одна команда, < 2 мин, без Docker, без облака |
+| Поле             | Значение                                                                                                                                                                                                                       |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Название**     | ProductCamp Conversion Analytics Dashboard                                                                                                                                                                                     |
+| **Что делает**   | Локальный аналитический инструмент: подключается к Яндекс.Метрике по OAuth → кэширует данные в SQLite → поднимает интерактивный дашборд → помогает формулировать и проверять продуктовые гипотезы → генерирует DOCX/PDF-отчёты |
+| **KPI кампании** | 300+ **платных** билетов                                                                                                                                                                                                       |
+| **Стадия**       | v0.11.0 — рабочий продукт, фазы A–D завершены                                                                                                                                                                                  |
+| **ЦА**           | Команда трека «Конверсии и лидген» ProductCamp: Лиза (лидирует направление), Сергей (аналитик/инженер), волонтёры команды маркетинга                                                                                           |
+| **Запуск**       | `./run.sh` — одна команда, < 2 мин, без Docker, без облака                                                                                                                                                                     |
 
 ### Главная боль
 
@@ -63,15 +63,15 @@ flowchart TD
 
 ### Слои
 
-| Слой | Где | Технологии |
-|---|---|---|
-| Извлечение | `code/backend/src/metrika/` | undici fetch, Zod, token-bucket, retry, backoff+jitter |
-| Хранение | `code/backend/src/db/` | better-sqlite3, миграции, repository pattern |
-| API | `code/backend/src/routes/` | Fastify 4, Zod, Swagger |
-| Аналитика | `code/backend/src/analytics/` | ICE (product), traffic-light, KPI-калькулятор |
-| Отчёты | `code/backend/src/report/` | `docx`, Puppeteer, immutable snapshot |
-| Фронтенд | `code/frontend/` | React 18, Vite, TailwindCSS, ECharts, TanStack, Zustand |
-| Общее | `code/shared/` (`@pca/shared`) | типы, `ICE_CONFIG`, валидация гипотез, `reportSections` |
+| Слой       | Где                            | Технологии                                              |
+| ---------- | ------------------------------ | ------------------------------------------------------- |
+| Извлечение | `code/backend/src/metrika/`    | undici fetch, Zod, token-bucket, retry, backoff+jitter  |
+| Хранение   | `code/backend/src/db/`         | better-sqlite3, миграции, repository pattern            |
+| API        | `code/backend/src/routes/`     | Fastify 4, Zod, Swagger                                 |
+| Аналитика  | `code/backend/src/analytics/`  | ICE (product), traffic-light, KPI-калькулятор           |
+| Отчёты     | `code/backend/src/report/`     | `docx`, Puppeteer, immutable snapshot                   |
+| Фронтенд   | `code/frontend/`               | React 18, Vite, TailwindCSS, ECharts, TanStack, Zustand |
+| Общее      | `code/shared/` (`@pca/shared`) | типы, `ICE_CONFIG`, валидация гипотез, `reportSections` |
 
 ### Структура репозитория
 
@@ -111,20 +111,20 @@ flowchart TD
 
 ### Таблицы SQLite
 
-| Таблица | Назначение | Ключ / история |
-|---|---|---|
-| `goals` | цели Метрики (seed) | PK `id`; `is_archived` если `id < 77` |
-| `raw_responses` | сырые ответы API (прослеживаемость) | UNIQUE `(query_hash, date_from, date_to)` |
-| `channel_stats` | нормализованные метрики по каналам | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням** |
-| `utm_stats` | разбивка по UTM | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням** |
-| `geo_device_stats` | разбивка по стране + устройству | PK `(date, country, device)` — **по дням** |
-| `page_stats` | поведение страниц входа | PK `(date, page)` — **по дням** |
-| `exit_page_stats` | поведение страниц выхода | PK `(date, page)` — **по дням** |
-| `hypotheses` | гипотезы в формате Воронковой | `ice_score` GENERATED `impact*confidence*ease`; FK `parent_id` → problem |
-| `b2b_manual` | ручной B2B-пайплайн | этапы lead/negotiation/invoiced/paid |
-| `report_snapshots` | immutable снапшоты отчётов | PK `id` (ulid) |
-| `decisions` | Decision Log | FK → `hypotheses`; `number` UNIQUE (DL-NNN) |
-| `_migrations` | трекинг применённых миграций | PK `name` |
+| Таблица            | Назначение                          | Ключ / история                                                           |
+| ------------------ | ----------------------------------- | ------------------------------------------------------------------------ |
+| `goals`            | цели Метрики (seed)                 | PK `id`; `is_archived` если `id < 77`                                    |
+| `raw_responses`    | сырые ответы API (прослеживаемость) | UNIQUE `(query_hash, date_from, date_to)`                                |
+| `channel_stats`    | нормализованные метрики по каналам  | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням** |
+| `utm_stats`        | разбивка по UTM                     | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням**          |
+| `geo_device_stats` | разбивка по стране + устройству     | PK `(date, country, device)` — **по дням**                               |
+| `page_stats`       | поведение страниц входа             | PK `(date, page)` — **по дням**                                          |
+| `exit_page_stats`  | поведение страниц выхода            | PK `(date, page)` — **по дням**                                          |
+| `hypotheses`       | гипотезы в формате Воронковой       | `ice_score` GENERATED `impact*confidence*ease`; FK `parent_id` → problem |
+| `b2b_manual`       | ручной B2B-пайплайн                 | этапы lead/negotiation/invoiced/paid                                     |
+| `report_snapshots` | immutable снапшоты отчётов          | PK `id` (ulid)                                                           |
+| `decisions`        | Decision Log                        | FK → `hypotheses`; `number` UNIQUE (DL-NNN)                              |
+| `_migrations`      | трекинг применённых миграций        | PK `name`                                                                |
 
 ### Инварианты БД
 
@@ -142,12 +142,12 @@ flowchart TD
 
 ### Double Diamond (верхний уровень)
 
-| Фаза | Что происходит | Инструмент |
-|---|---|---|
-| **Discover** | автосбор данных Метрики, авто-находки (аномалии, weak spots) | `pnpm sync`, дашборд |
-| **Define** | problem-гипотезы по структурированному формату + ICE | `.qwen/skills/hypothesis-check/` |
-| **Develop** | solution-гипотезы к каждой problem, тот же формат + ICE | `.qwen/skills/hypothesis-check/` |
-| **Deliver** | проверка top-N → Decision Log → action plan | `.qwen/skills/decision-log/`, страница Decisions |
+| Фаза         | Что происходит                                               | Инструмент                                       |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------ |
+| **Discover** | автосбор данных Метрики, авто-находки (аномалии, weak spots) | `pnpm sync`, дашборд                             |
+| **Define**   | problem-гипотезы по структурированному формату + ICE         | `.qwen/skills/hypothesis-check/`                 |
+| **Develop**  | solution-гипотезы к каждой problem, тот же формат + ICE      | `.qwen/skills/hypothesis-check/`                 |
+| **Deliver**  | проверка top-N → Decision Log → action plan                  | `.qwen/skills/decision-log/`, страница Decisions |
 
 ### Формат гипотезы
 
@@ -158,6 +158,7 @@ flowchart TD
 `[результату для бизнеса]`.
 
 **Обязательные поля (UI блокирует сохранение без них):**
+
 1. Структурный формат: Subject · Action · Solution · Condition («…, если …»).
 2. ≥3 скрытых допущения по категориям: behavior / market / tech.
 3. ≥2 метода проверки: synthetic CustDev / live / quantitative / market.
@@ -169,14 +170,15 @@ flowchart TD
 
 Каждый фактор 1–10. Итог — **произведение** (диапазон 1–1000), не среднее.
 
-| Диапазон | Бакет | Цвет |
-|---|---|---|
-| 1–125 | `low` | серый |
-| 126–342 | `medium` | жёлтый |
-| 343–729 | `high` | оранжевый |
-| 730–1000 | `top` | красный |
+| Диапазон | Бакет    | Цвет      |
+| -------- | -------- | --------- |
+| 1–125    | `low`    | серый     |
+| 126–342  | `medium` | жёлтый    |
+| 343–729  | `high`   | оранжевый |
+| 730–1000 | `top`    | красный   |
 
 **Anchor-описания:**
+
 - Impact 10 = «гарантированно +≥30 билетов до старта»; 5 = «+10 при удачном раскладе».
 - Confidence 10 = «есть прямые данные/интервью»; 5 = «аналогии и логика, не проверено».
 - Ease 10 = «полдня без согласований»; 5 = «неделя + согласование».
@@ -209,13 +211,13 @@ flowchart TD
 
 ### Пирамида тестов
 
-| Уровень | Инструмент | Что тестируем |
-|---|---|---|
-| Unit | Vitest (node) | чистые функции: ICE, traffic-light, KPI, валидация гипотез, Zod-схемы |
-| Integration | Vitest (node) | репозитории на реальной SQLite, API через `app.inject()` |
-| Component | Vitest (jsdom) + Testing Library | React-компоненты, валидации форм |
-| E2E | Playwright (chromium) | страницы рендерятся; блокировка сохранения; DOCX/PDF генерация |
-| Acceptance | Playwright | сквозной цикл «гипотеза → DL → статус», прослеживаемость, детерминизм |
+| Уровень     | Инструмент                       | Что тестируем                                                         |
+| ----------- | -------------------------------- | --------------------------------------------------------------------- |
+| Unit        | Vitest (node)                    | чистые функции: ICE, traffic-light, KPI, валидация гипотез, Zod-схемы |
+| Integration | Vitest (node)                    | репозитории на реальной SQLite, API через `app.inject()`              |
+| Component   | Vitest (jsdom) + Testing Library | React-компоненты, валидации форм                                      |
+| E2E         | Playwright (chromium)            | страницы рендерятся; блокировка сохранения; DOCX/PDF генерация        |
+| Acceptance  | Playwright                       | сквозной цикл «гипотеза → DL → статус», прослеживаемость, детерминизм |
 
 ### Команды
 
@@ -235,25 +237,25 @@ pnpm e2e        # Playwright
 
 ## 7. Стек (фиксированный)
 
-| Слой | Технология |
-|---|---|
-| Runtime | Node.js 20 LTS |
-| Язык | TypeScript 5, strict (noUncheckedIndexedAccess, noUnusedLocals/Parameters) |
-| Backend | Fastify 4 |
-| Validation | Zod |
-| HTTP | undici (built-in fetch) |
-| Storage | SQLite via `better-sqlite3` (без Docker) |
-| Frontend | React 18 + Vite 5 |
-| UI | TailwindCSS + shadcn/ui |
-| Charts | Apache ECharts (`echarts-for-react`) |
-| Tables | TanStack Table v8 |
-| State | Zustand + TanStack Query |
-| DOCX | `docx` |
-| PDF | Puppeteer (рендер той же HTML-страницы превью) |
-| Dates | `date-fns` + `date-fns-tz` (Europe/Moscow) |
-| Tests | Vitest + Playwright |
-| Lint | ESLint flat config + Prettier |
-| PM | pnpm 9 |
+| Слой       | Технология                                                                 |
+| ---------- | -------------------------------------------------------------------------- |
+| Runtime    | Node.js 20 LTS                                                             |
+| Язык       | TypeScript 5, strict (noUncheckedIndexedAccess, noUnusedLocals/Parameters) |
+| Backend    | Fastify 4                                                                  |
+| Validation | Zod                                                                        |
+| HTTP       | undici (built-in fetch)                                                    |
+| Storage    | SQLite via `better-sqlite3` (без Docker)                                   |
+| Frontend   | React 18 + Vite 5                                                          |
+| UI         | TailwindCSS + shadcn/ui                                                    |
+| Charts     | Apache ECharts (`echarts-for-react`)                                       |
+| Tables     | TanStack Table v8                                                          |
+| State      | Zustand + TanStack Query                                                   |
+| DOCX       | `docx`                                                                     |
+| PDF        | Puppeteer (рендер той же HTML-страницы превью)                             |
+| Dates      | `date-fns` + `date-fns-tz` (Europe/Moscow)                                 |
+| Tests      | Vitest + Playwright                                                        |
+| Lint       | ESLint flat config + Prettier                                              |
+| PM         | pnpm 9                                                                     |
 
 **Запрещено** добавлять зависимости вне списка без ADR в `docs/decisions/`.
 
@@ -264,19 +266,19 @@ pnpm e2e        # Playwright
 Глобальные фильтры (sticky header): период (7д / 14д / произвольный),
 каналы, сегмент B2C / B2C+B2B / B2B, показ архивных целей.
 
-| Страница | Что показывает |
-|---|---|
-| **Overview** | KPI-стрип (цель 300, заявки, gap), графики: визиты/заявки по дням, заявки по дням, микс каналов, **топ стран** (bar), **доля устройств** (donut), weak spots |
-| **Traffic** | бар каналов, grouped-bar «визиты vs заявки», таблица каналов, UTM-разбивка, бейдж низкого покрытия UTM |
-| **Audience** | графики и таблицы по стране (bar) и устройству (donut): визиты / пользователи / заявки / CR |
-| **Behavior** | страницы входа (startURL) и выхода (exitURL): графики + таблицы (визиты / отказы / заявки / CR) |
-| **Trends** | линия визитов и заявок по дням + WoW (неделя-к-неделе) со стрелками |
-| **Funnel** | воронка «заявка ≠ оплата»: Визиты → Заявки B2C → Билеты B2B → Оплачено B2B |
-| **B2B** | CRUD-таблица сделок, pipeline по этапам (lead/negotiation/invoiced/paid) |
-| **Hypotheses** | AI-генерация problem/solution гипотез, ICE-сортировка, риски, планы проверки |
-| **Decisions** | Decision Log: CRUD решений, привязка к гипотезам, светофор |
-| **Report** | сборка snapshot, AI-анализ (опц.), экспорт DOCX/PDF, полный просмотр отчёта на экране |
-| **Sources** | «Откуда эта цифра?» — поиск сырого ответа Метрики по `raw_response_id` |
+| Страница       | Что показывает                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Overview**   | KPI-стрип (цель 300, заявки, gap), графики: визиты/заявки по дням, заявки по дням, микс каналов, **топ стран** (bar), **доля устройств** (donut), weak spots |
+| **Traffic**    | бар каналов, grouped-bar «визиты vs заявки», таблица каналов, UTM-разбивка, бейдж низкого покрытия UTM                                                       |
+| **Audience**   | графики и таблицы по стране (bar) и устройству (donut): визиты / пользователи / заявки / CR                                                                  |
+| **Behavior**   | страницы входа (startURL) и выхода (exitURL): графики + таблицы (визиты / отказы / заявки / CR)                                                              |
+| **Trends**     | линия визитов и заявок по дням + WoW (неделя-к-неделе) со стрелками                                                                                          |
+| **Funnel**     | воронка «заявка ≠ оплата»: Визиты → Заявки B2C → Билеты B2B → Оплачено B2B                                                                                   |
+| **B2B**        | CRUD-таблица сделок, pipeline по этапам (lead/negotiation/invoiced/paid)                                                                                     |
+| **Hypotheses** | AI-генерация problem/solution гипотез, ICE-сортировка, риски, планы проверки                                                                                 |
+| **Decisions**  | Decision Log: CRUD решений, привязка к гипотезам, светофор                                                                                                   |
+| **Report**     | сборка snapshot, AI-анализ (опц.), экспорт DOCX/PDF, полный просмотр отчёта на экране                                                                        |
+| **Sources**    | «Откуда эта цифра?» — поиск сырого ответа Метрики по `raw_response_id`                                                                                       |
 
 ---
 
@@ -299,25 +301,25 @@ pnpm e2e        # Playwright
 
 ### API эндпоинты
 
-| Метод | Путь | Описание |
-|---|---|---|
-| GET | `/api/health` | health check: counterId, metrikaTokenPresent |
-| GET | `/api/metrics/channels` | channel_stats за период |
-| GET | `/api/metrics/utm` | utm_stats за период |
-| GET | `/api/metrics/geo-device` | geo_device_stats за период |
-| GET | `/api/metrics/pages` | page_stats за период |
-| GET | `/api/metrics/exit-pages` | exit_page_stats за период |
-| GET | `/api/metrics/primary-goal` | авто-определённая KPI-цель |
-| GET | `/api/metrics/goals` | все цели (seed) |
-| POST | `/api/sync` | запуск sync Метрики |
-| POST | `/api/report/snapshot` | build snapshot за период |
-| POST | `/api/report/insights` | AI-анализ снапшота |
-| POST | `/api/report/hypotheses` | генерация гипотез из снапшота |
-| POST | `/api/report/generate` | экспорт DOCX/PDF |
-| CRUD | `/api/hypotheses` | гипотезы |
-| CRUD | `/api/decisions` | Decision Log |
-| CRUD | `/api/b2b` | B2B-пайплайн |
-| GET | `/api/metrics/raw/:id` | сырой ответ по ID (Sources) |
+| Метод | Путь                        | Описание                                     |
+| ----- | --------------------------- | -------------------------------------------- |
+| GET   | `/api/health`               | health check: counterId, metrikaTokenPresent |
+| GET   | `/api/metrics/channels`     | channel_stats за период                      |
+| GET   | `/api/metrics/utm`          | utm_stats за период                          |
+| GET   | `/api/metrics/geo-device`   | geo_device_stats за период                   |
+| GET   | `/api/metrics/pages`        | page_stats за период                         |
+| GET   | `/api/metrics/exit-pages`   | exit_page_stats за период                    |
+| GET   | `/api/metrics/primary-goal` | авто-определённая KPI-цель                   |
+| GET   | `/api/metrics/goals`        | все цели (seed)                              |
+| POST  | `/api/sync`                 | запуск sync Метрики                          |
+| POST  | `/api/report/snapshot`      | build snapshot за период                     |
+| POST  | `/api/report/insights`      | AI-анализ снапшота                           |
+| POST  | `/api/report/hypotheses`    | генерация гипотез из снапшота                |
+| POST  | `/api/report/generate`      | экспорт DOCX/PDF                             |
+| CRUD  | `/api/hypotheses`           | гипотезы                                     |
+| CRUD  | `/api/decisions`            | Decision Log                                 |
+| CRUD  | `/api/b2b`                  | B2B-пайплайн                                 |
+| GET   | `/api/metrics/raw/:id`      | сырой ответ по ID (Sources)                  |
 
 ---
 
@@ -338,31 +340,31 @@ pnpm e2e        # Playwright
 
 Спецификации в `docs/specs/`:
 
-| # | Спека | Статус |
-|---|---|---|
-| 001 | Двойная KPI-цель: оплата + заявка | `superseded` (заменена 002) |
+| #   | Спека                                                       | Статус                                    |
+| --- | ----------------------------------------------------------- | ----------------------------------------- |
+| 001 | Двойная KPI-цель: оплата + заявка                           | `superseded` (заменена 002)               |
 | 002 | Переработка продукта: AI-гипотезы, отчёт ГОСТ, дашборд, ops | `accepted` (фазы A–D done, E in progress) |
 
 ### Фаза 002 — подфазы
 
-| Фаза | Описание | Статус |
-|---|---|---|
-| **A** | Движок AI-гипотез (≥10 problem + ≥10 solution, ICE, риски, планы проверки) | ✅ Done |
-| **B** | Отчёт ≥40 стр. A4 по ГОСТ, DOCX/PDF download, «Перестроить отчёт» | ✅ Done |
-| **C** | Дашборд: больше графиков (Overview), фильтры по датам, легенды, гео/устройства на Overview, пустые состояния | ✅ Done |
-| **D** | Ops UI: Settings (ключ/токен/счётчик), «История отчётов», убрать Sources | ✅ Done |
-| **E** | Аудит парсинга Метрики, полная пирамида тестов, README/доки/CLAUDE/QWEN, релиз | 🔄 In progress |
+| Фаза  | Описание                                                                                                     | Статус         |
+| ----- | ------------------------------------------------------------------------------------------------------------ | -------------- |
+| **A** | Движок AI-гипотез (≥10 problem + ≥10 solution, ICE, риски, планы проверки)                                   | ✅ Done        |
+| **B** | Отчёт ≥40 стр. A4 по ГОСТ, DOCX/PDF download, «Перестроить отчёт»                                            | ✅ Done        |
+| **C** | Дашборд: больше графиков (Overview), фильтры по датам, легенды, гео/устройства на Overview, пустые состояния | ✅ Done        |
+| **D** | Ops UI: Settings (ключ/токен/счётчик), «История отчётов», убрать Sources                                     | ✅ Done        |
+| **E** | Аудит парсинга Метрики, полная пирамида тестов, README/доки/CLAUDE/QWEN, релиз                               | 🔄 In progress |
 
 ---
 
 ## 12. ADR (архитектурные решения)
 
-| # | Решение |
-|---|---|
+| #   | Решение                                                                   |
+| --- | ------------------------------------------------------------------------- |
 | 001 | Монорепо pnpm-workspace, Fastify 4 + React 18 + SQLite, TypeScript strict |
-| 005 | ICE = произведение (I × C × E), не среднее |
-| 006 | Пирамида тестов: Vitest + Playwright, порог 100% покрытия |
-| 007 | Парсер Метрики + хранение истории по дням в SQLite (без Docker) |
+| 005 | ICE = произведение (I × C × E), не среднее                                |
+| 006 | Пирамида тестов: Vitest + Playwright, порог 100% покрытия                 |
+| 007 | Парсер Метрики + хранение истории по дням в SQLite (без Docker)           |
 
 ---
 
@@ -370,25 +372,25 @@ pnpm e2e        # Playwright
 
 Лежат в `.qwen/skills/` (и зеркалируются в `.claude/skills/`):
 
-| Скрипт | Назначение |
-|---|---|
-| `hypothesis-check/SKILL.md` | структурирование problem/solution гипотез + ICE |
-| `synthetic-custdev/SKILL.md` | симуляция 5 архетипов ЦА ProductCamp для CustDev |
-| `market-scan/SKILL.md` | рыночный анализ конкурирующих конференций с источниками |
-| `decision-log/SKILL.md` | шаблон DL-NNN и промпт генерации черновика |
+| Скрипт                       | Назначение                                              |
+| ---------------------------- | ------------------------------------------------------- |
+| `hypothesis-check/SKILL.md`  | структурирование problem/solution гипотез + ICE         |
+| `synthetic-custdev/SKILL.md` | симуляция 5 архетипов ЦА ProductCamp для CustDev        |
+| `market-scan/SKILL.md`       | рыночный анализ конкурирующих конференций с источниками |
+| `decision-log/SKILL.md`      | шаблон DL-NNN и промпт генерации черновика              |
 
 ---
 
 ## 14. CI/CD
 
-| Workflow | Триггер | Что делает |
-|---|---|---|
-| `ci.yml` | push main / PR | lint + typecheck + coverage (100% порог) + build |
-| `security.yml` | push main / PR | gitleaks (секрет-скан) + pnpm audit (report-only) |
-| `e2e.yml` | push / PR | Playwright smoke (chromium), отчёт-артефакт при падении |
-| `pr-lint.yml` | PR | Conventional Commits заголовок |
-| `review.yml` | PR | AI code review (пропускается без ANTHROPIC_API_KEY) |
-| `release.yml` | тег `v*.*.*` | verify → package (tar.gz + frontend zip + checksums) → GitHub Release |
+| Workflow       | Триггер        | Что делает                                                            |
+| -------------- | -------------- | --------------------------------------------------------------------- |
+| `ci.yml`       | push main / PR | lint + typecheck + coverage (100% порог) + build                      |
+| `security.yml` | push main / PR | gitleaks (секрет-скан) + pnpm audit (report-only)                     |
+| `e2e.yml`      | push / PR      | Playwright smoke (chromium), отчёт-артефакт при падении               |
+| `pr-lint.yml`  | PR             | Conventional Commits заголовок                                        |
+| `review.yml`   | PR             | AI code review (пропускается без ANTHROPIC_API_KEY)                   |
+| `release.yml`  | тег `v*.*.*`   | verify → package (tar.gz + frontend zip + checksums) → GitHub Release |
 
 ---
 
@@ -412,5 +414,5 @@ pnpm e2e        # Playwright
 > Заполняется после каждого цикла проверки гипотезы. Полные записи — `data/decisions/DL-*.md`.
 
 - **DL-001** — не заполнено (пока ни одной завершённой проверки)
-- **DL-002** — _ _
-- **DL-003** — _ _
+- **DL-002** — \_ \_
+- **DL-003** — \_ \_

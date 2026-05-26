@@ -6,7 +6,15 @@ import { formatInt, formatPercent } from '../lib/format';
 import { errorMessage } from '../lib/error-message';
 import { downloadFile, reportDownloadUrl } from '../lib/download';
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }): JSX.Element {
+function Stat({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}): JSX.Element {
   return (
     <div className="rounded border border-slate-200 p-2">
       <div className="text-xs uppercase text-slate-500">{label}</div>
@@ -96,7 +104,11 @@ export function ReportPreviewView({
           {/* KPI strip */}
           <div className="grid grid-cols-4 gap-2">
             <Stat label="Цель" value={formatInt(snapshot.kpi.target)} />
-            <Stat label="Заявки B2C" value={formatInt(snapshot.kpi.b2cApplications)} hint="заявка ≠ оплата" />
+            <Stat
+              label="Заявки B2C"
+              value={formatInt(snapshot.kpi.b2cApplications)}
+              hint="заявка ≠ оплата"
+            />
             <Stat label="Оплачено B2B" value={formatInt(snapshot.kpi.b2bPaidTickets)} />
             <Stat label="Gap" value={formatInt(snapshot.kpi.gap)} />
           </div>
@@ -142,7 +154,8 @@ export function ReportPreviewView({
           <ul className="text-sm text-slate-600">
             <li>Каналов: {snapshot.channels.length}</li>
             <li>
-              AI-гипотез: {snapshot.generatedHypotheses
+              AI-гипотез:{' '}
+              {snapshot.generatedHypotheses
                 ? `${snapshot.generatedHypotheses.problems.length} проблем + ${snapshot.generatedHypotheses.solutions.length} решений`
                 : 'не сгенерированы'}
             </li>

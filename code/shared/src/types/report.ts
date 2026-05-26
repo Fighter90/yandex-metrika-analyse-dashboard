@@ -50,8 +50,16 @@ export interface B2bSummary {
   readonly totalTickets: number;
   readonly paidTickets: number;
   readonly dealsCount: number;
-  readonly deals: Array<{ readonly company: string; readonly tickets: number; readonly stage: string }>;
-  readonly byStage: Array<{ readonly stage: string; readonly tickets: number; readonly deals: number }>;
+  readonly deals: Array<{
+    readonly company: string;
+    readonly tickets: number;
+    readonly stage: string;
+  }>;
+  readonly byStage: Array<{
+    readonly stage: string;
+    readonly tickets: number;
+    readonly deals: number;
+  }>;
 }
 
 /** Funnel stages for the report. */
