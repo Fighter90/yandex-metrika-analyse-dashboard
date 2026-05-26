@@ -199,12 +199,18 @@ function b2bSection(s: ReportSnapshot): ReportSection | null {
 function funnelSection(s: ReportSnapshot): ReportSection | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const funnel = (s as any).funnel as
-    | { visits: number; b2cApplications: number; b2bPipelineTickets: number; b2bPaidTickets: number }
+    | {
+        visits: number;
+        b2cApplications: number;
+        b2bPipelineTickets: number;
+        b2bPaidTickets: number;
+      }
     | undefined;
 
   if (!funnel) return null;
 
-  const visitToAppCR = funnel.visits > 0 ? ((funnel.b2cApplications / funnel.visits) * 100).toFixed(1) : '0.0';
+  const visitToAppCR =
+    funnel.visits > 0 ? ((funnel.b2cApplications / funnel.visits) * 100).toFixed(1) : '0.0';
 
   const lines: string[] = [
     `Этап 1: Визиты — ${funnel.visits}`,
@@ -220,7 +226,9 @@ function funnelSection(s: ReportSnapshot): ReportSection | null {
     lines.push('');
     lines.push('Анализ воронки:');
     const lostVisits = funnel.visits - funnel.b2cApplications;
-    lines.push(`  • Потеряно на этапе заявки: ${lostVisits} визитов (${((lostVisits / funnel.visits) * 100).toFixed(1)}%)`);
+    lines.push(
+      `  • Потеряно на этапе заявки: ${lostVisits} визитов (${((lostVisits / funnel.visits) * 100).toFixed(1)}%)`,
+    );
     if (funnel.b2bPipelineTickets > 0) {
       lines.push(`  • B2B-пайплайн в работе: ${funnel.b2bPipelineTickets} билетов`);
     }
@@ -257,24 +265,34 @@ function channelAnalysisSection(s: ReportSnapshot): ReportSection {
 
   // Highlight top and bottom performers
   if (totals.length > 0) {
-    const bestCr = totals.reduce((best, t) => {
-      if (!t) return best;
-      const cr = t.visits > 0 ? t.goalReaches / t.visits : 0;
-      return cr > best.cr ? { channel: t.channel, cr } : best;
-    }, { channel: '', cr: 0 });
+    const bestCr = totals.reduce(
+      (best, t) => {
+        if (!t) return best;
+        const cr = t.visits > 0 ? t.goalReaches / t.visits : 0;
+        return cr > best.cr ? { channel: t.channel, cr } : best;
+      },
+      { channel: '', cr: 0 },
+    );
 
-    const worstCr = totals.reduce((worst, t) => {
-      if (!t || t.visits === 0) return worst;
-      const cr = t.goalReaches / t.visits;
-      return cr < worst.cr ? { channel: t.channel, cr } : worst;
-    }, { channel: totals[0]?.channel ?? '', cr: 1 });
+    const worstCr = totals.reduce(
+      (worst, t) => {
+        if (!t || t.visits === 0) return worst;
+        const cr = t.goalReaches / t.visits;
+        return cr < worst.cr ? { channel: t.channel, cr } : worst;
+      },
+      { channel: totals[0]?.channel ?? '', cr: 1 },
+    );
 
     lines.push('Выводы:');
     if (bestCr.channel) {
-      lines.push(`  • Лучший CR: ${bestCr.channel} (${(bestCr.cr * 100).toFixed(1)}%) — масштабировать`);
+      lines.push(
+        `  • Лучший CR: ${bestCr.channel} (${(bestCr.cr * 100).toFixed(1)}%) — масштабировать`,
+      );
     }
     if (worstCr.channel && worstCr.cr > 0) {
-      lines.push(`  • Худший CR: ${worstCr.channel} (${(worstCr.cr * 100).toFixed(1)}%) — проверить качество трафика`);
+      lines.push(
+        `  • Худший CR: ${worstCr.channel} (${(worstCr.cr * 100).toFixed(1)}%) — проверить качество трафика`,
+      );
     }
   }
 

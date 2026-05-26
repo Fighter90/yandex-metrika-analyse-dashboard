@@ -343,13 +343,7 @@ export async function generateInsightsChunked(
 
   for (const chunk of ANALYSIS_CHUNKS) {
     try {
-      const result = await generateChunk(
-        doFetch,
-        input.apiKey,
-        input.model,
-        chunk,
-        facts,
-      );
+      const result = await generateChunk(doFetch, input.apiKey, input.model, chunk, facts);
       sections.push(`## ${chunk.section}\n\n${result}`);
     } catch (err) {
       // If one chunk fails, skip it and continue with the rest
