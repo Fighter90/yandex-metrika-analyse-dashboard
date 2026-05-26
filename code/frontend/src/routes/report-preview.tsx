@@ -5,7 +5,7 @@ import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
 import { errorMessage } from '../lib/error-message';
 import { downloadFile, reportDownloadUrl } from '../lib/download';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function Stat({
   label,
@@ -88,6 +88,16 @@ export interface ReportPreviewProps {
   onInsights: (snapshotId: string) => void;
 }
 
+// 5 stages matching the backend ANALYSIS_CHUNKS
+const AI_STAGES = [
+  'Подготовка данных',
+  'Генерация: Итог',
+  'Генерация: Каналы, UTM и Аудитория',
+  'Генерация: Страницы и Воронка',
+  'Генерация: Риски и Рекомендации',
+  'Генерация: Гипотезы и Дорожная карта',
+];
+
 /** Pure preview: the snapshot summary that DOCX/PDF render from, plus export. */
 export function ReportPreviewView({
   snapshot,
@@ -101,40 +111,61 @@ export function ReportPreviewView({
 }: ReportPreviewProps): JSX.Element {
   const [aiProgress, setAiProgress] = useState(0);
   const [aiStage, setAiStage] = useState('');
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Simulate progress when AI analysis is pending
   useEffect(() => {
     if (!insightsPending) {
       setAiProgress(0);
       setAiStage('');
+      if (intervalRef.current) clearInterval(intervalRef.current);
       return;
     }
 
-    const stages = [
-      'Подготовка данных',
-      'Генерация: Краткие итоги',
-      'Генерация: Каналы и UTM',
-      'Генерация: Аудитория',
-      'Генерация: Страницы',
-      'Генерация: Воронка и B2B',
-      'Генерация: Риски',
-      'Генерация: Рекомендации',
-      'Генерация: Приоритизация гипотез',
-      'Генерация: Гипотезы решений',
-      'Генерация: Дорожная карта',
-    ];
+    // Start from stage 0
+    setAiStage(AI_STAGES[0] ?? '');
+    setAiProgress(0);
 
     let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      const progress = Math.min(Math.round((step / stages.length) * 100), 99);
-      setAiProgress(progress);
-      const stageIdx = Math.min(step, stages.length - 1);
-      if (stages[stageIdx]) setAiStage(stages[stageIdx]);
-    }, 1500);
+    const totalSteps = AI_STAGES.length;
+    // Each step takes ~3-5 seconds (total 15-25 seconds for 5 chunks)
+    const stepDuration = 3000;
 
-    return () => clearInterval(interval);
+    intervalRef.current = setInterval(() => {
+      step++;
+      if (step >= totalSteps) {
+        // Stay at 95% until response arrives (never hit 100% until done)
+        setAiProgress(95);
+        setAiStage(AI_STAGES[totalSteps - 1] ?? 'Завершение…');
+      } else {
+        const progress = Math.round((step / totalSteps) * 90);
+        setAiProgress(progress);
+        if (AI_STAGES[step]) setAiStage(AI_STAGES[step]);
+      }
+    }, stepDuration);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [insightsPending]);
+
+  // When narrative arrives, snap to 100%
+  useEffect(() => {
+    if (narrative) {
+      setAiProgress(100);
+      setAiStage('Готово!');
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+  }, [narrative]);
+
+  // When error arrives, show error state
+  useEffect(() => {
+    if (insightsError) {
+      setAiProgress(0);
+      setAiStage('Ошибка');
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+  }, [insightsError]);
 
   return (
     <section className="space-y-4">
@@ -249,7 +280,7 @@ export function ReportPreviewView({
               <div className="space-y-2">
                 <AIProgress progress={aiProgress} stage={aiStage} />
                 <p className="text-xs text-violet-500">
-                  Генерация AI-анализа: 10 разделов, это может занять 1–2 минуты.
+                  Генерация AI-анализа: 5 разделов, обычно занимает 30–60 секунд.
                 </p>
               </div>
             ) : (

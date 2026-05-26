@@ -142,6 +142,8 @@ export function snapshotFacts(s: ReportSnapshot): string {
  * Chunked AI analysis: generates the report narrative by making multiple focused calls
  * to the LLM, then combines the results. This avoids truncation and produces a
  * detailed 30+ page report.
+ *
+ * Reduced from 10 chunks to 5 for faster completion (~30-60 seconds total).
  */
 interface AnalysisChunk {
   readonly section: string;
@@ -155,98 +157,50 @@ const ANALYSIS_CHUNKS: AnalysisChunk[] = [
     systemPrompt:
       'Ты — старший продуктовый аналитик. Пиши по-русски, развёрнуто. Используй ТОЛЬКО приведённые числа. ' +
       'Принцип «заявка ≠ оплата» соблюдай строго. Напиши подробный executive summary (3–5 абзацев): ' +
-      'где мы сейчас, какой gap до цели, основные выводы по данным.',
+      'где мы сейчас, какой gap до цели, основные выводы по данным. Включи анализ каналов, UTM, аудитории, страниц, воронки и B2B.',
     userPrompt: (facts) =>
       `Данные:\n${facts}\n\nНапиши подробный итог для команды трека «Конверсии и лидген».`,
   },
   {
-    section: 'Каналы и UTM',
+    section: 'Каналы, UTM и Аудитория',
     systemPrompt:
-      'Ты — аналитик трафика. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Проанализируй каждый канал: объём, CR, качество трафика. Сравни каналы между собой. ' +
-      'Выдели лучшие и худшие. Напиши 2–3 абзаца на каждый значимый канал.',
+      'Ты — аналитик трафика и аудитории. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
+      'Проанализируй каждый канал: объём, CR, качество трафика. Проанализируй UTM-кампании, ' +
+      'гео и устройства. Выдели лучшие и худшие. Напиши 3–5 абзацев на каждый значимый аспект.',
     userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nДетальный анализ каналов и UTM: какой трафик конвертирует, какой — пустые визиты.`,
+      `Данные:\n${facts}\n\nДетальный анализ каналов, UTM, гео и устройств: какой трафик конвертирует, какой — пустые визиты.`,
   },
   {
-    section: 'Аудитория',
+    section: 'Страницы и Воронка',
     systemPrompt:
-      'Ты — аналитик аудитории. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Проанализируй гео и устройства: какие регионы и устройства приносят больше заявок, ' +
-      'где конверсия выше/ниже. Напиши 2–3 абзаца.',
+      'Ты — аналитик поведения и воронки. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
+      'Проанализируй страницы входа и выхода: где высокий bounce, где отвалы. ' +
+      'Проанализируй воронку конверсии и B2B-трек. Напиши 3–5 абзацев.',
     userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nАнализ аудитории: гео, устройства, различия в конверсии.`,
+      `Данные:\n${facts}\n\nАнализ страниц, воронки конверсии и B2B-трека: bounce rate, отвалы, точки роста, статус сделок.`,
   },
   {
-    section: 'Страницы',
-    systemPrompt:
-      'Ты — аналитик поведения. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Проанализируй страницы входа и выхода: где высокий bounce, где отвалы, ' +
-      'какие страницы работают хорошо, какие — плохо. Напиши 2–3 абзаца.',
-    userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nАнализ страниц входа и выхода: bounce rate, отвалы, точки роста.`,
-  },
-  {
-    section: 'Воронка и B2B',
-    systemPrompt:
-      'Ты — аналитик воронки. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Проанализируй воронку: где потери, какие этапы работают, ' +
-      'каков статус B2B-сделок, что можно улучшить. Напиши 2–3 абзаца.',
-    userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nАнализ воронки конверсии и B2B-трека: потери, точки роста, статус сделок.`,
-  },
-  {
-    section: 'Риски',
-    systemPrompt:
-      'Ты — аналитик рисков. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Выяви 5–7 ключевых рисков для достижения цели в 300 платных билетов. ' +
-      'Каждый риск — с конкретными цифрами и обоснованием. Напиши по абзацу на каждый риск.',
-    userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nВыяви ключевые риски для достижения цели в 300 платных билетов.`,
-  },
-  {
-    section: 'Рекомендации',
+    section: 'Риски и Рекомендации',
     systemPrompt:
       'Ты — старший продуктовый аналитик. Пиши по-русски, конкретно. Используй ТОЛЬКО приведённые числа. ' +
-      'Дай 5–7 конкретных рекомендаций с ожидаемым эффектом. Каждая рекомендация: ' +
-      'что сделать, почему, какой результат ожидать (в цифрах), приоритет. ' +
-      'Напиши по абзацу на каждую рекомендацию.',
+      'Выяви 5–7 ключевых рисков и дай 5–7 конкретных рекомендаций с ожидаемым эффектом. ' +
+      'Каждая рекомендация: что сделать, почему, какой результат ожидать (в цифрах), приоритет.',
     userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nКонкретные рекомендации для команды трека «Конверсии и лидген».`,
+      `Данные:\n${facts}\n\nРиски и рекомендации для команды трека «Конверсии и лидген».`,
   },
   {
-    section: 'Приоритизация гипотез',
+    section: 'Гипотезы и Дорожная карта',
     systemPrompt:
-      'Ты — продуктовый менеджер. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Проанализируй существующие гипотезы (если есть) или предложи новые. ' +
-      'Расставь приоритеты по ICE (Impact × Confidence × Ease). ' +
-      'Для каждой гипотезы: формулировка, обоснование ICE, план проверки, дедлайн.',
+      'Ты — продуктовый стратег и руководитель проекта. Пиши по-русски, детально. ' +
+      'Используй ТОЛЬКО приведённые числа. ' +
+      'Расставь приоритеты гипотез по ICE. Составь дорожную карту на оставшийся период. ' +
+      'Для каждой гипотезы: формулировка, ICE, план проверки. Для дорожной карты: недели, ответственные, результат.',
     userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nПриоритизация гипотез по ICE с подробным обоснованием каждого балла.`,
-  },
-  {
-    section: 'Гипотезы решений',
-    systemPrompt:
-      'Ты — продуктовый стратег. Пиши по-русски, детально. Используй ТОЛЬКО приведённые числа. ' +
-      'Для каждой ключевой проблемы предложи конкретное решение. ' +
-      'Формула: «Если [сделаем X], то [пользователи смогут Y], что приведёт к [результату Z]». ' +
-      'Для каждого решения: риски, план проверки, критерии успеха, дедлайн.',
-    userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nПодробные гипотезы решений с рисками, планами проверки и критериями успеха.`,
-  },
-  {
-    section: 'Дорожная карта',
-    systemPrompt:
-      'Ты — руководитель проекта. Пиши по-русски, конкретно. Используй ТОЛЬКО приведённые числа. ' +
-      'Составь дорожную карту на оставшийся период до старта ProductCamp. ' +
-      'Разбей на недели: что делать, кто ответственный, какой результат. ' +
-      'Фокус на быстрых победах (quick wins) и долгосрочных действиях.',
-    userPrompt: (facts) =>
-      `Данные:\n${facts}\n\nДорожная карта для команды трека «Конверсии и лидген» на оставшийся период.`,
+      `Данные:\n${facts}\n\nПриоритизация гипотез по ICE и дорожная карта для команды трека «Конверсии и лидген».`,
   },
 ];
 
-/** Generate one analysis chunk via Anthropic. */
+/** Generate one analysis chunk via Anthropic with timeout. */
 async function generateChunk(
   doFetch: AnthropicFetch,
   apiKey: string,
@@ -256,11 +210,17 @@ async function generateChunk(
 ): Promise<string> {
   const req: AnthropicRequest = {
     model,
-    max_tokens: 4000,
+    max_tokens: 2000,
     system: chunk.systemPrompt,
     messages: [{ role: 'user', content: chunk.userPrompt(facts) }],
   };
-  const res = await doFetch(ANTHROPIC_URL, {
+
+  // Timeout: 45 seconds per chunk
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`Chunk "${chunk.section}" timed out after 45s`)), 45_000),
+  );
+
+  const fetchPromise = doFetch(ANTHROPIC_URL, {
     method: 'POST',
     headers: {
       'x-api-key': apiKey,
@@ -269,6 +229,8 @@ async function generateChunk(
     },
     body: JSON.stringify(req),
   });
+
+  const res = await Promise.race([fetchPromise, timeout]);
   const raw = await res.text();
   if (!res.ok) throw new Error(`Anthropic request failed (HTTP ${res.status}): ${raw}`);
 
@@ -332,7 +294,8 @@ export function parseInsights(raw: string): string {
 
 /**
  * Generate the full detailed report narrative using chunked AI analysis.
- * Makes multiple focused calls to the LLM, then combines results.
+ * Makes 5 focused calls to the LLM (reduced from 10 for speed), then combines results.
+ * Each chunk has a 45-second timeout. Failed chunks are skipped.
  */
 export async function generateInsightsChunked(
   doFetch: AnthropicFetch,
@@ -346,7 +309,7 @@ export async function generateInsightsChunked(
       const result = await generateChunk(doFetch, input.apiKey, input.model, chunk, facts);
       sections.push(`## ${chunk.section}\n\n${result}`);
     } catch (err) {
-      // If one chunk fails, skip it and continue with the rest
+      // If one chunk fails or times out, skip it and continue with the rest
       sections.push(
         `## ${chunk.section}\n\n[Ошибка генерации: ${(err as Error).message} — раздел пропущен]`,
       );

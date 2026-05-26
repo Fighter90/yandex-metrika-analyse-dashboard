@@ -74,7 +74,7 @@ describe('parseInsights', () => {
 
 describe('generateInsights', () => {
   it('POSTs to Anthropic with auth headers and returns the narrative', async () => {
-    // Mock 10 chunk responses (one per section)
+    // Mock 5 chunk responses (reduced from 10 for speed)
     const doFetch = vi.fn<AnthropicFetch>().mockResolvedValue({
       ok: true,
       status: 200,
@@ -86,10 +86,10 @@ describe('generateInsights', () => {
       model: 'claude-sonnet-4-6',
       snapshot,
     });
-    // Should contain 10 sections joined together
+    // Should contain 5 sections joined together
     expect(out).toContain('## Section');
     expect(out).toContain('анализ');
-    expect(doFetch).toHaveBeenCalledTimes(10);
+    expect(doFetch).toHaveBeenCalledTimes(5);
     const firstCall = doFetch.mock.calls[0];
     if (firstCall) {
       expect(firstCall[0]).toBe(ANTHROPIC_URL);
