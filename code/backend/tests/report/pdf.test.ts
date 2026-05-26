@@ -57,8 +57,8 @@ describe('reportHtml', () => {
     expect(html).toContain('class="cover"');
     expect(html).toContain('Содержание');
     expect(html).toContain('Период: 2025-01-01 — 2025-01-07');
-    expect(html).toContain('<h1>1. Executive Summary</h1>');
-    expect(html).toContain('<li>1. Executive Summary</li>');
+    expect(html).toContain('<h1>1. Краткие итоги</h1>');
+    expect(html).toContain('<li>1. Краткие итоги</li>');
   });
 
   it('escapes &, < and > in content', () => {
