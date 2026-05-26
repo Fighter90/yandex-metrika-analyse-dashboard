@@ -147,6 +147,10 @@ Zustand · `docx` · Puppeteer · date-fns(-tz) · Vitest + Playwright · ESLint
    `buildServer(deps)`.
 5. **Дашборд.** React + TanStack Query читает API; страницы — паттерн «чистая View(status,…) + тонкий
    data-wrapper»; графики на ECharts. KPI всюду разделяет **заявку и оплату**.
+   - **Сегмент-фильтр** (B2C / B2C+B2B / B2B): фильтрует каналы и UTM на всех страницах.
+   - **📅 Выбрать даты**: кастомный date picker (от/до).
+   - **🔄 Перестроить отчёт**: кнопка на всех страницах — перестраивает снапшот с текущими фильтрами.
+   - **архивные цели**: checkbox включает/отключает показ архивных целей Метрики.
 6. **Отчёт.** `SnapshotBuilder` собирает **неизменяемый** `ReportSnapshot` из БД (детерминированно:
    `id` и `generatedAt` — входные параметры, без `Date.now()`/LLM в render-пути). `reportSections`
    даёт общий контент для DOCX (`docx/builder.ts`) и PDF (`pdf/html.ts` → `pdf/renderer.ts` через
