@@ -140,11 +140,11 @@ describe('updateEnvFile (unit)', () => {
     if (fs.existsSync(ENV_BACKUP)) {
       fs.renameSync(ENV_BACKUP, ENV_PATH);
     }
-    // Clean up test .env if it exists
-    if (fs.existsSync(ENV_PATH) && !fs.existsSync(ENV_BACKUP)) {
-      // Only delete if it was created by this test suite
+    // Clean up test .env if it exists and wasn't restored
+    if (fs.existsSync(ENV_PATH)) {
       const content = fs.readFileSync(ENV_PATH, 'utf-8');
-      if (content.includes('TEST_KEY') || content.includes('VALID_KEY')) {
+      if (content.includes('TEST_KEY') || content.includes('VALID_KEY') ||
+          content.includes('EXISTING') || content.includes('NEW_KEY')) {
         fs.unlinkSync(ENV_PATH);
       }
     }
