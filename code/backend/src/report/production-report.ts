@@ -34,29 +34,27 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
         payload: snapshot,
       });
 
-      // Auto-generate AI hypotheses if Anthropic key is available
+      // Fire-and-forget AI hypotheses generation (doesn't block the response)
       if (hasAnthropicKey()) {
-        try {
-          const generatedHypotheses = await generateHypotheses(snapshot, {
-            fetch: globalThis.fetch as unknown as AnthropicFetch,
-            apiKey: config.ANTHROPIC_API_KEY,
-            model: config.ANTHROPIC_MODEL,
+        generateHypotheses(snapshot, {
+          fetch: globalThis.fetch as unknown as AnthropicFetch,
+          apiKey: config.ANTHROPIC_API_KEY,
+          model: config.ANTHROPIC_MODEL,
+        })
+          .then((generatedHypotheses) => {
+            snapshots.save({
+              id,
+              generatedAt,
+              dateFrom: from,
+              dateTo: to,
+              payload: { ...snapshot, generatedHypotheses },
+              docxPath: undefined,
+              pdfPath: undefined,
+            });
+          })
+          .catch(() => {
+            // Hypotheses generation failed — user can retry via POST /api/report/hypotheses
           });
-          // Persist hypotheses onto the snapshot so DOCX/PDF render them deterministically
-          snapshots.save({
-            id,
-            generatedAt,
-            dateFrom: from,
-            dateTo: to,
-            payload: { ...snapshot, generatedHypotheses },
-            docxPath: undefined,
-            pdfPath: undefined,
-          });
-          return { ...snapshot, generatedHypotheses };
-        } catch {
-          // Hypotheses generation failed — return snapshot without hypotheses
-          // (user can retry via POST /api/report/hypotheses)
-        }
       }
 
       return snapshot;
