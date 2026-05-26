@@ -9,12 +9,13 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.0.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.1.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
-> analytical insights on every page (green/yellow/red badges), custom date picker (from/to),
-> History → "View" opens saved snapshots, Settings with current COUNTER_ID display, 397 tests
-> passing, full CI/CD. Verified against live data of the ProductCamp counter (54280963).
+> analytical insights on every page (green/yellow/red badges), custom date picker (from/to,
+> max 365 days), presets 7d/14d/30d/90d/1y, GOAL_ID select from Metrika, History → "View"
+> opens saved snapshots, Settings with current COUNTER_ID display, PDF auto-detect Chrome,
+> 397 tests passing, full CI/CD. Verified against live data of the ProductCamp counter (54280963).
 
 ## Quickstart
 
