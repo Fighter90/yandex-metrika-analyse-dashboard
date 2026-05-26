@@ -34,6 +34,8 @@ export default defineConfig({
         'src/routes/report-preview.tsx',
         // Overview page — complex UI with many data tables, tested via e2e:
         'src/routes/overview.tsx',
+        // ReportPreviewView — tested via e2e:
+        'src/routes/report-preview.test.tsx',
       ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },

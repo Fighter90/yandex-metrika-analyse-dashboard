@@ -78,27 +78,51 @@ describe('parseInsights', () => {
 
 describe('generateInsights', () => {
   it('POSTs to Anthropic with auth headers and returns the narrative', async () => {
-    const doFetch = fakeFetch({
+    // Mock 10 chunk responses (one per section)
+    const doFetch = vi.fn(async () => ({
       ok: true,
       status: 200,
-      body: JSON.stringify({ content: [{ type: 'text', text: 'анализ' }] }),
-    });
+      text: async () =>
+        JSON.stringify({ content: [{ type: 'text', text: `## Section\n\nанализ` }] }),
+    }));
     const out = await generateInsights(doFetch, {
       apiKey: 'sk-test',
       model: 'claude-sonnet-4-6',
       snapshot,
     });
-    expect(out).toBe('анализ');
-    const call = vi.mocked(doFetch).mock.calls[0];
+    // Should contain 10 sections joined together
+    expect(out).toContain('## Section');
+    expect(out).toContain('анализ');
+    expect(doFetch).toHaveBeenCalledTimes(10);
+    const call = doFetch.mock.calls[0];
     expect(call?.[0]).toBe(ANTHROPIC_URL);
     expect(call?.[1].headers['x-api-key']).toBe('sk-test');
     expect(call?.[1].headers['anthropic-version']).toBeTruthy();
   });
 
-  it('throws on a non-2xx Anthropic response', async () => {
-    const doFetch = fakeFetch({ ok: false, status: 401, body: '{"error":"auth"}' });
-    await expect(
-      generateInsights(doFetch, { apiKey: 'bad', model: 'm', snapshot }),
-    ).rejects.toThrow(/HTTP 401/);
+  it('handles partial failures (some chunks fail, others succeed)', async () => {
+    let callCount = 0;
+    const doFetch = vi.fn(async () => {
+      callCount++;
+      if (callCount <= 2) {
+        // First 2 chunks fail
+        return { ok: false, status: 401, text: async () => '{"error":"auth"}' };
+      }
+      // Rest succeed
+      return {
+        ok: true,
+        status: 200,
+        text: async () =>
+          JSON.stringify({ content: [{ type: 'text', text: `## Section\n\nанализ` }] }),
+      };
+    });
+    const out = await generateInsights(doFetch, {
+      apiKey: 'bad',
+      model: 'm',
+      snapshot,
+    });
+    // Should still return output with error messages for failed chunks
+    expect(out).toContain('Ошибка генерации');
+    expect(out).toContain('анализ');
   });
 });
