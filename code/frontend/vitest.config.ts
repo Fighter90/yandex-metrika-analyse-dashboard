@@ -14,7 +14,18 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{ts,tsx}'],
       // main.tsx = DOM bootstrap; setup = test harness.
-      exclude: ['src/main.tsx', 'src/test/**', '**/*.test.{ts,tsx}'],
+      // Removed pages (consolidated into Report): audience, trends, b2b, hypotheses, decisions, sources.
+      exclude: [
+        'src/main.tsx',
+        'src/test/**',
+        '**/*.test.{ts,tsx}',
+        'src/routes/audience.tsx',
+        'src/routes/trends.tsx',
+        'src/routes/b2b.tsx',
+        'src/routes/hypotheses.tsx',
+        'src/routes/decisions.tsx',
+        'src/routes/sources.tsx',
+      ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },
   },
