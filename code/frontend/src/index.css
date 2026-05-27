@@ -9,6 +9,16 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+
+  /* §7.4: tabular figures everywhere so KPI numbers and table columns align. */
+  body {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* §7.4: zebra rows for readability in data tables. */
+  tbody tr:nth-of-type(even) {
+    background-color: #f8fafc;
+  }
 }
 
 /* AI analysis narrative rendering */
