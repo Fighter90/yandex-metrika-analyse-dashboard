@@ -6,6 +6,44 @@
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-27
+
+> v2.3.0 — AI-анализ без обрезаний, md-to-html с таблицами/списками/HR, DOCX/PDF GOST форматирование,
+> полный рендеринг AI narrative на странице отчёта.
+
+### Added
+
+- **md-to-html.ts**: полный markdown-парсер с таблицами, списками, горизонтальными линиями, заголовками
+- **AI narrative без ограничений**: убран `max-h-[60vh]`, весь анализ виден без скролла внутри контейнера
+- **Улучшенные стили AI-анализа**: h3 цвет, ul с маркерами, hr разделители, line-height 1.7
+
+### Fixed
+
+- **AI-анализ обрезался**: теперь рендерится полностью через `parseChunkedNarrative` в reportSections
+- **DOCX/PDF**: AI narrative полностью включается в экспорт с GOST форматированием
+
+## [2.2.1] - 2026-05-27
+
+> v2.2.1 — Goals Page NaN Fix
+
+### Fixed
+
+- **Goals page NaN**: `kpi.applications` вместо `kpi.reaches`, `summarizeChannels(data, deals)`
+
+## [2.2.0] - 2026-05-27
+
+> v2.2.0 — Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting
+
+### Added
+
+- **Overview Gap**: считается по B2B paid (300 - оплачено), не по заявкам
+- **4 KPI карточки**: Цель, Заявки B2C, Оплачено B2B, Gap
+
+### Fixed
+
+- **History «Просмотреть»**: загружает сохранённый aiNarrative без повторного запроса к Anthropic
+- **DOCX/PDF**: GOST форматирование (Times New Roman 14pt, 1.5 line spacing, поля 30/15/20/20mm)
+
 ## [2.1.0] - 2026-05-27
 
 > v2.1.0 — Фильтры до 1 года (7д/14д/30д/90д/1г), GOAL_ID select из Метрики, PDF авто-поиск Chrome,
