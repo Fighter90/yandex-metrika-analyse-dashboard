@@ -1,10 +1,102 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Goal } from '@pca/shared';
+import { Combobox } from '@headlessui/react';
 import { api } from '../lib/api';
 import { errorMessage } from '../lib/error-message';
 import { useFilters } from '../store/filters';
 import { B2b } from './b2b';
+
+interface GoalOption {
+  readonly value: string;
+  readonly label: string;
+  readonly group: 'auto' | 'active' | 'archived';
+}
+
+/** Searchable GOAL_ID combobox with Активные/Архивные groups (FINAL §9.2). */
+function GoalCombobox({
+  value,
+  onChange,
+  goals,
+  archivedGoals,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  goals: Goal[] | undefined;
+  archivedGoals: Goal[] | undefined;
+}): JSX.Element {
+  const [query, setQuery] = useState('');
+  const options: GoalOption[] = [
+    { value: '0', label: '0 — Авто-определение', group: 'auto' },
+    ...(goals ?? [])
+      .filter((g) => !g.isArchived)
+      .map((g) => ({
+        value: String(g.id),
+        label: `${g.id} — ${g.name}${g.isB2b ? ' (B2B)' : ''}`,
+        group: 'active' as const,
+      })),
+    ...(archivedGoals ?? []).map((g) => ({
+      value: String(g.id),
+      label: `${g.id} — ${g.name} (архив)`,
+      group: 'archived' as const,
+    })),
+  ];
+  const filtered = query
+    ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
+    : options;
+  const groups: Array<['active' | 'archived', string]> = [
+    ['active', 'Активные'],
+    ['archived', 'Архивные'],
+  ];
+  const selectedLabel = options.find((o) => o.value === value)?.label ?? value;
+
+  return (
+    <Combobox value={value} onChange={(v: string | null) => onChange(v ?? '0')}>
+      <div className="relative mt-1">
+        <Combobox.Input
+          className="block w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          displayValue={() => selectedLabel}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Поиск цели…"
+        />
+        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded border border-slate-200 bg-white py-1 text-sm shadow-lg">
+          {filtered
+            .filter((o) => o.group === 'auto')
+            .map((o) => (
+              <Combobox.Option
+                key={o.value}
+                value={o.value}
+                className="cursor-pointer px-3 py-1.5 ui-active:bg-indigo-50"
+              >
+                {o.label}
+              </Combobox.Option>
+            ))}
+          {groups.map(([group, title]) => {
+            const items = filtered.filter((o) => o.group === group);
+            if (items.length === 0) return null;
+            return (
+              <div key={group}>
+                <div className="px-3 py-1 text-xs uppercase text-slate-400">{title}</div>
+                {items.map((o) => (
+                  <Combobox.Option
+                    key={o.value}
+                    value={o.value}
+                    className="cursor-pointer px-3 py-1.5 ui-active:bg-indigo-50"
+                  >
+                    {o.label}
+                  </Combobox.Option>
+                ))}
+              </div>
+            );
+          })}
+          {filtered.length === 0 ? (
+            <div className="px-3 py-1.5 text-slate-400">Ничего не найдено</div>
+          ) : null}
+        </Combobox.Options>
+      </div>
+    </Combobox>
+  );
+}
 
 interface SettingsForm {
   YANDEX_OAUTH_TOKEN: string;
@@ -314,25 +406,12 @@ export function SettingsView({
         />
         <div>
           <label className="block text-sm font-medium text-slate-700">Цель KPI (GOAL_ID)</label>
-          <select
+          <GoalCombobox
             value={form.GOAL_ID}
-            onChange={(e) => set('GOAL_ID', e.target.value)}
-            className="mt-1 block w-full rounded border border-slate-300 px-3 py-2 text-sm"
-          >
-            <option value="0">0 — Авто-определение</option>
-            {goals
-              ?.filter((g) => !g.isArchived)
-              .map((g) => (
-                <option key={g.id} value={String(g.id)}>
-                  {g.id} — {g.name} {g.isB2b ? '(B2B)' : ''}
-                </option>
-              ))}
-            {archivedGoals?.map((g) => (
-              <option key={g.id} value={String(g.id)}>
-                {g.id} — {g.name} (архив)
-              </option>
-            ))}
-          </select>
+            onChange={(v) => set('GOAL_ID', v)}
+            goals={goals}
+            archivedGoals={archivedGoals}
+          />
           <p className="mt-0.5 text-xs text-slate-400">
             0 = определить автоматически, выберите ID — зафиксировать цель. Всего:{' '}
             {goals?.length ?? 0} активных, {archivedGoals?.length ?? 0} архивных.
