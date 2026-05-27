@@ -1,0 +1,4 @@
+#!/bin/sh
+# Committed git hook (enabled via core.hooksPath, set by the package.json "prepare" script).
+# Fails the commit if doc version markers drift from package.json.
+node scripts/sync-versions.mjs --check || exit 1
