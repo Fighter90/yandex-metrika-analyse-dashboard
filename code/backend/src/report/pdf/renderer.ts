@@ -53,7 +53,7 @@ export async function buildPdf(snapshot: ReportSnapshot): Promise<Buffer> {
   if (!executablePath) {
     throw new Error(
       'Chrome not found. Set PUPPETEER_EXECUTABLE_PATH in .env to the Chrome executable path. ' +
-      'On macOS: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        'On macOS: /Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     );
   }
 

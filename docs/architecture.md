@@ -44,30 +44,30 @@ flowchart TD
 
 ## Слои
 
-| Слой       | Где                                           | Технологии                                           |
-| ---------- | --------------------------------------------- | ---------------------------------------------------- |
-| Извлечение | `code/backend/src/metrika/`                   | undici fetch, Zod, token-bucket, retry               |
-| Хранение   | `code/backend/src/db/`                        | better-sqlite3, миграции, repository pattern         |
-| API        | `code/backend/src/routes/`                    | Fastify 4, Zod, Swagger                              |
-| Аналитика  | `code/backend/src/analytics/`                 | ICE, traffic-light, KPI, forecast                    |
-| AI-анализ  | `code/backend/src/report/ai-insights.ts`      | Anthropic Claude, 5 chunks × 6000 tokens             |
-| Отчёты     | `code/backend/src/report/`                    | `docx` (markdown), Puppeteer (markdown HTML)         |
-| Фронтенд   | `code/frontend/`                              | React 18, Vite, Tailwind, ECharts, TanStack, Zustand |
-| Общее      | `code/shared/`                                | типы, `ICE_CONFIG`, валидация, report-sections       |
+| Слой       | Где                                      | Технологии                                           |
+| ---------- | ---------------------------------------- | ---------------------------------------------------- |
+| Извлечение | `code/backend/src/metrika/`              | undici fetch, Zod, token-bucket, retry               |
+| Хранение   | `code/backend/src/db/`                   | better-sqlite3, миграции, repository pattern         |
+| API        | `code/backend/src/routes/`               | Fastify 4, Zod, Swagger                              |
+| Аналитика  | `code/backend/src/analytics/`            | ICE, traffic-light, KPI, forecast                    |
+| AI-анализ  | `code/backend/src/report/ai-insights.ts` | Anthropic Claude, 5 chunks × 6000 tokens             |
+| Отчёты     | `code/backend/src/report/`               | `docx` (markdown), Puppeteer (markdown HTML)         |
+| Фронтенд   | `code/frontend/`                         | React 18, Vite, Tailwind, ECharts, TanStack, Zustand |
+| Общее      | `code/shared/`                           | типы, `ICE_CONFIG`, валидация, report-sections       |
 
 ## Страницы дашборда (9)
 
-| Страница | URL | Описание |
-|----------|-----|----------|
-| Обзор | `/` | KPI (4 карточки), визиты/заявки, микс каналов, топ стран, устройства, UTM, страницы |
-| Трафик | `/traffic` | Бар-чарт каналов, визиты vs заявки, таблица каналов, UTM-разбивка |
-| Поведение | `/behavior` | CR страниц входа, отказы, таблицы с подсветкой, рекомендации |
-| Воронка | `/funnel` | 4 этапа, анализ потерь, CR по каналам, B2B по этапам |
-| Цели | `/goals` | Прогресс-ринг, метрики, B2B сделки, прогноз |
-| Отчёт | `/report` | Snapshot, AI-анализ (HTML), экспорт DOCX/PDF |
-| История | `/history` | Список снапшотов, «Просмотреть» → сохранённый AI-анализ |
-| Настройки | `/settings` | OAuth, COUNTER_ID, GOAL_ID select, ANTHROPIC_API_KEY, sync с прогрессом |
-| Справка | `/help` | Документация, FAQ (10 вопросов), глоссарий |
+| Страница  | URL         | Описание                                                                            |
+| --------- | ----------- | ----------------------------------------------------------------------------------- |
+| Обзор     | `/`         | KPI (4 карточки), визиты/заявки, микс каналов, топ стран, устройства, UTM, страницы |
+| Трафик    | `/traffic`  | Бар-чарт каналов, визиты vs заявки, таблица каналов, UTM-разбивка                   |
+| Поведение | `/behavior` | CR страниц входа, отказы, таблицы с подсветкой, рекомендации                        |
+| Воронка   | `/funnel`   | 4 этапа, анализ потерь, CR по каналам, B2B по этапам                                |
+| Цели      | `/goals`    | Прогресс-ринг, метрики, B2B сделки, прогноз                                         |
+| Отчёт     | `/report`   | Snapshot, AI-анализ (HTML), экспорт DOCX/PDF                                        |
+| История   | `/history`  | Список снапшотов, «Просмотреть» → сохранённый AI-анализ                             |
+| Настройки | `/settings` | OAuth, COUNTER_ID, GOAL_ID select, ANTHROPIC_API_KEY, sync с прогрессом             |
+| Справка   | `/help`     | Документация, FAQ (10 вопросов), глоссарий                                          |
 
 ## Ключевые решения
 

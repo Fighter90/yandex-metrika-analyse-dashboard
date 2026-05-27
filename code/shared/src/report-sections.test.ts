@@ -8,6 +8,7 @@ import type {
   SolutionHypothesis,
 } from './index';
 import { reportSections } from './index';
+import { aiHypothesisSections } from './report-section-helpers';
 
 const genProblem = (over: Partial<ProblemHypothesis> = {}): ProblemHypothesis => ({
   id: 'P01',
@@ -545,5 +546,18 @@ describe('reportSections — new sections', () => {
     expect(testSec?.lines.join(' ')).toContain('Some content');
     expect(anotherSec).toBeDefined();
     expect(anotherSec?.lines.join(' ')).toContain('More content');
+  });
+});
+
+describe('aiHypothesisSections — direct unit tests', () => {
+  // reportSections guards the call with hasAiHypotheses, which prevents calling
+  // aiHypothesisSections with { problems: [], solutions: [] }. We test that path directly
+  // to cover the right-hand branch of the `&&` compound condition at line 198.
+  it('returns [] when called directly with both arrays empty', () => {
+    expect(aiHypothesisSections({ problems: [], solutions: [] })).toEqual([]);
+  });
+
+  it('returns [] when called with undefined', () => {
+    expect(aiHypothesisSections(undefined)).toEqual([]);
   });
 });

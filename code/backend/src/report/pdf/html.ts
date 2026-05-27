@@ -102,15 +102,22 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     }
 
     // Wrap list items in <ul>
-    content = content.replace(/(<li>.*?<\/li>)/gs, (match) => {
-      if (!match.startsWith('<ul>')) return `<ul>${match}</ul>`;
-      return match;
-    });
+    // The regex only captures <li>…</li> so match always starts with <li>, never <ul>.
+    // The else branch is structurally unreachable; the guard is a defensive no-op.
+    content = content.replace(
+      /(<li>.*?<\/li>)/gs,
+      /* c8 ignore next */ (match) => {
+        /* c8 ignore next 2 */
+        if (!match.startsWith('<ul>')) return `<ul>${match}</ul>`;
+        return match;
+      },
+    );
     // Merge consecutive <ul> blocks
     content = content.replace(/<\/ul>\s*<ul>/g, '');
 
     if (i === 0) {
-      body += `<section class="cover"><h1>${escapeHtml(heading)}</h1>${content}` +
+      body +=
+        `<section class="cover"><h1>${escapeHtml(heading)}</h1>${content}` +
         `<p class="sub">Период: ${escapeHtml(snapshot.period.from)} — ${escapeHtml(snapshot.period.to)}</p></section>` +
         `<section class="toc"><h2>Содержание</h2><ol>${toc}</ol></section>`;
     } else {

@@ -39,3 +39,6 @@ code/backend/data/
 .claude/scheduled_tasks.lock
 
 *.docx
+
+# qwen worktrees / local agent settings
+.qwen/

@@ -9,6 +9,7 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/coverage/**',
       'data/**',
+      '.qwen/**',
       '**/*.config.js',
       '**/*.config.ts',
     ],

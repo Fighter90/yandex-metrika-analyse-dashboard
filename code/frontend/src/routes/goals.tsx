@@ -54,16 +54,12 @@ function GoalRing({
 
 /** Calculate total paid B2B tickets from deals */
 function calcB2bPaid(deals: B2bDeal[]): number {
-  return deals
-    .filter((d) => d.stage === 'paid')
-    .reduce((sum, d) => sum + d.tickets, 0);
+  return deals.filter((d) => d.stage === 'paid').reduce((sum, d) => sum + d.tickets, 0);
 }
 
 /** Calculate total B2B pipeline tickets (not yet paid) */
 function calcB2bPipeline(deals: B2bDeal[]): number {
-  return deals
-    .filter((d) => d.stage !== 'paid')
-    .reduce((sum, d) => sum + d.tickets, 0);
+  return deals.filter((d) => d.stage !== 'paid').reduce((sum, d) => sum + d.tickets, 0);
 }
 
 /** Pure presentational Goals view. */
@@ -114,8 +110,8 @@ export function GoalsView({
             </h3>
             <div className="space-y-1 text-sm text-slate-600">
               <p>
-                Осталось:{' '}
-                <span className="font-bold text-red-600">{formatInt(remaining)}</span> билетов
+                Осталось: <span className="font-bold text-red-600">{formatInt(remaining)}</span>{' '}
+                билетов
               </p>
               <div className="rounded bg-slate-50 px-3 py-2">
                 <p className="font-medium">B2C заявки (Метрика): {formatInt(b2cApplications)}</p>

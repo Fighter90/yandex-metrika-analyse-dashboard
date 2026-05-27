@@ -7,7 +7,7 @@ import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
 import { channelRows } from '../lib/traffic';
-import { byCountry, audienceBarOption, deviceShareOption } from '../lib/audience';
+import { byCountry, audienceBarOption } from '../lib/audience';
 
 /** Insight badge with green/red indicator */
 function InsightBadge({
@@ -31,44 +31,17 @@ function InsightBadge({
   );
 }
 
-/** Funnel stage card */
-function FunnelStageCard({
-  label,
-  value,
-  conversionFromPrev,
-  conversionFromVisits,
-  hint,
-  color,
-}: {
-  label: string;
-  value: number;
-  conversionFromPrev: string;
-  conversionFromVisits: string;
-  hint?: string;
-  color: string;
-}): JSX.Element {
-  return (
-    <div className={`rounded-lg border border-slate-200 bg-white p-4 shadow-sm ${color}`}>
-      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
-      <div className="mt-1 text-2xl font-bold">{formatInt(value)}</div>
-      <div className="mt-1 text-xs text-slate-400">
-        от предыдущего: <span className="font-medium">{conversionFromPrev}</span>
-      </div>
-      <div className="text-xs text-slate-400">
-        от визитов: <span className="font-medium">{conversionFromVisits}</span>
-      </div>
-      {hint && <div className="mt-1 text-xs text-amber-600">{hint}</div>}
-    </div>
-  );
-}
-
 /** Bar chart for channel conversion rates */
 function channelCrOption(channels: ChannelStat[]): object {
   const rows = channelRows(channels)
     .filter((r) => r.visits > 20)
     .sort((a, b) => a.conversionRate - b.conversionRate);
   return {
-    title: { text: 'Конверсия каналов (CR заявки/визиты)', left: 'center', textStyle: { fontSize: 13 } },
+    title: {
+      text: 'Конверсия каналов (CR заявки/визиты)',
+      left: 'center',
+      textStyle: { fontSize: 13 },
+    },
     tooltip: {
       trigger: 'axis',
       formatter: (params: unknown[]) => {
@@ -86,7 +59,8 @@ function channelCrOption(channels: ChannelStat[]): object {
         data: rows.map((r) => ({
           value: r.conversionRate,
           itemStyle: {
-            color: r.conversionRate > 0.02 ? '#22c55e' : r.conversionRate > 0.01 ? '#f59e0b' : '#ef4444',
+            color:
+              r.conversionRate > 0.02 ? '#22c55e' : r.conversionRate > 0.01 ? '#f59e0b' : '#ef4444',
           },
         })),
         label: {
@@ -109,8 +83,7 @@ function funnelChartOption(
   return {
     tooltip: {
       trigger: 'item',
-      formatter: (p: { name: string; value: number }) =>
-        `${p.name}: ${formatInt(p.value)}`,
+      formatter: (p: { name: string; value: number }) => `${p.name}: ${formatInt(p.value)}`,
     },
     series: [
       {
@@ -129,8 +102,7 @@ function funnelChartOption(
         label: {
           show: true,
           position: 'inside',
-          formatter: (p: { name: string; value: number }) =>
-            `${p.name}\n${formatInt(p.value)}`,
+          formatter: (p: { name: string; value: number }) => `${p.name}\n${formatInt(p.value)}`,
           fontSize: 11,
         },
         data: [
@@ -176,13 +148,15 @@ function FunnelLossAnalysis({
         <div className="flex items-center justify-between">
           <span>Потеряно на этапе B2B pipeline:</span>
           <span className="font-medium">
-            {formatInt(Math.max(0, lostAtPipeline))} ({formatPercent(Math.max(0, pipelineLossRate) / 100)})
+            {formatInt(Math.max(0, lostAtPipeline))} (
+            {formatPercent(Math.max(0, pipelineLossRate) / 100)})
           </span>
         </div>
         <div className="flex items-center justify-between">
           <span>Потеряно на этапе оплаты:</span>
           <span className="font-medium">
-            {formatInt(Math.max(0, lostAtPayment))} ({formatPercent(Math.max(0, paymentLossRate) / 100)})
+            {formatInt(Math.max(0, lostAtPayment))} (
+            {formatPercent(Math.max(0, paymentLossRate) / 100)})
           </span>
         </div>
       </div>
@@ -217,13 +191,11 @@ export function FunnelView({
   const b2bTickets = deals.reduce((a, d) => a + d.tickets, 0);
   const b2bPaid = deals.reduce((a, d) => a + (d.stage === 'paid' ? d.tickets : 0), 0);
   const b2bDealsCount = deals.length;
-  const overallCr = visits > 0 ? reaches / visits : 0;
 
   if (visits === 0 && b2bDealsCount === 0) return <EmptyState />;
 
   // Conversion rates between stages
   const appConversionRate = visits > 0 ? reaches / visits : 0;
-  const pipelineConversionRate = reaches > 0 ? b2bTickets / reaches : 0;
   const paymentConversionRate = b2bTickets > 0 ? b2bPaid / b2bTickets : 0;
 
   // Geo data
@@ -237,7 +209,6 @@ export function FunnelView({
   }, new Map());
 
   // Page insights
-  const avgBounce = pages.length > 0 ? pages.reduce((a, p) => a + p.bounceRate, 0) / pages.length : 0;
   const highBouncePages = pages.filter((p) => p.bounceRate > 0.4 && p.visits > 30);
   const lowCrPages = pages.filter((p) => p.conversionRate < 0.005 && p.visits > 50);
 
@@ -262,9 +233,7 @@ export function FunnelView({
         <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
           <div className="text-xs text-slate-500">Оплачено B2B</div>
           <div className="text-xl font-bold">{formatInt(b2bPaid)}</div>
-          <div className="text-xs text-slate-400">
-            CR {formatPercent(paymentConversionRate)}
-          </div>
+          <div className="text-xs text-slate-400">CR {formatPercent(paymentConversionRate)}</div>
         </div>
       </div>
 
@@ -273,12 +242,21 @@ export function FunnelView({
         <h3 className="mb-2 text-sm font-semibold text-slate-700">Ключевые наблюдения</h3>
         <div className="flex flex-wrap gap-2">
           {appConversionRate > 0.02 ? (
-            <InsightBadge type="good" text={`CR заявка/визит ${formatPercent(appConversionRate)} — хороший`} />
+            <InsightBadge
+              type="good"
+              text={`CR заявка/визит ${formatPercent(appConversionRate)} — хороший`}
+            />
           ) : (
-            <InsightBadge type="warning" text={`CR заявка/визит ${formatPercent(appConversionRate)} — низкий, цель > 2%`} />
+            <InsightBadge
+              type="warning"
+              text={`CR заявка/визит ${formatPercent(appConversionRate)} — низкий, цель > 2%`}
+            />
           )}
           {b2bPaid > 0 ? (
-            <InsightBadge type="good" text={`B2B приносит ${formatInt(b2bPaid)} оплаченных билетов`} />
+            <InsightBadge
+              type="good"
+              text={`B2B приносит ${formatInt(b2bPaid)} оплаченных билетов`}
+            />
           ) : (
             <InsightBadge type="warning" text="B2B = 0 оплат — нужно запустить активные продажи" />
           )}
@@ -395,8 +373,8 @@ export function FunnelView({
             <li className="flex items-start gap-2">
               <span className="text-red-500">🔴</span>
               <span>
-                <b>B2B = 0 оплат.</b> Запустить активные продажи: составить список целевых
-                компаний, отправить персональные офферы, назначить встречи.
+                <b>B2B = 0 оплат.</b> Запустить активные продажи: составить список целевых компаний,
+                отправить персональные офферы, назначить встречи.
               </span>
             </li>
           )}
@@ -441,12 +419,7 @@ export function Funnel(): JSX.Element {
     queryFn: () => api.pages({ from, to }),
   });
 
-  const status = combineStatus(
-    channelsQ.status,
-    dealsQ.status,
-    geoQ.status,
-    pagesQ.status,
-  );
+  const status = combineStatus(channelsQ.status, dealsQ.status, geoQ.status, pagesQ.status);
 
   return (
     <FunnelView

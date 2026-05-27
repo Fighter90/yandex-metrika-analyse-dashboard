@@ -50,16 +50,58 @@ function SyncProgress({ progress, stage }: { progress: number; stage: string }):
 }
 
 const SYNC_STAGES = [
-  { label: 'Подключение к Яндекс.Метрике', description: 'Проверяем OAuth-токен и устанавливаем соединение с API Метрики...', pct: 5 },
-  { label: 'Получение списка целей', description: 'Загружаем все настроенные цели счётчика для определения KPI...', pct: 15 },
-  { label: 'Загрузка данных по каналам', description: 'Парсим визиты, заявки и конверсии по каждому каналу трафика (Direct, Search, Social и др.)...', pct: 30 },
-  { label: 'Загрузка UTM-разбивки', description: 'Собираем детальную статистику по UTM-меткам: source, medium, campaign...', pct: 45 },
-  { label: 'Загрузка гео и устройств', description: 'Загружаем разбивку по странам, регионам и типам устройств (смартфоны, ПК, планшеты)...', pct: 55 },
-  { label: 'Загрузка страниц входа', description: 'Парсим статистику по посадочным страницам: визиты, отказы, конверсии...', pct: 65 },
-  { label: 'Загрузка страниц выхода', description: 'Загружаем данные по страницам выхода для анализа точек отвала...', pct: 75 },
-  { label: 'Сохранение в базу данных', description: 'Записываем все полученные данные в SQLite для быстрого доступа...', pct: 85 },
-  { label: 'Обновление отчётов', description: 'Перегенерация снапшотов и переиндексация данных...', pct: 95 },
-  { label: 'Готово!', description: 'Все данные обновлены. Страницы дашборда будут автоматически refreshed.', pct: 100 },
+  {
+    label: 'Подключение к Яндекс.Метрике',
+    description: 'Проверяем OAuth-токен и устанавливаем соединение с API Метрики...',
+    pct: 5,
+  },
+  {
+    label: 'Получение списка целей',
+    description: 'Загружаем все настроенные цели счётчика для определения KPI...',
+    pct: 15,
+  },
+  {
+    label: 'Загрузка данных по каналам',
+    description:
+      'Парсим визиты, заявки и конверсии по каждому каналу трафика (Direct, Search, Social и др.)...',
+    pct: 30,
+  },
+  {
+    label: 'Загрузка UTM-разбивки',
+    description: 'Собираем детальную статистику по UTM-меткам: source, medium, campaign...',
+    pct: 45,
+  },
+  {
+    label: 'Загрузка гео и устройств',
+    description:
+      'Загружаем разбивку по странам, регионам и типам устройств (смартфоны, ПК, планшеты)...',
+    pct: 55,
+  },
+  {
+    label: 'Загрузка страниц входа',
+    description: 'Парсим статистику по посадочным страницам: визиты, отказы, конверсии...',
+    pct: 65,
+  },
+  {
+    label: 'Загрузка страниц выхода',
+    description: 'Загружаем данные по страницам выхода для анализа точек отвала...',
+    pct: 75,
+  },
+  {
+    label: 'Сохранение в базу данных',
+    description: 'Записываем все полученные данные в SQLite для быстрого доступа...',
+    pct: 85,
+  },
+  {
+    label: 'Обновление отчётов',
+    description: 'Перегенерация снапшотов и переиндексация данных...',
+    pct: 95,
+  },
+  {
+    label: 'Готово!',
+    description: 'Все данные обновлены. Страницы дашборда будут автоматически refreshed.',
+    pct: 100,
+  },
 ];
 
 /** Pure presentational Settings view. */
@@ -101,11 +143,12 @@ export function SettingsView({
   // If COUNTER_ID is 0 or missing, use health counter ID
   useEffect(() => {
     if (settings) {
-      const counterId = settings.COUNTER_ID && settings.COUNTER_ID !== '0'
-        ? settings.COUNTER_ID
-        : healthCounterId
-          ? String(healthCounterId)
-          : settings.COUNTER_ID;
+      const counterId =
+        settings.COUNTER_ID && settings.COUNTER_ID !== '0'
+          ? settings.COUNTER_ID
+          : healthCounterId
+            ? String(healthCounterId)
+            : settings.COUNTER_ID;
       setForm({ ...settings, COUNTER_ID: counterId });
     }
   }, [settings, healthCounterId]);
@@ -156,11 +199,12 @@ export function SettingsView({
     setForm((f) => ({ ...f, [field]: value }));
 
   // Display counter ID: prefer settings value, fallback to health endpoint
-  const displayCounterId = form.COUNTER_ID && form.COUNTER_ID !== '0'
-    ? form.COUNTER_ID
-    : healthCounterId
-      ? String(healthCounterId)
-      : form.COUNTER_ID;
+  const displayCounterId =
+    form.COUNTER_ID && form.COUNTER_ID !== '0'
+      ? form.COUNTER_ID
+      : healthCounterId
+        ? String(healthCounterId)
+        : form.COUNTER_ID;
 
   return (
     <section className="space-y-6">
@@ -269,11 +313,13 @@ export function SettingsView({
             className="mt-1 block w-full rounded border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="0">0 — Авто-определение</option>
-            {goals?.filter((g) => !g.isArchived).map((g) => (
-              <option key={g.id} value={String(g.id)}>
-                {g.id} — {g.name} {g.isB2b ? '(B2B)' : ''}
-              </option>
-            ))}
+            {goals
+              ?.filter((g) => !g.isArchived)
+              .map((g) => (
+                <option key={g.id} value={String(g.id)}>
+                  {g.id} — {g.name} {g.isB2b ? '(B2B)' : ''}
+                </option>
+              ))}
             {archivedGoals?.map((g) => (
               <option key={g.id} value={String(g.id)}>
                 {g.id} — {g.name} (архив)
@@ -281,8 +327,8 @@ export function SettingsView({
             ))}
           </select>
           <p className="mt-0.5 text-xs text-slate-400">
-            0 = определить автоматически, выберите ID — зафиксировать цель.
-            Всего: {goals?.length ?? 0} активных, {archivedGoals?.length ?? 0} архивных.
+            0 = определить автоматически, выберите ID — зафиксировать цель. Всего:{' '}
+            {goals?.length ?? 0} активных, {archivedGoals?.length ?? 0} архивных.
           </p>
         </div>
         <Field
@@ -398,12 +444,18 @@ export function Settings(): JSX.Element {
   const settings: SettingsForm | undefined = q.data
     ? {
         // Don't use masked values from API — keep secrets empty so they aren't overwritten
-        YANDEX_OAUTH_TOKEN: q.data.YANDEX_OAUTH_TOKEN.includes('****') ? '' : q.data.YANDEX_OAUTH_TOKEN,
+        YANDEX_OAUTH_TOKEN: q.data.YANDEX_OAUTH_TOKEN.includes('****')
+          ? ''
+          : q.data.YANDEX_OAUTH_TOKEN,
         YANDEX_CLIENT_ID: q.data.YANDEX_CLIENT_ID,
-        YANDEX_CLIENT_SECRET: q.data.YANDEX_CLIENT_SECRET.includes('****') ? '' : q.data.YANDEX_CLIENT_SECRET,
+        YANDEX_CLIENT_SECRET: q.data.YANDEX_CLIENT_SECRET.includes('****')
+          ? ''
+          : q.data.YANDEX_CLIENT_SECRET,
         COUNTER_ID: String(q.data.COUNTER_ID),
         GOAL_ID: String(q.data.GOAL_ID),
-        ANTHROPIC_API_KEY: q.data.ANTHROPIC_API_KEY.includes('****') ? '' : q.data.ANTHROPIC_API_KEY,
+        ANTHROPIC_API_KEY: q.data.ANTHROPIC_API_KEY.includes('****')
+          ? ''
+          : q.data.ANTHROPIC_API_KEY,
       }
     : undefined;
 
@@ -427,12 +479,21 @@ export function Settings(): JSX.Element {
         // Only send COUNTER_ID if it has been changed from the initial value
         const counterIdChanged = form.COUNTER_ID !== initialCounterId.current;
         saveMut.mutate({
-          YANDEX_OAUTH_TOKEN: (form.YANDEX_OAUTH_TOKEN && !isMasked(form.YANDEX_OAUTH_TOKEN)) ? form.YANDEX_OAUTH_TOKEN : undefined,
+          YANDEX_OAUTH_TOKEN:
+            form.YANDEX_OAUTH_TOKEN && !isMasked(form.YANDEX_OAUTH_TOKEN)
+              ? form.YANDEX_OAUTH_TOKEN
+              : undefined,
           YANDEX_CLIENT_ID: form.YANDEX_CLIENT_ID || undefined,
-          YANDEX_CLIENT_SECRET: (form.YANDEX_CLIENT_SECRET && !isMasked(form.YANDEX_CLIENT_SECRET)) ? form.YANDEX_CLIENT_SECRET : undefined,
+          YANDEX_CLIENT_SECRET:
+            form.YANDEX_CLIENT_SECRET && !isMasked(form.YANDEX_CLIENT_SECRET)
+              ? form.YANDEX_CLIENT_SECRET
+              : undefined,
           COUNTER_ID: counterIdChanged && form.COUNTER_ID ? Number(form.COUNTER_ID) : undefined,
           GOAL_ID: form.GOAL_ID ? Number(form.GOAL_ID) : undefined,
-          ANTHROPIC_API_KEY: (form.ANTHROPIC_API_KEY && !isMasked(form.ANTHROPIC_API_KEY)) ? form.ANTHROPIC_API_KEY : undefined,
+          ANTHROPIC_API_KEY:
+            form.ANTHROPIC_API_KEY && !isMasked(form.ANTHROPIC_API_KEY)
+              ? form.ANTHROPIC_API_KEY
+              : undefined,
         });
       }}
       onClear={() => clearMut.mutate()}

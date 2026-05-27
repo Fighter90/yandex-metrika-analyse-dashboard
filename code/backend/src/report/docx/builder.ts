@@ -66,22 +66,25 @@ function parseTable(lines: string[], startIdx: number): { table: Table; consumed
     .map((r) => r.split('|').filter((c) => c.trim() !== ''));
 
   const headerRow = new TableRow({
-    children: headerCells.map((cell) =>
-      new TableCell({
-        children: [new Paragraph({ children: parseInline(cell.trim()) })],
-        shading: { fill: 'F8FAFC', type: 'CLEAR', val: 'clear' },
-      }),
+    children: headerCells.map(
+      (cell) =>
+        new TableCell({
+          children: [new Paragraph({ children: parseInline(cell.trim()) })],
+          shading: { fill: 'F8FAFC', type: 'clear' },
+        }),
     ),
   });
 
-  const dataRowsParsed = dataRows.map((cells) =>
-    new TableRow({
-      children: cells.map((cell) =>
-        new TableCell({
-          children: [new Paragraph({ children: parseInline(cell.trim()) })],
-        }),
-      ),
-    }),
+  const dataRowsParsed = dataRows.map(
+    (cells) =>
+      new TableRow({
+        children: cells.map(
+          (cell) =>
+            new TableCell({
+              children: [new Paragraph({ children: parseInline(cell.trim()) })],
+            }),
+        ),
+      }),
   );
 
   return {

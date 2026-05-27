@@ -97,4 +97,62 @@ describe('buildDocx', () => {
     expect(buf.length).toBeGreaterThan(0);
     expect(buf.subarray(0, 2).toString('latin1')).toBe('PK'); // zip magic
   });
+
+  it('renders markdown tables, bold/italic/code inline and list items via aiNarrative', async () => {
+    // This snapshot injects markdown content through aiNarrative → parseChunkedNarrative →
+    // section.lines → buildDocx, exercising parseInline (bold/italic/code), parseTable,
+    // isTableRow (true branch), and the list-item branch in the line loop.
+    const markdownSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: [
+        '## Markdown Coverage Section',
+        '**bold text** and *italic text* and `code snippet` here',
+        'prefix **bold** suffix',
+        '- list item one',
+        '* list item two',
+        '| Канал | Визиты | CR |',
+        '|---|---|---|',
+        '| tg | 100 | 7.0% |',
+        '| vk | 50 | 3.5% |',
+      ].join('\n'),
+    };
+    const buf = await buildDocx(markdownSnapshot);
+    expect(buf.length).toBeGreaterThan(0);
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
+
+  it('handles a single-row table line (parseTable returns null → falls through to paragraph)', async () => {
+    // A line starting with | but without a second row causes parseTable to return null;
+    // the builder then renders it as a plain paragraph via parseInline.
+    const singleRowSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: '## Single Row Section\n| only one row |',
+    };
+    const buf = await buildDocx(singleRowSnapshot);
+    expect(buf.length).toBeGreaterThan(0);
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
+
+  it('handles parseInline with no markup (plain-text fallback run)', async () => {
+    // Plain text with no **bold**, *italic*, or `code` → parseInline returns [new TextRun(text)]
+    const plainSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: '## Plain Section\njust plain text here',
+    };
+    const buf = await buildDocx(plainSnapshot);
+    expect(buf.length).toBeGreaterThan(0);
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
+
+  it('handles a list item with no content (parseInline called with empty string)', async () => {
+    // A line "- " (dash-space only) causes line.slice(2) = '' → parseInline('') →
+    // runs stays empty → returns [new TextRun('')], covering the false branch of line 42.
+    const emptyListItemSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: '## Empty List Item\n- ',
+    };
+    const buf = await buildDocx(emptyListItemSnapshot);
+    expect(buf.length).toBeGreaterThan(0);
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
 });

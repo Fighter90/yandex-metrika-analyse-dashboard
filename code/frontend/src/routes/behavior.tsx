@@ -119,7 +119,11 @@ function bounceBarOption(rows: PageRow[], title: string): object {
       },
     },
     grid: { left: 140, right: 16, top: 32, bottom: 28 },
-    xAxis: { type: 'value', max: 1, axisLabel: { formatter: (v: number) => `${(v * 100).toFixed(0)}%` } },
+    xAxis: {
+      type: 'value',
+      max: 1,
+      axisLabel: { formatter: (v: number) => `${(v * 100).toFixed(0)}%` },
+    },
     yAxis: { type: 'category', data: top.map((r) => shortLabel(r.page)) },
     series: [
       {
@@ -127,9 +131,15 @@ function bounceBarOption(rows: PageRow[], title: string): object {
         type: 'bar',
         data: top.map((r) => ({
           value: r.bounceRate,
-          itemStyle: { color: r.bounceRate > 0.4 ? '#ef4444' : r.bounceRate > 0.25 ? '#f59e0b' : '#22c55e' },
+          itemStyle: {
+            color: r.bounceRate > 0.4 ? '#ef4444' : r.bounceRate > 0.25 ? '#f59e0b' : '#22c55e',
+          },
         })),
-        label: { show: true, position: 'right', formatter: (v: { value: number }) => formatPercent(v.value) },
+        label: {
+          show: true,
+          position: 'right',
+          formatter: (v: { value: number }) => formatPercent(v.value),
+        },
       },
     ],
   };
@@ -160,9 +170,20 @@ function crBarOption(rows: PageRow[], title: string): object {
         type: 'bar',
         data: top.map((r) => ({
           value: r.conversionRate,
-          itemStyle: { color: r.conversionRate > 0.02 ? '#22c55e' : r.conversionRate > 0.005 ? '#f59e0b' : '#ef4444' },
+          itemStyle: {
+            color:
+              r.conversionRate > 0.02
+                ? '#22c55e'
+                : r.conversionRate > 0.005
+                  ? '#f59e0b'
+                  : '#ef4444',
+          },
         })),
-        label: { show: true, position: 'right', formatter: (v: { value: number }) => formatPercent(v.value) },
+        label: {
+          show: true,
+          position: 'right',
+          formatter: (v: { value: number }) => formatPercent(v.value),
+        },
       },
     ],
   };
@@ -198,7 +219,11 @@ function PageTable({
           <tbody>
             {rows.map((r) => {
               const bounceColor =
-                r.bounceRate > 0.5 ? 'text-red-600' : r.bounceRate > 0.3 ? 'text-amber-600' : 'text-green-600';
+                r.bounceRate > 0.5
+                  ? 'text-red-600'
+                  : r.bounceRate > 0.3
+                    ? 'text-amber-600'
+                    : 'text-green-600';
               const crColor =
                 r.conversionRate > avgCR * 1.5
                   ? 'text-green-600'
@@ -210,9 +235,13 @@ function PageTable({
                   <td className="px-3 py-2 font-mono text-xs">{shortLabel(r.page)}</td>
                   <td className="px-3 py-2">{formatInt(r.visits)}</td>
                   <td className="px-3 py-2">{formatInt(r.users)}</td>
-                  <td className={`px-3 py-2 font-medium ${bounceColor}`}>{formatPercent(r.bounceRate)}</td>
+                  <td className={`px-3 py-2 font-medium ${bounceColor}`}>
+                    {formatPercent(r.bounceRate)}
+                  </td>
                   <td className="px-3 py-2">{formatInt(r.goalReaches)}</td>
-                  <td className={`px-3 py-2 font-medium ${crColor}`}>{formatPercent(r.conversionRate)}</td>
+                  <td className={`px-3 py-2 font-medium ${crColor}`}>
+                    {formatPercent(r.conversionRate)}
+                  </td>
                 </tr>
               );
             })}
@@ -222,7 +251,9 @@ function PageTable({
       {rows.length > 0 && (
         <div className="rounded bg-slate-50 px-3 py-2 text-xs text-slate-600">
           Средние: отказы {formatPercent(avgBounce)} · CR {formatPercent(avgCR)} ·{' '}
-          {type === 'entry' ? 'Страницы отсортированы по визитам' : 'Страницы отсортированы по визитам'}
+          {type === 'entry'
+            ? 'Страницы отсортированы по визитам'
+            : 'Страницы отсортированы по визитам'}
         </div>
       )}
     </div>
@@ -252,17 +283,27 @@ export function BehaviorView({
   const entryRows = pageRows(entry);
   const exitRows = pageRows(exit);
   const { badges: entryBadges, summary: entrySummary } = computePageInsights(entry, 'entry');
-  const { badges: exitBadges, summary: exitSummary } = computePageInsights(exit, 'exit');
+  const { summary: exitSummary } = computePageInsights(exit, 'exit');
 
   // Summary stats
   const totalEntryVisits = entryRows.reduce((a, r) => a + r.visits, 0);
   const totalEntryReaches = entryRows.reduce((a, r) => a + r.goalReaches, 0);
   const entryCR = totalEntryVisits > 0 ? totalEntryReaches / totalEntryVisits : 0;
-  const avgEntryBounce = entryRows.length > 0 ? entryRows.reduce((a, r) => a + r.bounceRate, 0) / entryRows.length : 0;
+  const avgEntryBounce =
+    entryRows.length > 0 ? entryRows.reduce((a, r) => a + r.bounceRate, 0) / entryRows.length : 0;
 
   // Find best and worst pages
-  const bestPage = entryRows.length > 0 ? entryRows.reduce((best, r) => (r.conversionRate > best.conversionRate ? r : best), entryRows[0]!) : null;
-  const worstPage = entryRows.length > 0 ? entryRows.reduce((worst, r) => (r.bounceRate > worst.bounceRate ? r : worst), entryRows[0]!) : null;
+  const bestPage =
+    entryRows.length > 0
+      ? entryRows.reduce(
+          (best, r) => (r.conversionRate > best.conversionRate ? r : best),
+          entryRows[0]!,
+        )
+      : null;
+  const worstPage =
+    entryRows.length > 0
+      ? entryRows.reduce((worst, r) => (r.bounceRate > worst.bounceRate ? r : worst), entryRows[0]!)
+      : null;
 
   return (
     <section className="space-y-6">
@@ -280,10 +321,14 @@ export function BehaviorView({
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="text-xs text-slate-500">Средний bounce</div>
-          <div className={`text-2xl font-bold ${avgEntryBounce > 0.3 ? 'text-red-600' : avgEntryBounce > 0.2 ? 'text-amber-600' : 'text-green-600'}`}>
+          <div
+            className={`text-2xl font-bold ${avgEntryBounce > 0.3 ? 'text-red-600' : avgEntryBounce > 0.2 ? 'text-amber-600' : 'text-green-600'}`}
+          >
             {formatPercent(avgEntryBounce)}
           </div>
-          <div className="mt-1 text-xs text-slate-400">{avgEntryBounce > 0.3 ? '⚠️ Высокий' : '✅ В норме'}</div>
+          <div className="mt-1 text-xs text-slate-400">
+            {avgEntryBounce > 0.3 ? '⚠️ Высокий' : '✅ В норме'}
+          </div>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="text-xs text-slate-500">Страниц выхода</div>
@@ -297,15 +342,24 @@ export function BehaviorView({
         <h3 className="mb-2 text-sm font-semibold text-slate-700">Ключевые наблюдения</h3>
         <div className="flex flex-wrap gap-2">
           {bestPage && bestPage.conversionRate > 0.01 && (
-            <InsightBadge type="good" text={`Лучший CR: ${shortLabel(bestPage.page)} ${formatPercent(bestPage.conversionRate)}`} />
+            <InsightBadge
+              type="good"
+              text={`Лучший CR: ${shortLabel(bestPage.page)} ${formatPercent(bestPage.conversionRate)}`}
+            />
           )}
           {worstPage && worstPage.bounceRate > 0.4 && (
-            <InsightBadge type="warning" text={`Худший bounce: ${shortLabel(worstPage.page)} ${formatPercent(worstPage.bounceRate)}`} />
+            <InsightBadge
+              type="warning"
+              text={`Худший bounce: ${shortLabel(worstPage.page)} ${formatPercent(worstPage.bounceRate)}`}
+            />
           )}
           {entryCR > 0.02 ? (
             <InsightBadge type="good" text={`Общий CR ${formatPercent(entryCR)} — хороший`} />
           ) : (
-            <InsightBadge type="warning" text={`Общий CR ${formatPercent(entryCR)} — низкий, цель > 2%`} />
+            <InsightBadge
+              type="warning"
+              text={`Общий CR ${formatPercent(entryCR)} — низкий, цель > 2%`}
+            />
           )}
           {entryBadges.slice(0, 3)}
         </div>
@@ -340,8 +394,8 @@ export function BehaviorView({
             <li className="flex items-start gap-2">
               <span className="text-red-500">🔴</span>
               <span>
-                <b>{shortLabel(worstPage.page)}</b> — bounce {formatPercent(worstPage.bounceRate)}. Упростить контент,
-                добавить CTA, проверить мобильную версию.
+                <b>{shortLabel(worstPage.page)}</b> — bounce {formatPercent(worstPage.bounceRate)}.
+                Упростить контент, добавить CTA, проверить мобильную версию.
               </span>
             </li>
           )}
@@ -349,8 +403,8 @@ export function BehaviorView({
             <li className="flex items-start gap-2">
               <span className="text-amber-500">🟡</span>
               <span>
-                Общий CR {formatPercent(entryCR)} ниже 2%. Добавить формы захвата на страницы с высоким трафиком,
-                упростить навигацию.
+                Общий CR {formatPercent(entryCR)} ниже 2%. Добавить формы захвата на страницы с
+                высоким трафиком, упростить навигацию.
               </span>
             </li>
           )}
@@ -358,15 +412,14 @@ export function BehaviorView({
             <li className="flex items-start gap-2">
               <span className="text-green-500">🟢</span>
               <span>
-                CR {formatPercent(entryCR)} на хорошем уровне. Масштабировать трафик на страницы с лучшим CR.
+                CR {formatPercent(entryCR)} на хорошем уровне. Масштабировать трафик на страницы с
+                лучшим CR.
               </span>
             </li>
           )}
           <li className="flex items-start gap-2">
             <span className="text-blue-500">ℹ️</span>
-            <span>
-              А/B-тестировать посадочные страницы с bounce &gt; 30% и визитов &gt; 100.
-            </span>
+            <span>А/B-тестировать посадочные страницы с bounce &gt; 30% и визитов &gt; 100.</span>
           </li>
         </ul>
       </div>

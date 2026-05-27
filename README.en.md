@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.1.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.5.4.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to,
@@ -156,17 +156,17 @@ The end-to-end data flow as implemented:
 
 ## Dashboard Pages
 
-| Page | URL | Description |
-|------|-----|-------------|
-| **Overview** | `/` | KPI target, applications, gap; visits/applications charts; channel mix; top countries; device share; UTM breakdown; entry/exit pages; weak spots; color badges |
-| **Traffic** | `/traffic` | Channel bar chart; visits vs applications; channel table with CR; UTM breakdown; insights |
-| **Behavior** | `/behavior` | Entry page CR; entry/exit bounce rates; color-highlighted tables; recommendations |
-| **Funnel** | `/funnel` | 4 stages (Visits → B2C Applications → B2B Pipeline → B2B Paid); loss analysis; channel CR; B2B by stage; problematic pages |
-| **Goals** | `/goals` | Progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations |
-| **Report** | `/report` | Snapshot generation; AI analysis (5 sections, HTML rendering); DOCX/PDF export; rebuild |
-| **History** | `/history` | Snapshot list; "View" button → opens saved report |
-| **Settings** | `/settings` | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID, ANTHROPIC_API_KEY; sync with progress bar (10 stages); current counter display |
-| **Help** | `/help` | Full documentation: all pages described, filters, FAQ (10 questions), glossary |
+| Page         | URL         | Description                                                                                                                                                    |
+| ------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overview** | `/`         | KPI target, applications, gap; visits/applications charts; channel mix; top countries; device share; UTM breakdown; entry/exit pages; weak spots; color badges |
+| **Traffic**  | `/traffic`  | Channel bar chart; visits vs applications; channel table with CR; UTM breakdown; insights                                                                      |
+| **Behavior** | `/behavior` | Entry page CR; entry/exit bounce rates; color-highlighted tables; recommendations                                                                              |
+| **Funnel**   | `/funnel`   | 4 stages (Visits → B2C Applications → B2B Pipeline → B2B Paid); loss analysis; channel CR; B2B by stage; problematic pages                                     |
+| **Goals**    | `/goals`    | Progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                  |
+| **Report**   | `/report`   | Snapshot generation; AI analysis (5 sections, HTML rendering); DOCX/PDF export; rebuild                                                                        |
+| **History**  | `/history`  | Snapshot list; "View" button → opens saved report                                                                                                              |
+| **Settings** | `/settings` | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID, ANTHROPIC_API_KEY; sync with progress bar (10 stages); current counter display                             |
+| **Help**     | `/help`     | Full documentation: all pages described, filters, FAQ (10 questions), glossary                                                                                 |
 
 ## Filters (dashboard header)
 
@@ -283,13 +283,13 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 ## Releases
 
-| Version | Date | Description |
-|---------|------|-------------|
-| **v2.3.0** (Latest) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST |
-| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix |
-| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting |
+| Version                                                                              | Date       | Description                                                                  |
+| ------------------------------------------------------------------------------------ | ---------- | ---------------------------------------------------------------------------- |
+| **v2.3.0** (Latest)                                                                  | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST          |
+| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                           |
+| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                      |
 | [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide |
-| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page) |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page)           |
 
 ## License · Authors · Credits
 

@@ -1,7 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import * as fs from 'node:fs';
-import { settingsRoutes, mask, readEnvFile, updateEnvFile, ENV_PATH } from '../../src/routes/settings';
+import {
+  settingsRoutes,
+  mask,
+  readEnvFile,
+  updateEnvFile,
+  ENV_PATH,
+} from '../../src/routes/settings';
 
 const ENV_BACKUP = ENV_PATH + '.backup';
 
@@ -163,8 +169,12 @@ describe('updateEnvFile (unit)', () => {
     // Clean up test .env if it exists and wasn't restored
     if (fs.existsSync(ENV_PATH)) {
       const content = fs.readFileSync(ENV_PATH, 'utf-8');
-      if (content.includes('TEST_KEY') || content.includes('VALID_KEY') ||
-          content.includes('EXISTING') || content.includes('NEW_KEY')) {
+      if (
+        content.includes('TEST_KEY') ||
+        content.includes('VALID_KEY') ||
+        content.includes('EXISTING') ||
+        content.includes('NEW_KEY')
+      ) {
         fs.unlinkSync(ENV_PATH);
       }
     }
@@ -186,6 +196,61 @@ describe('updateEnvFile (unit)', () => {
     expect(content.endsWith('\n')).toBe(true);
 
     // Restore
+    fs.unlinkSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_BACKUP, ENV_PATH);
+  });
+
+  it('creates a new .env file when none exists (covers existsSync false branch)', () => {
+    // Save original .env and ensure it does not exist during the test
+    const hadEnv = fs.existsSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_PATH, ENV_BACKUP);
+
+    // At this point .env does NOT exist — exercises the false branch of the ternary
+    updateEnvFile({ TEST_KEY: 'testval' });
+
+    const content = fs.readFileSync(ENV_PATH, 'utf-8');
+    expect(content).toContain('TEST_KEY=testval\n');
+
+    // Restore
+    fs.unlinkSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_BACKUP, ENV_PATH);
+  });
+});
+
+describe('GET /settings — env key coverage', () => {
+  afterEach(() => {
+    if (fs.existsSync(ENV_BACKUP)) {
+      fs.renameSync(ENV_BACKUP, ENV_PATH);
+    }
+  });
+
+  it('returns masked/empty values for all keys when .env has no settings keys (covers ?? nullish branches)', async () => {
+    // Write a .env WITHOUT the settings keys so every ?? operator hits its fallback branch
+    const hadEnv = fs.existsSync(ENV_PATH);
+    if (hadEnv) fs.renameSync(ENV_PATH, ENV_BACKUP);
+
+    fs.writeFileSync(ENV_PATH, '# empty env\n', 'utf-8');
+
+    const app = appWith();
+    const res = await app.inject({ method: 'GET', url: '/settings' });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as {
+      YANDEX_OAUTH_TOKEN: string;
+      YANDEX_CLIENT_ID: string;
+      YANDEX_CLIENT_SECRET: string;
+      COUNTER_ID: number;
+      GOAL_ID: number;
+      ANTHROPIC_API_KEY: string;
+    };
+    // All values fall back to empty/zero defaults
+    expect(body.YANDEX_OAUTH_TOKEN).toBe('****'); // mask('') → '****'
+    expect(body.YANDEX_CLIENT_ID).toBe('');
+    expect(body.YANDEX_CLIENT_SECRET).toBe('****');
+    expect(body.COUNTER_ID).toBe(0);
+    expect(body.GOAL_ID).toBe(0);
+    expect(body.ANTHROPIC_API_KEY).toBe('****');
+    await app.close();
+
     fs.unlinkSync(ENV_PATH);
     if (hadEnv) fs.renameSync(ENV_BACKUP, ENV_PATH);
   });

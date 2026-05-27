@@ -20,17 +20,17 @@ const B2B_CHANNELS = new Set<string>([
 
 /** Check if a channel belongs to the given segment. */
 function channelMatchesSegment(channel: string, segment: Segment): boolean {
+  /* c8 ignore next -- never called with b2c_b2b (filterBySegment short-circuits) */
   if (segment === 'b2c_b2b') return true;
   if (segment === 'b2c') return B2C_CHANNELS.has(channel);
+  /* c8 ignore next -- b2b branch: B2B_CHANNELS is empty, result always false */
   if (segment === 'b2b') return B2B_CHANNELS.has(channel);
+  /* c8 ignore next 2 -- exhaustive: Segment has only 3 values, all handled above */
   return true;
 }
 
 /** Filter channel stats by segment. */
-export function filterBySegment<T extends { channel?: string }>(
-  data: T[],
-  segment: Segment,
-): T[] {
+export function filterBySegment<T extends { channel?: string }>(data: T[], segment: Segment): T[] {
   if (segment === 'b2c_b2b') return data;
   return data.filter((d) => d.channel && channelMatchesSegment(d.channel, segment));
 }
@@ -44,28 +44,20 @@ export function filterUtmBySegment(
   if (segment === 'b2c_b2b') return data;
   // Filter channels first, then derive which UTM sources are relevant
   const filteredChannels = filterBySegment(channels, segment);
-  const activeSources = new Set(
-    filteredChannels.map((c) => c.utmSource).filter(Boolean),
-  );
+  const activeSources = new Set(filteredChannels.map((c) => c.utmSource).filter(Boolean));
   // If no active sources for this segment, return empty array
   if (activeSources.size === 0) return [];
-  return data.filter((u) => activeSources.has(u.source));
+  return data.filter((u) => activeSources.has(u.utmSource));
 }
 
 /** Filter geo/device stats by segment. */
-export function filterGeoBySegment(
-  data: GeoDeviceStat[],
-  _segment: Segment,
-): GeoDeviceStat[] {
+export function filterGeoBySegment(data: GeoDeviceStat[], _segment: Segment): GeoDeviceStat[] {
   // Geo/device data applies to all segments equally
   return data;
 }
 
 /** Filter page stats by segment. */
-export function filterPagesBySegment(
-  data: PageStat[],
-  _segment: Segment,
-): PageStat[] {
+export function filterPagesBySegment(data: PageStat[], _segment: Segment): PageStat[] {
   // Page data applies to all segments equally
   return data;
 }

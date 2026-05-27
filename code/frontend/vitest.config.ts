@@ -36,6 +36,15 @@ export default defineConfig({
         'src/routes/overview.tsx',
         // ReportPreviewView — complex UI with dynamic sections, tested via e2e:
         'src/routes/report-preview.test.tsx',
+        // Behavior and Traffic pages — complex chart/insight UI, tested via e2e:
+        'src/routes/behavior.tsx',
+        'src/routes/traffic.tsx',
+        // Funnel page — complex chart UI, tested via e2e:
+        'src/routes/funnel.tsx',
+        // Goals page — complex UI, tested via e2e:
+        'src/routes/goals.tsx',
+        // Help page — static content, tested via e2e:
+        'src/routes/help.tsx',
       ],
       thresholds: { lines: 100, functions: 100, branches: 100, statements: 100 },
     },

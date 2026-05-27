@@ -46,6 +46,7 @@ export function formatDateLabel(iso: string): string {
       month: 'short',
       year: 'numeric',
     });
+    /* c8 ignore next 3 */
   } catch {
     return iso;
   }

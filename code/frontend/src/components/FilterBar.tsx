@@ -53,7 +53,11 @@ export function FilterBar(): JSX.Element {
             preset(d);
           }}
           className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
-          title={d === 365 ? 'Показать данные за последний год' : `Показать данные за последние ${d} дней`}
+          title={
+            d === 365
+              ? 'Показать данные за последний год'
+              : `Показать данные за последние ${d} дней`
+          }
         >
           {d === 365 ? '1г' : `${d}д`}
         </button>
@@ -74,8 +78,11 @@ export function FilterBar(): JSX.Element {
       {showCustom && (
         <div className="flex w-full flex-col gap-2 rounded border border-indigo-200 bg-indigo-50 px-3 py-2 sm:w-auto sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
-            <label className="text-xs text-indigo-700">От:</label>
+            <label htmlFor="custom-date-from" className="text-xs text-indigo-700">
+              От:
+            </label>
             <input
+              id="custom-date-from"
               type="date"
               value={customFrom}
               onChange={(e) => {
@@ -84,8 +91,11 @@ export function FilterBar(): JSX.Element {
               }}
               className="rounded border border-indigo-300 px-2 py-1 text-sm"
             />
-            <label className="text-xs text-indigo-700">До:</label>
+            <label htmlFor="custom-date-to" className="text-xs text-indigo-700">
+              До:
+            </label>
             <input
+              id="custom-date-to"
               type="date"
               value={customTo}
               onChange={(e) => {
@@ -102,9 +112,7 @@ export function FilterBar(): JSX.Element {
               Применить
             </button>
           </div>
-          {dateError && (
-            <p className="text-xs text-red-600">{dateError}</p>
-          )}
+          {dateError && <p className="text-xs text-red-600">{dateError}</p>}
           <p className="text-xs text-indigo-400">Макс. период: 365 дней (1 год)</p>
           <button
             type="button"

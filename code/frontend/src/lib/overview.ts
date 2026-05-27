@@ -14,9 +14,7 @@ export interface OverviewKpi {
  * applications показывается отдельно как «верхняя оценка» потенциала. */
 export function summarizeChannels(stats: ChannelStat[], deals: B2bDeal[] = []): OverviewKpi {
   const applications = stats.reduce((acc, s) => acc + s.goalReaches, 0);
-  const b2bPaid = deals
-    .filter((d) => d.stage === 'paid')
-    .reduce((acc, d) => acc + d.tickets, 0);
+  const b2bPaid = deals.filter((d) => d.stage === 'paid').reduce((acc, d) => acc + d.tickets, 0);
   return {
     target: KPI_TARGET_PAID_TICKETS,
     applications,

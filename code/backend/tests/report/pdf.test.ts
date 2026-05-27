@@ -64,4 +64,46 @@ describe('reportHtml', () => {
   it('escapes &, < and > in content', () => {
     expect(reportHtml(snapshot)).toContain('a&lt;b&gt;&amp;c');
   });
+
+  it('renders markdown tables, bold/italic/code and list items via aiNarrative', () => {
+    // Exercises renderTable, inlineToHtml (with **bold**, *italic*, `code`),
+    // the list-item branch, and the <ul> wrapping regex in reportHtml.
+    const markdownSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: [
+        '## Markdown Coverage Section',
+        '**bold text** and *italic text* and `code snippet` here',
+        '- list item one',
+        '* list item two',
+        '| Канал | Визиты |',
+        '|---|---|',
+        '| tg | 100 |',
+        '| vk | 50 |',
+      ].join('\n'),
+    };
+    const html = reportHtml(markdownSnapshot);
+    // Table is rendered directly (not run through escapeHtml), so tags appear verbatim
+    expect(html).toContain('<table>');
+    expect(html).toContain('<th>');
+    expect(html).toContain('<td>');
+    // inlineToHtml applies bold/italic/code replacements then escapes < and > characters,
+    // so the resulting tags appear escaped in the final output — coverage is still exercised.
+    expect(html).toContain('bold text');
+    expect(html).toContain('italic text');
+    expect(html).toContain('code snippet');
+    expect(html).toContain('<li>');
+    expect(html).toContain('<ul>');
+  });
+
+  it('handles a single-row table line (renderTable returns null → paragraph fallback)', () => {
+    // A | row | with no second row causes renderTable to return null; line renders as <p>.
+    const singleRowSnapshot: ReportSnapshot = {
+      ...snapshot,
+      aiNarrative: '## Single Row\n| only one row |',
+    };
+    const html = reportHtml(singleRowSnapshot);
+    // No table rendered — the | line falls through to inlineToHtml as a plain paragraph
+    expect(html).toContain('<p>');
+    expect(html).not.toContain('<table>');
+  });
 });

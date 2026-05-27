@@ -12,19 +12,27 @@ export function mdToHtml(md: string): string {
 
   const flushTable = () => {
     if (tableRows.length > 0) {
-      const headerRow = tableRows[0];
-      const dataRows = tableRows.slice(1).filter((r) => !r.startsWith('|---') && !r.startsWith('| ***'));
+      const headerRow = tableRows[0]!;
+      const dataRows = tableRows
+        .slice(1)
+        .filter((r) => !r.startsWith('|---') && !r.startsWith('| ***'));
       html.push('<table class="ai-table">');
       html.push('<thead><tr>');
-      headerRow.split('|').filter((c) => c.trim()).forEach((cell) => {
-        html.push(`<th>${cell.trim()}</th>`);
-      });
+      headerRow
+        .split('|')
+        .filter((c) => c.trim())
+        .forEach((cell) => {
+          html.push(`<th>${cell.trim()}</th>`);
+        });
       html.push('</tr></thead><tbody>');
       dataRows.forEach((row) => {
         html.push('<tr>');
-        row.split('|').filter((c) => c.trim()).forEach((cell) => {
-          html.push(`<td>${inlineFormat(cell.trim())}</td>`);
-        });
+        row
+          .split('|')
+          .filter((c) => c.trim())
+          .forEach((cell) => {
+            html.push(`<td>${inlineFormat(cell.trim())}</td>`);
+          });
         html.push('</tr>');
       });
       html.push('</tbody></table>');

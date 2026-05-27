@@ -5,12 +5,7 @@ import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
 import { EmptyState } from '../components/EmptyState';
-import {
-  channelMixOption,
-  dailyReachesOption,
-  summarizeChannels,
-  weakSpots,
-} from '../lib/overview';
+import { channelMixOption, summarizeChannels, weakSpots } from '../lib/overview';
 import { dailySeries, trendsOption } from '../lib/trends';
 import { byCountry, byDevice, audienceBarOption, deviceShareOption } from '../lib/audience';
 import { EChart } from '../components/charts/EChart';
@@ -261,7 +256,11 @@ export function OverviewView({
         <Kpi label="Цель (платных билетов)" value={formatInt(kpi.target)} />
         <Kpi label="Заявок B2C" value={formatInt(kpi.applications)} hint="заявка ≠ оплата" />
         <Kpi label="Оплачено B2B" value={formatInt(kpi.b2bPaid)} />
-        <Kpi label="Gap до цели" value={formatInt(kpi.gap)} hint={`${formatInt(kpi.b2bPaid)} оплачено из ${formatInt(kpi.target)}`} />
+        <Kpi
+          label="Gap до цели"
+          value={formatInt(kpi.gap)}
+          hint={`${formatInt(kpi.b2bPaid)} оплачено из ${formatInt(kpi.target)}`}
+        />
       </div>
 
       <Card title="Визиты и заявки по дням">
