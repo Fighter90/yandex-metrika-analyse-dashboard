@@ -201,10 +201,12 @@ export class SyncService {
   }
 
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
-    // Clear derived stats before reloading so a re-sync never duplicates rows. SQLite treats NULL
-    // as distinct in the (date, channel, utm_*) primary key, so INSERT OR REPLACE cannot dedupe
-    // rows with NULL UTM — a full wipe+reload is the reliable guarantee against duplication.
-    this.deps.metrics.clearDerivedStats();
+    // Full wipe of all synced data (stat tables + goals + raw_responses) before reloading so a
+    // re-sync always yields a fresh, duplicate-free dataset. SQLite treats NULL as distinct in the
+    // (date, channel, utm_*) primary key, so INSERT OR REPLACE cannot dedupe rows with NULL UTM —
+    // a full wipe+reload is the reliable guarantee. User-entered data (b2b/hypotheses/decisions/
+    // snapshots) is preserved.
+    this.deps.metrics.resetSyncedData();
     const goals = await this.syncGoals();
     // Auto-detect the KPI goal when the caller didn't pin one — so the user never hand-picks a
     // GOAL_ID. An explicit goalId always wins; otherwise pick the payment/purchase goal.

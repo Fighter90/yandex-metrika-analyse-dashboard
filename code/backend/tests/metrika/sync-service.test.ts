@@ -159,4 +159,18 @@ describe('SyncService.syncAll', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('exit-pages skipped'));
     warn.mockRestore();
   });
+
+  it('resets synced data on each run but preserves user-entered B2B deals', async () => {
+    db.prepare(
+      `INSERT INTO b2b_manual (company, tickets, stage, date_added)
+       VALUES ('Acme', 5, 'paid', '2025-01-01')`,
+    ).run();
+    await svc.syncAll('2025-01-01', '2025-01-07', 80);
+    await svc.syncAll('2025-01-01', '2025-01-07', 80);
+    // Two runs over the same range → no duplicate rows (reset+reload each time).
+    expect(metrics.listChannelStats()).toHaveLength(1);
+    expect(metrics.listGoals(true)).toHaveLength(2);
+    // User-entered B2B data survives the reset.
+    expect((db.prepare('SELECT COUNT(*) AS n FROM b2b_manual').get() as { n: number }).n).toBe(1);
+  });
 });

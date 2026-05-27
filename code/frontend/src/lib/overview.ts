@@ -1,5 +1,5 @@
 import type { ChannelStat, B2bDeal } from '@pca/shared';
-import { KPI_TARGET_PAID_TICKETS } from '@pca/shared';
+import { KPI_TARGET_PAID_TICKETS, periodTotals } from '@pca/shared';
 import { intTooltip } from './echart-format';
 
 export interface OverviewKpi {
@@ -13,7 +13,9 @@ export interface OverviewKpi {
  * Gap = target - b2bPaid (заявка ≠ оплата — gap считается только по оплаченным билетам).
  * applications показывается отдельно как «верхняя оценка» потенциала. */
 export function summarizeChannels(stats: ChannelStat[], deals: B2bDeal[] = []): OverviewKpi {
-  const applications = stats.reduce((acc, s) => acc + s.goalReaches, 0);
+  // applications comes from the single factsource (periodTotals) so the KPI strip, Funnel and Goals
+  // headline "Заявки B2C" numbers are guaranteed identical.
+  const { applications } = periodTotals(stats);
   const b2bPaid = deals.filter((d) => d.stage === 'paid').reduce((acc, d) => acc + d.tickets, 0);
   return {
     target: KPI_TARGET_PAID_TICKETS,

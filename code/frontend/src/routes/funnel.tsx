@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ChannelStat, B2bDeal, GeoDeviceStat, PageStat } from '@pca/shared';
+import { periodTotals } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
@@ -186,16 +187,16 @@ export function FunnelView({
       </p>
     );
 
-  const visits = stats.reduce((a, s) => a + s.visits, 0);
-  const reaches = stats.reduce((a, s) => a + s.goalReaches, 0);
+  // Headline Визиты/Заявки B2C come from the single factsource so this page agrees with Overview
+  // and Goals. appConversionRate below reuses the same clamped CR.
+  const { visits, applications: reaches, conversionRate: appConversionRate } = periodTotals(stats);
   const b2bTickets = deals.reduce((a, d) => a + d.tickets, 0);
   const b2bPaid = deals.reduce((a, d) => a + (d.stage === 'paid' ? d.tickets : 0), 0);
   const b2bDealsCount = deals.length;
 
   if (visits === 0 && b2bDealsCount === 0) return <EmptyState />;
 
-  // Conversion rates between stages
-  const appConversionRate = visits > 0 ? reaches / visits : 0;
+  // Conversion rate between B2B stages
   const paymentConversionRate = b2bTickets > 0 ? b2bPaid / b2bTickets : 0;
 
   // Geo data
