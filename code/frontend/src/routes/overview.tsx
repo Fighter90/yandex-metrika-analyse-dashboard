@@ -15,6 +15,7 @@ import { ChartCaption } from '../components/charts/ChartCaption';
 import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
 import { buildHypothesisUrl } from '../lib/hypothesis-prefill';
 import { shouldShowOnboarding, markOnboarded } from '../lib/onboarding';
+import { weeklyDigest } from '../lib/weekly-digest';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -266,6 +267,8 @@ export function OverviewView({
           hint={`${formatInt(kpi.b2bPaid)} оплачено из ${formatInt(kpi.target)}`}
         />
       </div>
+
+      <WeeklyDigest stats={stats} />
 
       <Card title="Визиты и заявки по дням">
         <EChart option={trendsOption(dailySeries(stats))} />
@@ -528,6 +531,61 @@ function Kpi({ label, value, hint }: { label: string; value: string; hint?: stri
       <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
       <div className="mt-1 text-2xl font-bold">{value}</div>
       {hint ? <div className="mt-1 text-xs text-amber-600">{hint}</div> : null}
+    </div>
+  );
+}
+
+/** WoW delta chip: green when up, red when down, grey when flat/unknown. */
+function Delta({ ratio }: { ratio: number }): JSX.Element {
+  const tone = ratio > 0 ? 'text-green-700' : ratio < 0 ? 'text-red-700' : 'text-slate-400';
+  const arrow = ratio > 0 ? '▲' : ratio < 0 ? '▼' : '→';
+  return (
+    <span className={`text-xs font-medium ${tone}`}>
+      {arrow} {formatPercent(Math.abs(ratio))} WoW
+    </span>
+  );
+}
+
+/** Weekly digest: a one-glance "what happened this week" card (WoW visits/applications + leaders). */
+function WeeklyDigest({ stats }: { stats: ChannelStat[] }): JSX.Element | null {
+  const d = weeklyDigest(stats);
+  if (!d.hasData) return null;
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h2 className="mb-3 text-lg font-semibold">Дайджест за неделю</h2>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p className="text-xs text-slate-500">Визиты (7 дней)</p>
+          <p className="text-xl font-semibold">{formatInt(d.visits)}</p>
+          <Delta ratio={d.visitsDelta} />
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Заявки (7 дней)</p>
+          <p className="text-xl font-semibold">{formatInt(d.applications)}</p>
+          <Delta ratio={d.applicationsDelta} />
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Топ-канал по визитам</p>
+          <p className="text-base font-semibold">{d.topChannel ? d.topChannel.channel : '—'}</p>
+          {d.topChannel ? (
+            <p className="text-xs text-slate-500">{formatInt(d.topChannel.visits)} визитов</p>
+          ) : null}
+        </div>
+        <div>
+          <p className="text-xs text-slate-500">Главное слабое место</p>
+          {d.topWeakSpot ? (
+            <>
+              <p className="text-base font-semibold text-red-700">{d.topWeakSpot.channel}</p>
+              <p className="text-xs text-slate-500">
+                CR {formatPercent(d.topWeakSpot.conversionRate)} при{' '}
+                {formatInt(d.topWeakSpot.visits)} визитах
+              </p>
+            </>
+          ) : (
+            <p className="text-base font-semibold text-green-700">нет явных утечек</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
