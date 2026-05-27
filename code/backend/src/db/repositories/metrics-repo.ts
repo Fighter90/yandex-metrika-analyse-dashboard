@@ -207,6 +207,24 @@ export class MetricsRepo {
     };
   }
 
+  /**
+   * Wipe all derived per-period stat tables (kept idempotent for re-sync — see syncAll). Does NOT
+   * touch raw_responses (audit trail), goals, B2B, hypotheses or decisions.
+   */
+  clearDerivedStats(): void {
+    const tables = [
+      'channel_stats',
+      'utm_stats',
+      'geo_device_stats',
+      'page_stats',
+      'exit_page_stats',
+    ];
+    const tx = this.db.transaction(() => {
+      for (const t of tables) this.db.prepare(`DELETE FROM ${t}`).run();
+    });
+    tx();
+  }
+
   upsertChannelStats(rows: readonly ChannelStat[]): void {
     const stmt = this.db.prepare(
       `INSERT OR REPLACE INTO channel_stats

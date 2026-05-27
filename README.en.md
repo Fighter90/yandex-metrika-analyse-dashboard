@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.5.4.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.5.5.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to,
@@ -286,7 +286,7 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 | Version                                                                              | Date       | Description                                                                  |
 | ------------------------------------------------------------------------------------ | ---------- | ---------------------------------------------------------------------------- |
-| **v2.5.4** (Latest)                                                                  | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage        |
+| **v2.5.5** (Latest)                                                                  | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage        |
 | [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                  |
 | [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST          |
 | [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                           |

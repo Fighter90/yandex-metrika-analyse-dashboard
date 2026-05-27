@@ -200,3 +200,33 @@ describe('MetricsRepo — exit-page stats', () => {
     expect(ranged.map((p) => p.page)).toEqual(['/pricing']);
   });
 });
+
+describe('MetricsRepo — clearDerivedStats', () => {
+  it('wipes the 5 derived stat tables but keeps goals and raw_responses', () => {
+    repo.upsertChannelStats([stat('2025-01-01')]);
+    repo.upsertUtmStats([utm('2025-01-01')]);
+    repo.upsertGeoDeviceStats([geo('2025-01-01')]);
+    repo.upsertPageStats([page('2025-01-01', { page: '/lp' })]);
+    repo.upsertExitPageStats([page('2025-01-01', { page: '/checkout' })]);
+    repo.upsertGoals([goal(100)]);
+    const rawId = repo.saveRawResponse({
+      endpoint: '/stat/v1/data',
+      queryHash: 'clr',
+      dateFrom: '2025-01-01',
+      dateTo: '2025-01-01',
+      payload: { ok: true },
+      fetchedAt: 't1',
+    });
+
+    repo.clearDerivedStats();
+
+    expect(repo.listChannelStats()).toHaveLength(0);
+    expect(repo.listUtmStats()).toHaveLength(0);
+    expect(repo.listGeoDeviceStats()).toHaveLength(0);
+    expect(repo.listPageStats()).toHaveLength(0);
+    expect(repo.listExitPageStats()).toHaveLength(0);
+    // audit trail + goals are NOT cleared
+    expect(repo.listGoals()).toHaveLength(1);
+    expect(repo.getRawResponse(rawId)).toBeDefined();
+  });
+});
