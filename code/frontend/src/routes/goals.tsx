@@ -183,9 +183,10 @@ export function GoalsView({
       </p>
     );
 
-  // Total progress = B2B paid + estimated B2C conversions (assuming 30% of applications convert)
-  const estimatedB2cPaid = Math.round(b2cApplications * 0.3);
-  const current = b2bPaid + estimatedB2cPaid;
+  // Progress counts ONLY confirmed paid tickets (B2B paid) — заявка ≠ оплата, and the
+  // application→payment conversion is unknown, so we never fabricate "estimated paid" from
+  // applications. B2C applications are shown separately below as an upper-bound on potential.
+  const current = b2bPaid;
   const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0;
   const remaining = Math.max(0, target - current);
 
@@ -209,7 +210,8 @@ export function GoalsView({
               <div className="rounded bg-slate-50 px-3 py-2">
                 <p className="font-medium">B2C заявки (Метрика): {formatInt(b2cApplications)}</p>
                 <p className="text-xs text-slate-500">
-                  ≈ {formatInt(estimatedB2cPaid)} платных (оценка 30% конверсии заявка→оплата)
+                  Верхняя оценка потенциала. Это заявки, не оплаты (заявка ≠ оплата); прогресс к
+                  цели считается только по подтверждённым оплатам.
                 </p>
               </div>
               <div className="rounded bg-slate-50 px-3 py-2">
@@ -386,7 +388,7 @@ export function GoalsView({
           <li className="flex items-start gap-2">
             <span className="text-blue-500">ℹ️</span>
             <span>
-              <b>Конверсия заявка→оплата ~30%.</b> Настроить follow-up: авто-письмо в течение 1
+              <b>Повышайте конверсию заявка→оплата.</b> Настроить follow-up: авто-письмо в течение 1
               часа, звонок менеджера в течение 24 часов.
             </span>
           </li>
