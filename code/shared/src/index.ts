@@ -9,3 +9,4 @@ export * from './types/decisions';
 export * from './types/metrics';
 export * from './types/report';
 export * from './types/generated-hypotheses';
+export * from './types/generated-decisions';

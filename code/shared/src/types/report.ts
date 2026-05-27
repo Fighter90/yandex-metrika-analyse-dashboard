@@ -2,6 +2,7 @@ import type { ChannelStat } from './metrics';
 import type { Hypothesis } from './hypotheses';
 import type { Decision } from './decisions';
 import type { GeneratedHypotheses } from './generated-hypotheses';
+import type { GeneratedDecisions } from './generated-decisions';
 
 /** Aggregated top-N breakdown rows for the report appendix (summed across the period). */
 export interface UtmBreakdownRow {
@@ -97,4 +98,10 @@ export interface ReportSnapshot {
    * stored value. Absent until hypotheses are generated via POST /report/hypotheses.
    */
   readonly generatedHypotheses?: GeneratedHypotheses;
+  /**
+   * Optional AI-proposed Decision Log entries (Anthropic), produced once from the snapshot +
+   * generated hypotheses and stored here. Render path never calls an LLM — reads this stored value.
+   * Absent until generated via POST /report/hypotheses (which also produces decisions).
+   */
+  readonly generatedDecisions?: GeneratedDecisions;
 }

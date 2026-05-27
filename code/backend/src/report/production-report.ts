@@ -9,6 +9,7 @@ import { buildDocx } from './docx/builder';
 import { buildPdf } from './pdf/renderer';
 import { generateInsights, type AnthropicFetch } from './ai-insights';
 import { generateHypotheses } from './ai-hypotheses';
+import { generateDecisions } from './ai-decisions';
 import { config, hasAnthropicKey } from '../config';
 
 const REPORTS_DIR = 'data/reports';
@@ -41,13 +42,19 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
           apiKey: config.ANTHROPIC_API_KEY,
           model: config.ANTHROPIC_MODEL,
         })
-          .then((generatedHypotheses) => {
+          .then(async (generatedHypotheses) => {
+            // Also propose Decision Log entries from the snapshot + hypotheses (best-effort).
+            const generatedDecisions = await generateDecisions(snapshot, generatedHypotheses, {
+              fetch: globalThis.fetch as unknown as AnthropicFetch,
+              apiKey: config.ANTHROPIC_API_KEY,
+              model: config.ANTHROPIC_MODEL,
+            }).catch(() => undefined);
             snapshots.save({
               id,
               generatedAt,
               dateFrom: from,
               dateTo: to,
-              payload: { ...snapshot, generatedHypotheses },
+              payload: { ...snapshot, generatedHypotheses, generatedDecisions },
               docxPath: undefined,
               pdfPath: undefined,
             });
@@ -137,13 +144,20 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
         apiKey: config.ANTHROPIC_API_KEY,
         model: config.ANTHROPIC_MODEL,
       });
-      // Persist the hypotheses onto the snapshot so DOCX/PDF render them (deterministically) later.
+      // Propose Decision Log entries from the snapshot + hypotheses (best-effort — don't fail the
+      // hypotheses response if decisions generation rejects).
+      const generatedDecisions = await generateDecisions(snapshot, generatedHypotheses, {
+        fetch: globalThis.fetch as unknown as AnthropicFetch,
+        apiKey: config.ANTHROPIC_API_KEY,
+        model: config.ANTHROPIC_MODEL,
+      }).catch(() => undefined);
+      // Persist hypotheses + decisions onto the snapshot so DOCX/PDF render them deterministically.
       snapshots.save({
         id: record.id,
         generatedAt: record.generatedAt,
         dateFrom: record.dateFrom,
         dateTo: record.dateTo,
-        payload: { ...snapshot, generatedHypotheses },
+        payload: { ...snapshot, generatedHypotheses, generatedDecisions },
         docxPath: record.docxPath,
         pdfPath: record.pdfPath,
       });

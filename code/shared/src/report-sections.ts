@@ -27,6 +27,7 @@ import {
   utmLine,
   hypothesisStatement,
   aiHypothesisSections,
+  aiDecisionSections,
 } from './report-section-helpers';
 
 export interface ReportSection {
@@ -457,6 +458,9 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
   if (hasAiHypotheses) {
     sections.push(...aiHypothesisSections(s.generatedHypotheses));
   }
+
+  // AI-proposed decisions — only when they exist (helper returns [] otherwise)
+  sections.push(...aiDecisionSections(s.generatedDecisions));
 
   // Decision Log — always show
   sections.push({

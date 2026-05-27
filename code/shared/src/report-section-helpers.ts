@@ -22,6 +22,7 @@ import type {
   SolutionHypothesis,
   SolutionRiskKind,
 } from './types/generated-hypotheses';
+import type { GeneratedDecisions, GeneratedDecisionOutcome } from './types/generated-decisions';
 import { iceBucket, type IceBucket } from './validation';
 
 export const CATEGORY_LABEL: Record<AssumptionCategory, string> = {
@@ -226,5 +227,39 @@ export function aiHypothesisSections(gh: GeneratedHypotheses | undefined): AiRep
             ],
     },
     ...sortedSolutions.map((s, i) => aiSolutionSection(s, i + 1)),
+  ];
+}
+
+/** Russian traffic-light label for a proposed decision outcome. */
+export const DECISION_OUTCOME_LABEL: Record<GeneratedDecisionOutcome, string> = {
+  green: '🟢 продолжать',
+  yellow: '🟡 доработать',
+  red: '🔴 отказаться',
+};
+
+/**
+ * AI-proposed Decision Log section (generatedDecisions). Empty array when none were generated, so
+ * the report simply omits the block. Each decision spells out method, period, finding and outcome.
+ */
+export function aiDecisionSections(gd: GeneratedDecisions | undefined): AiReportSection[] {
+  if (!gd || gd.decisions.length === 0) return [];
+  return [
+    {
+      heading: 'Decision Log (предполагаемые решения, AI)',
+      lines: [
+        `AI предложил ${gd.decisions.length} решений на основе данных среза и гипотез.`,
+        'Это черновики для обсуждения командой, а не зафиксированные решения.',
+      ],
+    },
+    ...gd.decisions.map((d, i) => ({
+      heading: `${i + 1}. ${d.id} → гипотеза ${d.hypothesisId}`,
+      lines: [
+        `Исход: ${DECISION_OUTCOME_LABEL[d.outcome]} — ${d.outcomeRationale}`,
+        `Метод: ${d.method} · период: ${d.periodDays} дн. · объём: ${d.scope}`,
+        `Вывод (уверенность: ${d.confidence}): ${d.findings}`,
+        `Обоснование (данные): ${d.evidence}`,
+        `Источник: ${d.source}`,
+      ],
+    })),
   ];
 }

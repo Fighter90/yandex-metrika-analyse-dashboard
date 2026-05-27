@@ -8,7 +8,7 @@ import type {
   SolutionHypothesis,
 } from './index';
 import { reportSections } from './index';
-import { aiHypothesisSections } from './report-section-helpers';
+import { aiHypothesisSections, aiDecisionSections } from './report-section-helpers';
 
 const genProblem = (over: Partial<ProblemHypothesis> = {}): ProblemHypothesis => ({
   id: 'P01',
@@ -559,5 +559,40 @@ describe('aiHypothesisSections — direct unit tests', () => {
 
   it('returns [] when called with undefined', () => {
     expect(aiHypothesisSections(undefined)).toEqual([]);
+  });
+});
+
+describe('aiDecisionSections + generatedDecisions in reportSections', () => {
+  const genDecision = (id: string) => ({
+    id,
+    hypothesisId: 'S01',
+    method: 'количественный анализ',
+    periodDays: 14,
+    scope: 'мобильный сегмент',
+    findings: 'CR с мобильных ниже среднего',
+    confidence: 'medium' as const,
+    evidence: '287 заявок B2C',
+    source: 'snap-1',
+    outcome: 'yellow' as const,
+    outcomeRationale: 'нужна доработка формы',
+  });
+
+  it('returns [] for undefined or empty decisions', () => {
+    expect(aiDecisionSections(undefined)).toEqual([]);
+    expect(aiDecisionSections({ decisions: [] })).toEqual([]);
+  });
+
+  it('renders an intro + one section per decision with the outcome label', () => {
+    const out = aiDecisionSections({ decisions: [genDecision('DL01'), genDecision('DL02')] });
+    expect(out[0]?.heading).toMatch(/Decision Log/);
+    expect(out).toHaveLength(3); // intro + 2 decisions
+    expect(out[1]?.lines.join('\n')).toContain('🟡 доработать');
+    expect(out[1]?.heading).toContain('DL01');
+  });
+
+  it('reportSections includes the AI decisions block when present', () => {
+    const snap = { ...baseSnapshot, generatedDecisions: { decisions: [genDecision('DL01')] } };
+    const headings = reportSections(snap).map((s) => s.heading);
+    expect(headings.some((h) => /Decision Log \(предполагаемые/.test(h))).toBe(true);
   });
 });
