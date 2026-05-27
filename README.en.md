@@ -9,13 +9,19 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.5.7.** A 12-page dashboard (Overview, Traffic, Behavior, Funnel,
-> Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
-> a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
-> analytical insights on every page (green/yellow/red badges), custom date picker (from/to,
-> max 365 days), presets 7d/14d/30d/90d/1y, GOAL_ID select from Metrika, History → "View"
-> opens saved snapshots, Settings with current COUNTER_ID display, PDF auto-detect Chrome,
-> GOST-formatted DOCX/PDF, full CI/CD. Verified against live data of the ProductCamp counter
+> ✅ **Status: working product v2.6.0.** A 12-page dashboard (Overview, Traffic, Behavior, Funnel,
+> Goals, Hypotheses, Decisions, B2B, Report, History, Settings, Help), mobile hamburger menu,
+> AI analysis in 5 sections with a progress bar (HTML rendering), sync with detailed progress
+> (10 stages with descriptions), analytical insights on every page (green/yellow/red badges),
+> custom date picker (from/to, max 365 days), presets 7d/14d/30d/90d/1y, GOAL_ID select from
+> Metrika, History → "View" opens saved snapshots, Settings with current COUNTER_ID display,
+> PDF auto-detect Chrome, GOST-formatted DOCX/PDF, full CI/CD.
+> **New in v2.6.0:** chart captions (🟢 correct / 🔴 attention / 💡 recommendation) under every
+> chart; weekly digest card on Overview (visits + applications WoW delta, top channel, top weak
+> spot); UTM-Sankey on Traffic ("Flow: source → campaign → applications"); funnel-by-channel and
+> CR-by-channel charts on Funnel; fixed visit undercounting by channel (channel_stats now matches
+> Metrika totals after re-sync); safe re-sync (token validated before DB is wiped); mobile-polish
+> (2-column KPI strips on phones, horizontal scroll on wide tables). Verified against live data
 > (`<COUNTER_ID>` from `.env`).
 
 ## Quickstart
@@ -157,17 +163,20 @@ The end-to-end data flow as implemented:
 
 ## Dashboard Pages
 
-| Page         | URL         | Description                                                                                                                                                    |
-| ------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Overview** | `/`         | KPI target, applications, gap; visits/applications charts; channel mix; top countries; device share; UTM breakdown; entry/exit pages; weak spots; color badges |
-| **Traffic**  | `/traffic`  | Channel bar chart; visits vs applications; channel table with CR; UTM breakdown; insights                                                                      |
-| **Behavior** | `/behavior` | Entry page CR; entry/exit bounce rates; color-highlighted tables; recommendations                                                                              |
-| **Funnel**   | `/funnel`   | 4 stages (Visits → B2C Applications → B2B Pipeline → B2B Paid); loss analysis; channel CR; B2B by stage; problematic pages                                     |
-| **Goals**    | `/goals`    | Progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                  |
-| **Report**   | `/report`   | Snapshot generation; AI analysis (5 sections, HTML rendering); DOCX/PDF export; rebuild                                                                        |
-| **History**  | `/history`  | Snapshot list; "View" button → opens saved report                                                                                                              |
-| **Settings** | `/settings` | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID, ANTHROPIC_API_KEY; sync with progress bar (10 stages); current counter display                             |
-| **Help**     | `/help`     | Full documentation: all pages described, filters, FAQ (10 questions), glossary                                                                                 |
+| Page           | URL           | Description                                                                                                                                                                |
+| -------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overview**   | `/`           | KPI strip; weekly digest card (visits + applications WoW delta, top channel, top weak spot); daily charts; channel mix; UTM breakdown; weak spots; chart captions 🟢/🔴/💡 |
+| **Traffic**    | `/traffic`    | Channel bar chart; visits vs applications; channel table with CR; UTM-Sankey (source → campaign → applications); insights; chart captions                                  |
+| **Behavior**   | `/behavior`   | Entry page CR; entry/exit bounce rates; color-highlighted tables; recommendations; chart captions                                                                          |
+| **Funnel**     | `/funnel`     | 4 stages (Visits → B2C Applications → B2B Pipeline → B2B Paid); loss analysis; funnel by channel; CR by channel; B2B by stage; chart captions                              |
+| **Goals**      | `/goals`      | Progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                              |
+| **Hypotheses** | `/hypotheses` | Structured hypothesis list and creation form (format + ≥3 assumptions + ≥2 methods + ICE + traffic light + deadline)                                                       |
+| **Decisions**  | `/decisions`  | Decision Log: DL-{N} entries linked to hypotheses; CSV export                                                                                                              |
+| **B2B**        | `/b2b`        | Manual B2B pipeline CRUD: company, stage, tickets, expected payment, owner                                                                                                 |
+| **Report**     | `/report`     | Snapshot generation; AI analysis (5 sections, HTML rendering); DOCX/PDF export; rebuild                                                                                    |
+| **History**    | `/history`    | Snapshot list (horizontally scrollable); "View" button → opens saved report                                                                                                |
+| **Settings**   | `/settings`   | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID, ANTHROPIC_API_KEY; sync with progress bar (10 stages); current counter display                                         |
+| **Help**       | `/help`       | Full documentation: all pages described, filters, FAQ (10 questions), glossary                                                                                             |
 
 ## Filters (dashboard header)
 
@@ -284,15 +293,16 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 ## Releases
 
-| Version                                                                              | Date       | Description                                                                  |
-| ------------------------------------------------------------------------------------ | ---------- | ---------------------------------------------------------------------------- |
-| **v2.5.7** (Latest)                                                                  | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage        |
-| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                  |
-| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST          |
-| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                           |
-| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                      |
-| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide |
-| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page)           |
+| Version                                                                              | Date       | Description                                                                                                    |
+| ------------------------------------------------------------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| **v2.6.0** (Latest)                                                                  | 2026-05-27 | Chart captions, weekly digest, UTM-Sankey, visit undercount fix (matches Metrika), safe re-sync, mobile-polish |
+| [v2.5.7](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.5.7) | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage                                          |
+| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                                                    |
+| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST                                            |
+| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                                                             |
+| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                                                        |
+| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide                                   |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page)                                             |
 
 ## License · Authors · Credits
 
