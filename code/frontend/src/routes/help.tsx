@@ -347,63 +347,6 @@ export function Help(): JSX.Element {
         </div>
       </Section>
 
-      {/* Hypotheses page */}
-      <Section title="Гипотезы" icon="🧪">
-        <p className="text-sm text-slate-600">
-          AI-генерация продуктовых гипотез на основе данных дашборда. Гипотезы делятся на проблемные
-          (problem) и решенческие (solution).
-        </p>
-        <div className="mt-3 space-y-2 text-sm text-slate-600">
-          <p className="font-medium">Что показывает страница:</p>
-          <ul className="ml-4 list-inside list-disc space-y-1">
-            <li>Сгенерированные problem/solution гипотезы в структурированном формате.</li>
-            <li>
-              <b>ICE-приоритизация:</b> Impact × Confidence × Ease (произведение, 1–1000) с
-              обоснованием каждой оценки.
-            </li>
-            <li>Скрытые допущения (behavior / market / tech) и планы проверки (≥2 метода).</li>
-          </ul>
-          <p>
-            Гипотезы выводятся из данных, а не задаются вручную: анализ подсвечивает слабые места,
-            из которых формулируются проверяемые гипотезы.
-          </p>
-        </div>
-      </Section>
-
-      {/* Decisions page */}
-      <Section title="Решения" icon="✅">
-        <p className="text-sm text-slate-600">
-          Decision Log — журнал решений по результатам проверки гипотез. Замыкает цикл «гипотеза →
-          данные → решение».
-        </p>
-        <div className="mt-3 space-y-2 text-sm text-slate-600">
-          <p className="font-medium">Что показывает страница:</p>
-          <ul className="ml-4 list-inside list-disc space-y-1">
-            <li>Список решений (DL-NNN) с привязкой к гипотезе и доказательной базе.</li>
-            <li>Светофор исхода: 🟢 продолжаем / 🟡 pivot / 🔴 стоп.</li>
-            <li>При создании решения статус связанной гипотезы обновляется автоматически.</li>
-          </ul>
-        </div>
-      </Section>
-
-      {/* B2B page */}
-      <Section title="B2B" icon="🏢">
-        <p className="text-sm text-slate-600">
-          Ручной B2B-пайплайн: Метрика не покрывает корпоративные продажи, поэтому сделки вносятся
-          вручную.
-        </p>
-        <div className="mt-3 space-y-2 text-sm text-slate-600">
-          <p className="font-medium">Что показывает страница:</p>
-          <ul className="ml-4 list-inside list-disc space-y-1">
-            <li>CRUD-таблица сделок: компания, билеты, этап, дата.</li>
-            <li>Этапы пайплайна: lead → negotiation → invoiced → paid.</li>
-            <li>
-              Оплаченные билеты (paid) засчитываются в KPI 300 — отсюда «заявка ≠ оплата» в воронке.
-            </li>
-          </ul>
-        </div>
-      </Section>
-
       {/* Report page */}
       <Section title="Отчёт" icon="📋">
         <p className="text-sm text-slate-600">
@@ -431,11 +374,15 @@ export function Help(): JSX.Element {
             <li>Методология (Double Diamond + ICE)</li>
             <li>Каналы, UTM, гео, страницы</li>
             <li>Воронка конверсии</li>
-            <li>B2B-пайплайн</li>
-            <li>Риски и рекомендации</li>
+            <li>
+              <b>Гипотезы роста (AI)</b> — проблемные и решенческие гипотезы, сгенерированные AI из
+              данных снапшота (секции «Решенческие/Проблемные гипотезы (AI)»).
+            </li>
+            <li>
+              <b>Decision Log (AI)</b> — предполагаемые решения, сгенерированные AI из данных
+              снапшота (секция «Decision Log (предполагаемые решения)»).
+            </li>
             <li>AI-анализ (5 секций: Итог, Каналы, Страницы, Риски, Гипотезы)</li>
-            <li>Гипотезы (проблемные и решенческие)</li>
-            <li>Дорожная карта</li>
             <li>Приложение с данными</li>
           </ul>
           <p className="font-medium mt-2">AI-анализ:</p>
@@ -515,6 +462,12 @@ export function Help(): JSX.Element {
             текущий этап: подключение → цели → каналы → UTM → гео → страницы → сохранение →
             обновление отчётов.
           </p>
+          <p className="font-medium mt-2">B2B-пайплайн:</p>
+          <p>
+            Сворачиваемая секция «B2B-пайплайн» позволяет вносить корпоративные сделки вручную
+            (Метрика не покрывает B2B). Этапы: lead → negotiation → invoiced → paid. Оплаченные
+            билеты (paid) засчитываются в KPI 300 и учитываются в воронке и целях.
+          </p>
         </div>
       </Section>
 
@@ -571,8 +524,9 @@ export function Help(): JSX.Element {
             отчёте они разделены.
           </FAQ>
           <FAQ question="Как добавить B2B сделку?">
-            Через API <code>POST /api/b2b</code> или напрямую в базу данных SQLite (таблица{' '}
-            <code>b2b_manual</code>). Этапы: lead → negotiation → invoiced → paid.
+            Через сворачиваемую секцию «B2B-пайплайн» на странице «Настройки», или через API{' '}
+            <code>POST /api/b2b</code> (таблица <code>b2b_manual</code>). Этапы: lead → negotiation
+            → invoiced → paid.
           </FAQ>
           <FAQ question="Почему AI-анализ занимает 30-60 секунд?">
             AI-анализ делает 5 запросов к Anthropic Claude, каждый генерирует отдельную секцию

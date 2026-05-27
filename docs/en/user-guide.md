@@ -4,9 +4,9 @@
 
 How to use the dashboard and generate reports. For the "Conversions & lead-gen" track team.
 
-> ✅ **Status: working product (v2.6.0).** A 12-page dashboard: Overview, Traffic, Behavior, Funnel,
-> Goals, Hypotheses, Decisions, B2B, Report, History, Settings, Help. Global filters up to 1 year,
-> AI report analysis, GOST-formatted DOCX/PDF. Run with `./setup.sh`.
+> ✅ **Status: working product (v2.7.0).** A 9-page dashboard: Overview, Traffic, Behavior, Funnel,
+> Goals, Report, History, Settings, Help. Global filters up to 1 year, AI report analysis
+> (including AI-generated hypotheses and AI Decision Log), GOST-formatted DOCX/PDF. Run with `./setup.sh`.
 
 ## 1. What it is and why
 
@@ -24,28 +24,25 @@ browser at `http://localhost:5173`.
 
 ## 3. Dashboard pages
 
-The dashboard has **12 pages** (top nav; on screens < 1024px a hamburger menu).
+The dashboard has **9 pages** (top nav; on screens < 1024px a hamburger menu).
 
 Global filters (header, on every page except Settings and Help): period presets
 **7d / 14d / 30d / 90d / 1y**, custom date picker (from/to, max 365 days), segment toggle
 **B2C / B2C+B2B / B2B**, "Archived goals" checkbox.
 
-| Page           | URL           | What it shows                                                                                                                                                                                       |
-| -------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Overview**   | `/`           | KPI strip (target 300, applications, gap); **weekly digest card** (visits + applications WoW delta, top channel, top weak spot); daily charts; channel mix; weak spots; **chart captions** 🟢/🔴/💡 |
-| **Traffic**    | `/traffic`    | channel bar chart; visits vs applications; channel table with CR; **UTM-Sankey** ("Flow: source → campaign → applications"); insights; chart captions                                               |
-| **Behavior**   | `/behavior`   | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR); recommendations; chart captions                                                              |
-| **Funnel**     | `/funnel`     | «application ≠ payment» funnel: Visits → B2C applications → B2B pipeline → B2B paid; **funnel by channel**; **CR by channel**; loss analysis; B2B by stage; chart captions                          |
-| **Goals**      | `/goals`      | progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                                                       |
-| **Hypotheses** | `/hypotheses` | hypothesis list and creation form (structured format: ≥3 assumptions + ≥2 methods + ICE + traffic light + deadline)                                                                                 |
-| **Decisions**  | `/decisions`  | Decision Log: DL-{N} entries linked to hypotheses; CSV export                                                                                                                                       |
-| **B2B**        | `/b2b`        | manual B2B pipeline CRUD: company, stage, tickets, expected payment, owner                                                                                                                          |
-| **Report**     | `/report`     | build a snapshot; AI analysis (5 sections, HTML); full report on screen; export DOCX/PDF; rebuild                                                                                                   |
-| **History**    | `/history`    | list of saved snapshots (horizontally scrollable); "View" opens a snapshot without regenerating                                                                                                     |
-| **Settings**   | `/settings`   | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID (select from Metrika), ANTHROPIC_API_KEY; "🔄 Sync now" with a progress bar                                                                      |
-| **Help**       | `/help`       | built-in documentation: all pages, filters, FAQ, glossary                                                                                                                                           |
+| Page         | URL         | What it shows                                                                                                                                                                                                                         |
+| ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overview** | `/`         | KPI strip (target 300; **«Оплат»** label for purchase/payment goals); **weekly digest card** (visits + applications WoW delta, top channel, top weak spot); daily charts; channel mix; weak spots; **chart captions** 🟢/🔴/💡        |
+| **Traffic**  | `/traffic`  | channel bar chart; visits vs applications; channel table with CR; **UTM-Sankey** ("Flow: source → campaign → applications"); insights; chart captions                                                                                 |
+| **Behavior** | `/behavior` | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR); recommendations; chart captions                                                                                                |
+| **Funnel**   | `/funnel`   | «application ≠ payment» funnel: Visits → B2C applications → B2B pipeline → B2B paid; **funnel by channel**; **CR by channel**; loss analysis; B2B by stage; chart captions                                                            |
+| **Goals**    | `/goals`    | progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                                                                                         |
+| **Report**   | `/report`   | build a snapshot; **AI-generated hypotheses** (problem + solution, «Growth Hypotheses (AI)» sections) and **AI Decision Log** embedded in the report; AI analysis (5 sections, HTML); full report on screen; export DOCX/PDF; rebuild |
+| **History**  | `/history`  | list of saved snapshots (horizontally scrollable); "View" opens a snapshot without regenerating                                                                                                                                       |
+| **Settings** | `/settings` | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID (select from Metrika), ANTHROPIC_API_KEY; "🔄 Sync now" with a progress bar; collapsible **«B2B Pipeline»** section for manual B2B deal entry                                      |
+| **Help**     | `/help`     | built-in documentation: all pages, filters, FAQ, glossary                                                                                                                                                                             |
 
-> Settings and Help have no filter bar.
+> `/hypotheses` and `/decisions` redirect to `/report`; `/b2b` redirects to `/settings`. Settings and Help have no filter bar.
 
 ### Chart captions (v2.6.0)
 
@@ -74,28 +71,28 @@ is no data — this is a known API limitation, not a bug (see the 🔴 caption u
 Every number on the dashboard and in the report traces back to the raw Metrika response in
 `raw_responses` (SQLite). No invented numbers — this is the anti-hallucination invariant.
 
-## 4. Working with hypotheses
+## 4. Hypotheses and Decision Log (AI inside the report)
 
-A hypothesis is saved only in the full structured format. The UI blocks saving until there are:
+As of v2.7.0 there are no standalone Hypotheses or Decisions pages in the nav. Instead:
 
-1. **Format:** Subject (audience) · Action · Solution · Condition ("…, if …").
-2. **≥3 hidden assumptions** covering **behavior / market / tech**.
-3. **≥2 validation methods** (synthetic CustDev / live / quantitative / market).
-4. **ICE** — three sliders Impact / Confidence / Ease (1–10), each with a one-line rationale.
-   Result `I × C × E` (1–1000) with a colored priority badge.
-5. **Traffic light** 🟢/🟡/🔴 — each with a concrete threshold and metric.
-6. **Deadline** for verification (in days).
+- **AI-generated hypotheses** (problem and solution) are generated when building a snapshot and
+  stored in `snapshot.generatedHypotheses`. They appear in the report under the sections
+  «Solution Hypotheses (AI)» / «Problem Hypotheses (AI)» in the structured methodology format
+  (ICE, assumptions, validation methods, traffic light).
+- **AI Decision Log** (suggested decisions) is generated similarly and stored in
+  `snapshot.generatedDecisions`. It appears in the report under «Decision Log (suggested decisions)».
 
-The "Generate hypothesis with skill" button explains how to structure a raw idea in Claude via
-`.claude/skills/hypothesis-check/SKILL.md` and paste the fields. It is a helper, not automation.
+Both blocks are visible in the **on-screen report** and exported to DOCX/PDF.
+Direct URLs `/hypotheses` and `/decisions` redirect to `/report`.
 
-## 5. Decision Log
+## 5. B2B pipeline (in Settings)
 
-Each verified hypothesis → a DL-{N} entry: what was tested, findings (3–5 points), quotes/data
-(required), traffic-light outcome, next step. On save, the linked hypothesis status auto-updates
-to the outcome (green/yellow/red). Entries can be exported to `data/decisions/DL-{N}.md`.
+Manual B2B deal entry has moved to a collapsible **«B2B Pipeline»** section on the **Settings**
+page (`/settings`). Stages: lead → negotiation → invoiced → paid. Paid tickets still count toward
+the 300 KPI and are included on the Funnel and Goals pages.
+The direct URL `/b2b` redirects to `/settings`.
 
-## 6. Generating reports
+## 6. Generating reports (including AI hypotheses and AI Decision Log)
 
 On the **Report** page:
 
@@ -110,12 +107,9 @@ On the **Report** page:
 The report is **detailed** and GOST-formatted (Times New Roman 14pt, title page, table of contents,
 numbered sections, page numbers; markdown is supported — tables, bold/italic, lists). Sections:
 Cover, Executive Summary (application ≠ payment), Methodology, Visit→application→payment funnel,
-Channel analysis, ICE prioritization, Define (a full card per problem hypothesis), Develop (a full
-card per solution hypothesis), Deliver/Decision Log (findings, evidence, outcome, next step), AI
-analysis (if generated), top breakdowns (UTM, geo+device, entry/exit pages), Roadmap, Glossary, Data
-Appendix. Every hypothesis is spelled out in full: structured hypothesis statement, hidden
-assumptions by category, validation methods, the ICE breakdown with a rationale per factor,
-traffic-light criteria, deadline and status.
+Channel analysis, **Solution/Problem Hypotheses (AI)** (from `snapshot.generatedHypotheses`),
+**Decision Log (suggested decisions)** (from `snapshot.generatedDecisions`), AI analysis (if
+generated), top breakdowns (UTM, geo+device, entry/exit pages), Data Appendix.
 
 Reports are built from the immutable **snapshot**: the same `snapshotId` yields the same content in
 DOCX, PDF and on screen (no `Date.now()`/LLM in the render path — the AI narrative is generated once
@@ -125,7 +119,6 @@ Chrome via `PUPPETEER_EXECUTABLE_PATH`; DOCX needs nothing extra.
 ## 7. Principles to remember
 
 - Every number traces back to `raw_responses` — if it doesn't, that's a bug.
-- B2B is part of the 300 KPI and is managed manually (the `b2b_manual` table, CRUD via
-  `POST /api/b2b`; a dedicated B2B UI page is planned and not in the current nav).
+- B2B is part of the 300 KPI and is managed manually via the «B2B Pipeline» section in Settings (the `b2b_manual` table, CRUD via `POST /api/b2b`).
 - Methodology under `.claude/skills/` must not change without a note in
   `docs/methodology-hypotheses.md`.

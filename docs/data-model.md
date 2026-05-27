@@ -5,20 +5,20 @@
 
 ## Таблицы
 
-| Таблица            | Назначение                                      | Ключ / история                                                                                                                                |
-| ------------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `goals`            | цели Метрики (seed)                             | PK `id`; `is_archived` если `id < ARCHIVED_GOAL_ID_THRESHOLD`                                                                                 |
-| `raw_responses`    | сырые ответы API (прослеживаемость)             | UNIQUE `(query_hash, date_from, date_to)` — идемпотентный кэш                                                                                 |
-| `channel_stats`    | нормализованные метрики по каналам              | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням**                                                                      |
-| `utm_stats`        | разбивка по UTM source/medium/campaign          | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням**; пропуски → `(none)`, отдельно от `channel_stats` чтобы не дублировать визиты |
-| `geo_device_stats` | разбивка по стране + типу устройства            | PK `(date, country, device)` — **по дням**; пропуски → `(none)`, отдельная таблица чтобы не дублировать визиты                                |
-| `page_stats`       | поведение страниц входа (startURL)              | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
-| `exit_page_stats`  | поведение страниц выхода (exitURL)              | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
-| `hypotheses`       | гипотезы в формате методологии проверки гипотез | `ice_score` GENERATED `impact*confidence*ease`                                                                                                |
-| `b2b_manual`       | ручной B2B-пайплайн                             | этапы lead/negotiation/invoiced/paid                                                                                                          |
-| `report_snapshots` | immutable снапшоты отчётов                      | PK `id` (ulid)                                                                                                                                |
-| `decisions`        | Decision Log                                    | FK → `hypotheses`; `number` UNIQUE (DL-NNN)                                                                                                   |
-| `_migrations`      | трекинг применённых миграций                    | PK `name`                                                                                                                                     |
+| Таблица            | Назначение                                                                                     | Ключ / история                                                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `goals`            | цели Метрики (seed)                                                                            | PK `id`; `is_archived` если `id < ARCHIVED_GOAL_ID_THRESHOLD`                                                                                 |
+| `raw_responses`    | сырые ответы API (прослеживаемость)                                                            | UNIQUE `(query_hash, date_from, date_to)` — идемпотентный кэш                                                                                 |
+| `channel_stats`    | нормализованные метрики по каналам                                                             | PK `(date, channel, utm_source, utm_medium, utm_campaign)` — **по дням**                                                                      |
+| `utm_stats`        | разбивка по UTM source/medium/campaign                                                         | PK `(date, utm_source, utm_medium, utm_campaign)` — **по дням**; пропуски → `(none)`, отдельно от `channel_stats` чтобы не дублировать визиты |
+| `geo_device_stats` | разбивка по стране + типу устройства                                                           | PK `(date, country, device)` — **по дням**; пропуски → `(none)`, отдельная таблица чтобы не дублировать визиты                                |
+| `page_stats`       | поведение страниц входа (startURL)                                                             | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
+| `exit_page_stats`  | поведение страниц выхода (exitURL)                                                             | PK `(date, page)` — **по дням**; визиты + bounce rate; отдельная таблица чтобы не дублировать визиты                                          |
+| `hypotheses`       | гипотезы методологии; с v2.7.0 AI-гипотезы хранятся в `report_snapshots.generatedHypotheses`   | `ice_score` GENERATED `impact*confidence*ease`                                                                                                |
+| `b2b_manual`       | ручной B2B-пайплайн; с v2.7.0 ввод через секцию «B2B-пайплайн» в Настройках                    | этапы lead/negotiation/invoiced/paid                                                                                                          |
+| `report_snapshots` | immutable снапшоты; поля `generatedHypotheses` и `generatedDecisions` хранят AI-контент отчёта | PK `id` (ulid)                                                                                                                                |
+| `decisions`        | Decision Log; с v2.7.0 AI Decision Log хранится в `report_snapshots.generatedDecisions`        | FK → `hypotheses`; `number` UNIQUE (DL-NNN)                                                                                                   |
+| `_migrations`      | трекинг применённых миграций                                                                   | PK `name`                                                                                                                                     |
 
 ## Связи и инварианты
 
