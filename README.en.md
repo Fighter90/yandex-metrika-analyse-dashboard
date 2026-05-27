@@ -15,7 +15,8 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to,
 > max 365 days), presets 7d/14d/30d/90d/1y, GOAL_ID select from Metrika, History → "View"
 > opens saved snapshots, Settings with current COUNTER_ID display, PDF auto-detect Chrome,
-> 397 tests passing, full CI/CD. Verified against live data of the ProductCamp counter (54280963).
+> GOST-formatted DOCX/PDF, full CI/CD. Verified against live data of the ProductCamp counter
+> (`<COUNTER_ID>` from `.env`).
 
 ## Quickstart
 
@@ -151,8 +152,8 @@ The end-to-end data flow as implemented:
 6. **Report.** `SnapshotBuilder` assembles an **immutable** `ReportSnapshot` from the DB
    (deterministic: `id` and `generatedAt` are inputs, no `Date.now()`/LLM in the render path).
    `reportSections` feeds both DOCX (`docx/builder.ts`) and PDF (`pdf/html.ts` →
-   `pdf/renderer.ts` via puppeteer-core). The **AI analysis** is generated in 5 chunks (45s each,
-   with timeout), rendered as HTML (tables, headers, formatting).
+   `pdf/renderer.ts` via puppeteer-core). The **AI analysis** is generated in 5 chunks (with a
+   per-section timeout), rendered as HTML (tables, headers, formatting).
 
 ## Dashboard Pages
 
@@ -170,8 +171,8 @@ The end-to-end data flow as implemented:
 
 ## Filters (dashboard header)
 
-- **7d / 14d / 30d** — quick period presets
-- **📅 Dates** — custom period (start date → end date → Apply)
+- **7d / 14d / 30d / 90d / 1y** — quick period presets
+- **📅 Dates** — custom period (start date → end date → Apply, max 365 days)
 - **Segment**: B2C / B2C+B2B / B2B (filters channels and UTM)
 - **Archived goals** — show/hide archived Metrika goals
 
@@ -271,7 +272,7 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 - [x] Settings: sync progress bar (10 stages), current COUNTER_ID display.
 - [x] Help page: full documentation (12 sections, 10 FAQ, glossary).
 - [x] 397 tests passing (shared: 54, backend: 222, frontend: 121).
-- [x] Verified against live Metrika data (counter 54280963); security audit + `.gitignore`.
+- [x] Verified against live Metrika data (counter `<COUNTER_ID>` from `.env`); security audit + `.gitignore`.
 
 ### Known limitations
 
@@ -285,7 +286,9 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 | Version                                                                              | Date       | Description                                                                  |
 | ------------------------------------------------------------------------------------ | ---------- | ---------------------------------------------------------------------------- |
-| **v2.3.0** (Latest)                                                                  | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST          |
+| **v2.5.4** (Latest)                                                                  | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage        |
+| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                  |
+| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST          |
 | [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                           |
 | [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                      |
 | [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide |
