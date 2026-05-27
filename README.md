@@ -9,7 +9,7 @@
 
 > **KPI кампании:** 300+ **платных** билетов. Везде в инструменте: **заявка ≠ оплата**.
 
-> ✅ **Статус: рабочий продукт v2.7.1.** Дашборд из 9 страниц (Обзор, Трафик, Поведение,
+> ✅ **Статус: рабочий продукт v2.8.0.** Дашборд из 9 страниц (Обзор, Трафик, Поведение,
 > Воронка, Цели, Отчёт, История, Настройки, Справка), мобильное меню (гамбургер), AI-анализ
 > в 5 секций с прогресс-баром (HTML-рендеринг), синхронизация с детальным прогрессом (10 стадий
 > с описанием), детальные аналитические выводы на каждой странице (зелёный/жёлтый/красный),
@@ -304,19 +304,20 @@ KPI-математику) проходят через **спеку** до код
 
 ## Релизы
 
-| Версия                                                                                 | Дата       | Описание                                                                                                                                                            |
-| -------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2.7.1** (Latest)                                                                    | 2026-05-27 | Sync по периоду фильтра, оси бар-чарта, formatGoalLabel в отчёте/Целях, inv-тест визитов, mobile e2e, блок 🟢/🔴 в отчёте; полная сверка с Метрикой (0 расхождений) |
-| [v2.7.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.0)   | 2026-05-27 | Навигация → 9 страниц; AI-гипотезы и AI Decision Log в отчёте; B2B-пайплайн в Настройках; formatGoalLabel («Оплат»); единая палитра цветов каналов                  |
-| [v2.6.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.6.0)   | 2026-05-27 | Подписи под графиками, дайджест за неделю, новые графики (Sankey/heatmap), фикс недоучёта визитов по каналам (сверка с Метрикой), безопасный re-sync, mobile-polish |
-| [v2.5.7](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.5.7)   | 2026-05-27 | Hotfix билда/гейта (TS в DOCX/фронте) + синхронизация версий, 100% coverage                                                                                         |
-| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1)   | 2026-05-27 | Документация и архитектура, выравнивание под 9-страничный дашборд                                                                                                   |
-| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0)   | 2026-05-27 | AI-анализ без обрезаний, md-to-html с таблицами/списками, DOCX/PDF GOST                                                                                             |
-| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1)   | 2026-05-27 | Goals Page NaN Fix                                                                                                                                                  |
-| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0)   | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                                                                                                             |
-| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0)   | 2026-05-27 | Фильтры до 1 года, GOAL_ID select, PDF авто-поиск, руководство пользователя                                                                                         |
-| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0)   | 2026-05-26 | Полная переработка дашборда (9 страниц, AI HTML, мобильное меню, Help page)                                                                                         |
-| [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) | 2026-05-26 | AI-анализ HTML, Help page, переработка воронки, прогресс-бар синхронизации                                                                                          |
+| Версия                                                                                 | Дата       | Описание                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **v2.8.0** (Latest)                                                                    | 2026-05-28 | Графики-изображения в DOCX/PDF (бар/воронка/микс) + блок 🟢/🔴 у каждого графика (spec 014); мобильный bottom-sheet фильтров; B2B kanban+drawer; sync-versions + pre-commit |
+| [v2.7.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.1)   | 2026-05-27 | Sync по периоду фильтра, оси бар-чарта, formatGoalLabel в отчёте/Целях, inv-тест визитов, mobile e2e, блок 🟢/🔴 в отчёте; полная сверка с Метрикой (0 расхождений)         |
+| [v2.7.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.0)   | 2026-05-27 | Навигация → 9 страниц; AI-гипотезы и AI Decision Log в отчёте; B2B-пайплайн в Настройках; formatGoalLabel («Оплат»); единая палитра цветов каналов                          |
+| [v2.6.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.6.0)   | 2026-05-27 | Подписи под графиками, дайджест за неделю, новые графики (Sankey/heatmap), фикс недоучёта визитов по каналам (сверка с Метрикой), безопасный re-sync, mobile-polish         |
+| [v2.5.7](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.5.7)   | 2026-05-27 | Hotfix билда/гейта (TS в DOCX/фронте) + синхронизация версий, 100% coverage                                                                                                 |
+| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1)   | 2026-05-27 | Документация и архитектура, выравнивание под 9-страничный дашборд                                                                                                           |
+| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0)   | 2026-05-27 | AI-анализ без обрезаний, md-to-html с таблицами/списками, DOCX/PDF GOST                                                                                                     |
+| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1)   | 2026-05-27 | Goals Page NaN Fix                                                                                                                                                          |
+| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0)   | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                                                                                                                     |
+| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0)   | 2026-05-27 | Фильтры до 1 года, GOAL_ID select, PDF авто-поиск, руководство пользователя                                                                                                 |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0)   | 2026-05-26 | Полная переработка дашборда (9 страниц, AI HTML, мобильное меню, Help page)                                                                                                 |
+| [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) | 2026-05-26 | AI-анализ HTML, Help page, переработка воронки, прогресс-бар синхронизации                                                                                                  |
 
 ## License · Authors · Credits
 
