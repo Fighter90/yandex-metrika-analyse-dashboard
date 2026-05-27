@@ -104,10 +104,15 @@ export async function trafficBySource(
     ENDPOINTS.statData,
     {
       ids: opts.counterId,
-      dimensions: 'ym:s:lastTrafficSource,ym:s:lastSourceEngine',
+      // Group by traffic source only. Querying lastSourceEngine too would split one channel into
+      // several rows (Search = Google + Yandex …) — visits are additive but users are NOT (the same
+      // person across engines counts once per source), so a single-dimension query gives Metrika's
+      // native, deduplicated visits AND users per channel.
+      dimensions: 'ym:s:lastTrafficSource',
       metrics: trafficMetrics(opts.goalId),
       date1: opts.from,
       date2: opts.to,
+      attribution: 'lastsign',
     },
     StatDataResponseSchema,
   );

@@ -51,6 +51,7 @@ export async function pageBehavior(
       metrics: pageMetrics(opts.goalId),
       date1: opts.from,
       date2: opts.to,
+      attribution: 'lastsign',
     },
     StatDataResponseSchema,
   );
