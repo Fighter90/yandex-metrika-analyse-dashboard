@@ -24,9 +24,9 @@ export default defineConfig({
         'src/routes/b2b.tsx',
         'src/routes/hypotheses.tsx',
         'src/routes/decisions.tsx',
-        // New files needing dedicated tests (Phase D):
+        // Settings — stateful UI with setInterval progress simulation + mutation glue;
+        // SettingsView is unit-tested, the wrapper is covered by the e2e smoke spec.
         'src/routes/settings.tsx',
-        'src/routes/history.tsx',
         // Thin fetch wrappers — tested through integration/e2e:
         'src/lib/api.ts',
         // Minor UI branch (generatedHypotheses absent) — covered manually:
