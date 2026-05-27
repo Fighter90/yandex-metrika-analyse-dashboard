@@ -4,9 +4,9 @@
 
 How to use the dashboard and generate reports. For the "Conversions & lead-gen" track team.
 
-> ✅ **Status: working product (v2.5.7).** A 12-page dashboard: Overview, Traffic, Behavior, Funnel,
-> Goals, Report, History, Settings, Help. Global filters up to 1 year, AI report analysis,
-> GOST-formatted DOCX/PDF. Run with `./setup.sh`.
+> ✅ **Status: working product (v2.6.0).** A 12-page dashboard: Overview, Traffic, Behavior, Funnel,
+> Goals, Hypotheses, Decisions, B2B, Report, History, Settings, Help. Global filters up to 1 year,
+> AI report analysis, GOST-formatted DOCX/PDF. Run with `./setup.sh`.
 
 ## 1. What it is and why
 
@@ -30,19 +30,44 @@ Global filters (header, on every page except Settings and Help): period presets
 **7d / 14d / 30d / 90d / 1y**, custom date picker (from/to, max 365 days), segment toggle
 **B2C / B2C+B2B / B2B**, "Archived goals" checkbox.
 
-| Page         | URL         | What it shows                                                                                                                                                     |
-| ------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Overview** | `/`         | KPI strip (target 300, applications, gap), daily visits/applications charts, channel mix, top countries, device share, weak spots, colored insight badges (🟢/🔴) |
-| **Traffic**  | `/traffic`  | channel bar chart, visits vs applications, channel table with CR, UTM breakdown, low-UTM-coverage badge, insights                                                 |
-| **Behavior** | `/behavior` | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR), recommendations                                            |
-| **Funnel**   | `/funnel`   | «application ≠ payment» funnel: Visits → B2C applications → B2B pipeline → B2B paid, loss analysis, channel CR, B2B by stage                                      |
-| **Goals**    | `/goals`    | progress ring to 300 tickets, metrics, B2B deals, data-driven recommendations                                                                                     |
-| **Report**   | `/report`   | build a snapshot, AI analysis (5 sections, HTML), full report on screen, export DOCX/PDF, rebuild                                                                 |
-| **History**  | `/history`  | list of saved snapshots by date; "View" opens a snapshot without regenerating                                                                                     |
-| **Settings** | `/settings` | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID (select from Metrika), ANTHROPIC_API_KEY; "🔄 Sync now" with a progress bar                                    |
-| **Help**     | `/help`     | built-in documentation: all pages, filters, FAQ, glossary                                                                                                         |
+| Page           | URL           | What it shows                                                                                                                                                                                       |
+| -------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Overview**   | `/`           | KPI strip (target 300, applications, gap); **weekly digest card** (visits + applications WoW delta, top channel, top weak spot); daily charts; channel mix; weak spots; **chart captions** 🟢/🔴/💡 |
+| **Traffic**    | `/traffic`    | channel bar chart; visits vs applications; channel table with CR; **UTM-Sankey** ("Flow: source → campaign → applications"); insights; chart captions                                               |
+| **Behavior**   | `/behavior`   | entry (startURL) and exit (exitURL) pages: charts + tables (visits / bounce rate / applications / CR); recommendations; chart captions                                                              |
+| **Funnel**     | `/funnel`     | «application ≠ payment» funnel: Visits → B2C applications → B2B pipeline → B2B paid; **funnel by channel**; **CR by channel**; loss analysis; B2B by stage; chart captions                          |
+| **Goals**      | `/goals`      | progress ring to 300 tickets; metrics; B2B deals; data-driven recommendations                                                                                                                       |
+| **Hypotheses** | `/hypotheses` | hypothesis list and creation form (structured format: ≥3 assumptions + ≥2 methods + ICE + traffic light + deadline)                                                                                 |
+| **Decisions**  | `/decisions`  | Decision Log: DL-{N} entries linked to hypotheses; CSV export                                                                                                                                       |
+| **B2B**        | `/b2b`        | manual B2B pipeline CRUD: company, stage, tickets, expected payment, owner                                                                                                                          |
+| **Report**     | `/report`     | build a snapshot; AI analysis (5 sections, HTML); full report on screen; export DOCX/PDF; rebuild                                                                                                   |
+| **History**    | `/history`    | list of saved snapshots (horizontally scrollable); "View" opens a snapshot without regenerating                                                                                                     |
+| **Settings**   | `/settings`   | OAuth token, Client ID/Secret, COUNTER_ID, GOAL_ID (select from Metrika), ANTHROPIC_API_KEY; "🔄 Sync now" with a progress bar                                                                      |
+| **Help**       | `/help`       | built-in documentation: all pages, filters, FAQ, glossary                                                                                                                                           |
 
 > Settings and Help have no filter bar.
+
+### Chart captions (v2.6.0)
+
+Every chart and table in the dashboard now has a three-line caption block:
+
+- **🟢 Correct** — the SQLite data source and what it represents.
+- **🔴 Attention** — a known limitation (e.g. exitURL is not returned by Metrika).
+- **💡 Recommendation** — what to check or how to act on the data.
+
+This extends the anti-hallucination principle: users see not just a number but its origin.
+
+### Weekly digest (Overview page)
+
+A card at the top of the Overview page shows the last 7 days:
+visits and applications with a WoW delta (vs the previous 7 days), the top channel by visits,
+and the top weak spot. Data comes from `channel_stats`.
+
+### Limitation: exit pages
+
+Yandex Metrika does not return `ym:s:exitURL` for the ProductCamp counter, so the
+`exit_page_stats` table remains empty. The "Exit pages" block hides automatically when there
+is no data — this is a known API limitation, not a bug (see the 🔴 caption under the block).
 
 ### Where does this number come from?
 
