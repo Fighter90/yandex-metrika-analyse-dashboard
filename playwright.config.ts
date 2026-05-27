@@ -15,7 +15,20 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: 'on-first-retry',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    // Desktop runs every spec except the mobile-only one.
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /mobile\.spec\.ts/,
+    },
+    // Mobile (iPhone 14, 390×844) runs only the dedicated mobile spec.
+    {
+      name: 'mobile-iphone-14',
+      use: { ...devices['iPhone 14'] },
+      testMatch: /mobile\.spec\.ts/,
+    },
+  ],
   webServer: {
     command: 'pnpm --filter @pca/frontend dev',
     url: BASE_URL,

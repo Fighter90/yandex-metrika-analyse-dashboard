@@ -8,7 +8,8 @@ test.describe('Read-only dashboard pages render their data', () => {
     await installMocks(page);
     await page.goto('/');
     await expect(page.getByText('Цель (платных билетов)')).toBeVisible();
-    await expect(page.getByText(/Заявок/)).toBeVisible();
+    // Mocked primary goal is a purchase goal → KPI is labelled «Оплат» (formatGoalLabel, v2.7.0).
+    await expect(page.getByText(/Оплат/)).toBeVisible();
     await expect(page.getByRole('heading', { name: /Слабые места/ })).toBeVisible();
     // Charts: «визиты и заявки по дням», channel mix, geo bar, device donut
     await expect(page.locator('canvas')).toHaveCount(4);
