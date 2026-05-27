@@ -62,12 +62,9 @@ describe('channelMixOption', () => {
       stat({ channel: 'podcast', visits: 5 }),
       stat({ channel: 'direct', visits: 2 }),
     ]) as { series: { data: { name: string; value: number }[] }[] };
-    expect(o.series[0]?.data).toEqual(
-      expect.arrayContaining([
-        { name: 'podcast', value: 15 },
-        { name: 'direct', value: 2 },
-      ]),
-    );
+    const byName = new Map(o.series[0]?.data.map((d) => [d.name, d.value]));
+    expect(byName.get('podcast')).toBe(15);
+    expect(byName.get('direct')).toBe(2);
   });
 
   it('includes a legend with channel names', () => {

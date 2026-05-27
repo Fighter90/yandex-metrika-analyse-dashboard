@@ -106,10 +106,11 @@ describe('channelBarOption', () => {
   it('maps channels to a bar series', () => {
     const o = channelBarOption(channelRows([stat({ channel: 'podcast', visits: 10 })])) as {
       xAxis: { data: string[] };
-      series: { data: number[] }[];
+      series: { data: { value: number; itemStyle: { color: string } }[] }[];
     };
     expect(o.xAxis.data).toEqual(['podcast']);
-    expect(o.series[0]?.data).toEqual([10]);
+    expect(o.series[0]?.data[0]?.value).toBe(10);
+    expect(o.series[0]?.data[0]?.itemStyle.color).toMatch(/^#[0-9A-F]{6}$/i);
   });
 });
 

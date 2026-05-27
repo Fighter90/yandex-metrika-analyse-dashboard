@@ -1,6 +1,7 @@
 import type { ChannelStat, B2bDeal } from '@pca/shared';
 import { KPI_TARGET_PAID_TICKETS, periodTotals } from '@pca/shared';
 import { intTooltip } from './echart-format';
+import { channelColor } from './chart-colors';
 
 export interface OverviewKpi {
   readonly target: number;
@@ -70,7 +71,11 @@ export function channelMixOption(stats: ChannelStat[]): object {
       {
         type: 'pie',
         radius: ['40%', '70%'],
-        data: [...byChannel].map(([name, value]) => ({ name, value })),
+        data: [...byChannel].map(([name, value]) => ({
+          name,
+          value,
+          itemStyle: { color: channelColor(name) },
+        })),
       },
     ],
   };
