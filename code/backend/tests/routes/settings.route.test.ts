@@ -5,6 +5,19 @@ import { settingsRoutes, mask, readEnvFile, updateEnvFile, ENV_PATH } from '../.
 
 const ENV_BACKUP = ENV_PATH + '.backup';
 
+function backupEnv(): void {
+  if (fs.existsSync(ENV_PATH)) {
+    fs.copyFileSync(ENV_PATH, ENV_BACKUP);
+  }
+}
+
+function restoreEnv(): void {
+  if (fs.existsSync(ENV_BACKUP)) {
+    fs.copyFileSync(ENV_BACKUP, ENV_PATH);
+    fs.unlinkSync(ENV_BACKUP);
+  }
+}
+
 function appWith(): FastifyInstance {
   const app = Fastify();
   app.register(settingsRoutes);
@@ -12,7 +25,10 @@ function appWith(): FastifyInstance {
 }
 
 describe('settings routes', () => {
+  afterEach(() => restoreEnv());
+
   it('GET /settings returns masked config', async () => {
+    backupEnv();
     const app = appWith();
     const res = await app.inject({ method: 'GET', url: '/settings' });
     expect(res.statusCode).toBe(200);
@@ -24,6 +40,7 @@ describe('settings routes', () => {
   });
 
   it('POST /settings saves and returns ok', async () => {
+    backupEnv();
     const app = appWith();
     const res = await app.inject({
       method: 'POST',
@@ -36,6 +53,7 @@ describe('settings routes', () => {
   });
 
   it('POST /settings/refresh returns ok', async () => {
+    backupEnv();
     const app = appWith();
     const res = await app.inject({
       method: 'POST',
@@ -47,6 +65,7 @@ describe('settings routes', () => {
   });
 
   it('POST /settings writes new keys that did not exist before', async () => {
+    backupEnv();
     const app = appWith();
     const res = await app.inject({
       method: 'POST',
@@ -59,6 +78,7 @@ describe('settings routes', () => {
   });
 
   it('POST /settings updates existing keys (overwrite branch)', async () => {
+    backupEnv();
     const app = appWith();
     // First write
     await app.inject({
