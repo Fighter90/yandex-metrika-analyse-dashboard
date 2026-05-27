@@ -274,6 +274,8 @@ export async function installMocks(page: Page, opts: MockOptions = {}): Promise<
         channels: CHANNELS,
         hypotheses: { problems: [], solutions: [] },
         decisions: [],
+        b2bSummary: { totalTickets: 0, paidTickets: 0, dealsCount: 0, deals: [], byStage: [] },
+        funnel: { visits: 2647, b2cApplications: 30, b2bPipelineTickets: 0, b2bPaidTickets: 20 },
         breakdowns: { utm: UTM, geoDevice: GEO_DEVICE, entryPages: PAGES, exitPages: EXIT_PAGES },
       },
       201,

@@ -4,6 +4,7 @@ import {
   Document,
   Footer,
   HeadingLevel,
+  ImageRun,
   PageNumber,
   Packer,
   Paragraph,
@@ -117,6 +118,23 @@ export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
         children: [new TextRun(heading)],
       }),
     );
+
+    // Embed the section's chart PNG (FINAL §6.4), if rendered into the snapshot.
+    const chartBase64 = section.chartId ? snapshot.charts?.[section.chartId] : undefined;
+    if (chartBase64) {
+      children.push(
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new ImageRun({
+              type: 'png',
+              data: Buffer.from(chartBase64, 'base64'),
+              transformation: { width: 600, height: 340 },
+            }),
+          ],
+        }),
+      );
+    }
 
     // Process lines, detecting tables
     const lines = section.lines;

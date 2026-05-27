@@ -10,9 +10,10 @@
  */
 import type { Hypothesis } from './types/hypotheses';
 import type { Decision } from './types/decisions';
-import type { ReportSnapshot } from './types/report';
+import type { ReportSnapshot, ReportChartId } from './types/report';
 import { iceBucket } from './validation';
 import { buildReportRecommendations } from './report-recommendations';
+import { chartRecommendation, REPORT_CHART_TITLES } from './report-charts';
 import {
   BUCKET_LABEL,
   CATEGORY_LABEL,
@@ -34,6 +35,21 @@ import {
 export interface ReportSection {
   readonly heading: string;
   readonly lines: string[];
+  /** When set and snapshot.charts has this id, renderers embed the chart PNG at the top of the section. */
+  readonly chartId?: ReportChartId;
+}
+
+/** Per-chart 🟢/🔴 interpretation block (FINAL §6.3), appended below each chart's section. */
+function chartBlock(s: ReportSnapshot, id: ReportChartId): string[] {
+  const rec = chartRecommendation(s, id);
+  return [
+    '',
+    `Интерпретация диаграммы «${REPORT_CHART_TITLES[id]}» (по порогам, прослеживается до данных):`,
+    '🟢 Что хорошо:',
+    ...rec.good.map((g) => `  • ${g}`),
+    '🔴 Что плохо:',
+    ...rec.bad.map((b) => `  • ${b}`),
+  ];
 }
 
 /** Parse markdown-style chunked AI narrative into report sections.
@@ -306,7 +322,8 @@ function channelAnalysisSection(s: ReportSnapshot): ReportSection {
     }
   }
 
-  return { heading: 'Анализ по каналам (детальный)', lines };
+  lines.push(...chartBlock(s, 'channelBar'));
+  return { heading: 'Анализ по каналам (детальный)', lines, chartId: 'channelBar' };
 }
 
 /**
@@ -404,6 +421,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
 
   sections.push({
     heading: 'Воронка: визит → заявка → оплата',
+    chartId: 'funnel',
     lines: [
       `1) Визиты (сумма по каналам за период): ${totalVisits}`,
       `2) Заявки B2C (достижения цели): ${s.kpi.b2cApplications} — конверсия визит→заявка ${pct(
@@ -416,11 +434,13 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
       'Заявка ≠ оплата: шаги воронки не суммируются — это разные метрики из разных источников',
       '(заявки — из целей Метрики, оплаты B2B — из ручного пайплайна). Цель — двигать именно',
       'оплаты, поэтому Gap считается по оплаченным билетам, а не по заявкам.',
+      ...chartBlock(s, 'funnel'),
     ],
   });
 
   sections.push({
     heading: 'Анализ по каналам',
+    chartId: 'channelMix',
     lines:
       channelTotals(s.channels).length === 0
         ? ['Нет данных по каналам за период.']
@@ -437,6 +457,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
             '',
             'Каналы с высоким CR в заявку — кандидаты на усиление бюджета; с высоким объёмом, но',
             'низким CR — кандидаты на проверку качества трафика и пути к оплате.',
+            ...chartBlock(s, 'channelMix'),
           ],
   });
 

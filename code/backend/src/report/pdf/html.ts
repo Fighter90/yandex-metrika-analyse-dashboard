@@ -72,7 +72,11 @@ export function reportHtml(snapshot: ReportSnapshot): string {
   all.forEach((sec, i) => {
     const heading = i === 0 ? sec.heading : `${i}. ${escapeHtml(sec.heading)}`;
     const lines = sec.lines;
-    let content = '';
+    // Embed the section's chart PNG (FINAL §6.4), if rendered into the snapshot.
+    const chartBase64 = sec.chartId ? snapshot.charts?.[sec.chartId] : undefined;
+    let content = chartBase64
+      ? `<p class="chart"><img alt="${escapeHtml(sec.heading)}" src="data:image/png;base64,${chartBase64}"></p>`
+      : '';
     let lineIdx = 0;
 
     while (lineIdx < lines.length) {
@@ -145,6 +149,8 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     'ul{margin:4pt 0;padding-left:20pt}',
     'li{margin:2pt 0}',
     'code{font-family:Courier New,monospace;font-size:12pt;background:#f0f0f0;padding:1pt 3pt}',
+    'p.chart{text-align:center;margin:8pt 0}',
+    'p.chart img{max-width:100%;height:auto}',
     '</style></head><body>',
     body,
     '</body></html>',

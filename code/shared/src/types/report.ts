@@ -72,6 +72,12 @@ export interface ReportFunnel {
   readonly b2bPaidTickets: number;
 }
 
+/** Charts the report embeds as PNG images (DOCX ImageRun / PDF <img>). */
+export type ReportChartId = 'channelBar' | 'funnel' | 'channelMix';
+
+/** Rendered chart images keyed by id: base64-encoded PNG bytes (without the data: prefix). */
+export type ReportCharts = Partial<Record<ReportChartId, string>>;
+
 /** Immutable report snapshot — DOCX/PDF render from this, never from live data. */
 export interface ReportSnapshot {
   readonly id: string;
@@ -110,4 +116,10 @@ export interface ReportSnapshot {
    * «Заявок B2C». Lets the report/DOCX/PDF headline match the dashboard. Absent → treat as applications.
    */
   readonly goalLabel?: GoalLabel;
+  /**
+   * Optional rendered chart PNGs (base64), produced once from the snapshot numbers via headless
+   * ECharts at report-generation time and embedded identically into DOCX and PDF. The render path
+   * stays deterministic — it only reads these bytes. Absent → report renders text/tables only.
+   */
+  readonly charts?: ReportCharts;
 }

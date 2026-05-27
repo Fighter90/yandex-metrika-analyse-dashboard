@@ -4,7 +4,7 @@ import type { ReportSnapshot } from '@pca/shared';
 import { reportHtml } from './html';
 
 /** Find Chrome executable path across platforms. */
-function findChromePath(): string | undefined {
+export function findChromePath(): string | undefined {
   // Explicit env var takes priority
   if (process.env.PUPPETEER_EXECUTABLE_PATH) return process.env.PUPPETEER_EXECUTABLE_PATH;
 

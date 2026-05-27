@@ -7,6 +7,7 @@ import type { SnapshotRepo } from '../db/repositories/snapshot-repo';
 import type { ReportRunner } from '../routes/report';
 import { buildDocx } from './docx/builder';
 import { buildPdf } from './pdf/renderer';
+import { renderReportCharts } from './chart-renderer';
 import { generateInsights, type AnthropicFetch } from './ai-insights';
 import { generateHypotheses } from './ai-hypotheses';
 import { generateDecisions } from './ai-decisions';
@@ -77,7 +78,9 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
     generate: async (snapshotId, format) => {
       const record = snapshots.getById(snapshotId);
       if (!record) return undefined;
-      const snapshot = record.payload as ReportSnapshot;
+      const stored = record.payload as ReportSnapshot;
+      // Render charts once from the immutable snapshot so DOCX and PDF embed identical PNGs (§6.4).
+      const snapshot: ReportSnapshot = { ...stored, charts: await renderReportCharts(stored) };
       const buf = format === 'pdf' ? await buildPdf(snapshot) : await buildDocx(snapshot);
       mkdirSync(REPORTS_DIR, { recursive: true });
       const filePath = join(REPORTS_DIR, `${snapshotId}.${format}`);
@@ -87,7 +90,8 @@ export function makeReportRunner(builder: SnapshotBuilder, snapshots: SnapshotRe
     download: async (snapshotId, format) => {
       const record = snapshots.getById(snapshotId);
       if (!record) return undefined;
-      const snapshot = record.payload as ReportSnapshot;
+      const stored = record.payload as ReportSnapshot;
+      const snapshot: ReportSnapshot = { ...stored, charts: await renderReportCharts(stored) };
       const body = format === 'pdf' ? await buildPdf(snapshot) : await buildDocx(snapshot);
       const contentType =
         format === 'pdf'

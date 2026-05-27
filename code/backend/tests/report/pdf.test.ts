@@ -65,6 +65,19 @@ describe('reportHtml', () => {
     expect(reportHtml(snapshot)).toContain('a&lt;b&gt;&amp;c');
   });
 
+  it('embeds chart images as data URIs when the snapshot carries rendered charts (§6.4)', () => {
+    const png =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const html = reportHtml({
+      ...snapshot,
+      charts: { channelBar: png, funnel: png, channelMix: png },
+    });
+    expect(html).toContain(`src="data:image/png;base64,${png}"`);
+    expect(html).toContain('class="chart"');
+    // Without charts, no image is emitted.
+    expect(reportHtml(snapshot)).not.toContain('data:image/png;base64');
+  });
+
   it('renders markdown tables, bold/italic/code and list items via aiNarrative', () => {
     // Exercises renderTable, inlineToHtml (with **bold**, *italic*, `code`),
     // the list-item branch, and the <ul> wrapping regex in reportHtml.

@@ -98,6 +98,21 @@ describe('buildDocx', () => {
     expect(buf.subarray(0, 2).toString('latin1')).toBe('PK'); // zip magic
   });
 
+  it('embeds chart PNGs (ImageRun) when the snapshot carries rendered charts (§6.4)', async () => {
+    // 1x1 transparent PNG — enough to exercise the ImageRun embedding branch.
+    const png =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    const withCharts: ReportSnapshot = {
+      ...snapshot,
+      charts: { channelBar: png, funnel: png, channelMix: png },
+    };
+    const withoutCharts = await buildDocx(snapshot);
+    const buf = await buildDocx(withCharts);
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+    // Embedding images makes the document strictly larger.
+    expect(buf.length).toBeGreaterThan(withoutCharts.length);
+  });
+
   it('renders markdown tables, bold/italic/code inline and list items via aiNarrative', async () => {
     // This snapshot injects markdown content through aiNarrative → parseChunkedNarrative →
     // section.lines → buildDocx, exercising parseInline (bold/italic/code), parseTable,
