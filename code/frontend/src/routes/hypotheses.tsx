@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import type { GeneratedHypotheses, ProblemHypothesis, SolutionHypothesis } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { errorMessage } from '../lib/error-message';
+import { parseHypothesisSeed, hasSeed, type HypothesisSeed } from '../lib/hypothesis-prefill';
 
 export type GenStatus = 'idle' | 'pending' | 'error' | 'success';
 
@@ -110,6 +112,34 @@ export interface HypothesesViewProps {
   readonly hypotheses: GeneratedHypotheses | undefined;
   readonly genError: string | undefined;
   readonly onGenerate: () => void;
+  /** Incoming seed from a «слабое место → гипотеза» deep-link, surfaced as starting context. */
+  readonly seed?: HypothesisSeed;
+}
+
+/** Read-only «контекст для гипотезы» card built from a deep-link seed. */
+function SeedContext({ seed }: { readonly seed: HypothesisSeed }): JSX.Element {
+  const rows: ReadonlyArray<readonly [string, string | undefined]> = [
+    ['Сегмент', seed.segment],
+    ['Проблема', seed.trouble],
+    ['Действие', seed.action],
+    ['Барьер', seed.barrier],
+    ['Данные', seed.evidence],
+  ];
+  return (
+    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
+      <p className="mb-2 font-semibold text-amber-900">Контекст для гипотезы (из слабого места)</p>
+      <dl className="space-y-0.5">
+        {rows
+          .filter(([, value]) => value !== undefined && value !== '')
+          .map(([label, value]) => (
+            <div key={label} className="flex gap-2">
+              <dt className="font-medium text-amber-800">{label}:</dt>
+              <dd className="text-amber-900">{value}</dd>
+            </div>
+          ))}
+      </dl>
+    </div>
+  );
 }
 
 /** Pure presentational view — all states: idle/pending/error/success. */
@@ -118,6 +148,7 @@ export function HypothesesView({
   hypotheses,
   genError,
   onGenerate,
+  seed,
 }: HypothesesViewProps): JSX.Element {
   const sortedSolutions = hypotheses
     ? [...hypotheses.solutions].sort((a, b) => b.ice.score - a.ice.score)
@@ -136,6 +167,8 @@ export function HypothesesView({
           {status === 'pending' ? 'Генерирую…' : 'Сгенерировать гипотезы'}
         </button>
       </div>
+
+      {seed && hasSeed(seed) ? <SeedContext seed={seed} /> : null}
 
       {genError ? (
         <p role="alert" className="rounded bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -183,6 +216,8 @@ export function HypothesesView({
 /** Data + mutation wrapper: builds a snapshot, then generates hypotheses. */
 export function Hypotheses(): JSX.Element {
   const { from, to } = useFilters();
+  const [searchParams] = useSearchParams();
+  const seed = parseHypothesisSeed(searchParams);
   const buildMut = useMutation({ mutationFn: api.buildSnapshot });
   const genMut = useMutation({
     mutationFn: (snapshotId: string) => api.generateHypotheses(snapshotId),
@@ -215,6 +250,7 @@ export function Hypotheses(): JSX.Element {
       hypotheses={genMut.data?.hypotheses}
       genError={errorMessage(error)}
       onGenerate={handleGenerate}
+      seed={seed}
     />
   );
 }

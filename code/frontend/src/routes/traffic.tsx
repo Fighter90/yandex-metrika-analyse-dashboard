@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import type { ChannelStat, UtmStat } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
@@ -14,6 +15,7 @@ import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
 import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
+import { buildHypothesisUrl } from '../lib/hypothesis-prefill';
 
 /** Insight badge with green/red indicator */
 function InsightBadge({
@@ -58,11 +60,22 @@ function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
     // Low CR with high traffic - problem
     else if (r.conversionRate < overallCR * 0.5 && r.visits > 50) {
       insights.push(
-        <InsightBadge
-          key={`cr-bad-${r.channel}`}
-          type="warning"
-          text={`${r.channel}: CR ${formatPercent(r.conversionRate)} — ниже среднего при ${r.visits} визитах, проверить качество`}
-        />,
+        <span key={`cr-bad-${r.channel}`} className="inline-flex items-center gap-1">
+          <InsightBadge
+            type="warning"
+            text={`${r.channel}: CR ${formatPercent(r.conversionRate)} — ниже среднего при ${r.visits} визитах, проверить качество`}
+          />
+          <Link
+            to={buildHypothesisUrl({
+              segment: r.channel,
+              trouble: 'низкая конверсия',
+              evidence: `CR ${formatPercent(r.conversionRate)} при ${formatInt(r.visits)} визитах`,
+            })}
+            className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100"
+          >
+            → гипотеза
+          </Link>
+        </span>,
       );
     }
   }
