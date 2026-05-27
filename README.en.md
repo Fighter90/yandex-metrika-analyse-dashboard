@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.7.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.7.1.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to, max
@@ -292,17 +292,18 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 ## Releases
 
-| Version                                                                              | Date       | Description                                                                                                                             |
-| ------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2.7.0** (Latest)                                                                  | 2026-05-27 | Navigation → 9 pages; AI hypotheses + AI Decision Log in report; B2B pipeline in Settings; formatGoalLabel; centralised channel palette |
-| [v2.6.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.6.0) | 2026-05-27 | Chart captions, weekly digest, UTM-Sankey, visit undercount fix (matches Metrika), safe re-sync, mobile-polish                          |
-| [v2.5.7](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.5.7) | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage                                                                   |
-| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                                                                             |
-| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST                                                                     |
-| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                                                                                      |
-| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                                                                                 |
-| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide                                                            |
-| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page)                                                                      |
+| Version                                                                              | Date       | Description                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **v2.7.1** (Latest)                                                                  | 2026-05-27 | Sync uses filter period, bar-chart axes, formatGoalLabel in report/Goals, visits invariant test, mobile e2e, report 🟢/🔴 block; full Metrika reconciliation (0 mismatches) |
+| [v2.7.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.0) | 2026-05-27 | Navigation → 9 pages; AI hypotheses + AI Decision Log in report; B2B pipeline in Settings; formatGoalLabel; centralised channel palette                                     |
+| [v2.6.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.6.0) | 2026-05-27 | Chart captions, weekly digest, UTM-Sankey, visit undercount fix (matches Metrika), safe re-sync, mobile-polish                                                              |
+| [v2.5.7](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.5.7) | 2026-05-27 | Build/gate hotfix (TS in DOCX/frontend) + version sync, 100% coverage                                                                                                       |
+| [v2.4.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.4.1) | 2026-05-27 | Docs and architecture pass, aligned to the 9-page dashboard                                                                                                                 |
+| [v2.3.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.3.0) | 2026-05-27 | AI narrative full rendering, md-to-html tables/lists, DOCX/PDF GOST                                                                                                         |
+| [v2.2.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.1) | 2026-05-27 | Goals Page NaN Fix                                                                                                                                                          |
+| [v2.2.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.2.0) | 2026-05-27 | Gap Fix, History AI Narrative, DOCX/PDF GOST Formatting                                                                                                                     |
+| [v2.1.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.1.0) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide                                                                                                |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page)                                                                                                          |
 
 ## License · Authors · Credits
 
