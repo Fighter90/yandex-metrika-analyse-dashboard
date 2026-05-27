@@ -12,6 +12,7 @@ import type { Hypothesis } from './types/hypotheses';
 import type { Decision } from './types/decisions';
 import type { ReportSnapshot } from './types/report';
 import { iceBucket } from './validation';
+import { buildReportRecommendations } from './report-recommendations';
 import {
   BUCKET_LABEL,
   CATEGORY_LABEL,
@@ -354,6 +355,21 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
         `Гипотез в работе: ${problems.length} проблемных + ${solutions.length} решенческих.`,
         `Закрытых проверок (Decision Log): ${s.decisions.length}.`,
       ],
+    },
+    {
+      heading: 'Рекомендации: что хорошо и что плохо',
+      lines: (() => {
+        const rec = buildReportRecommendations(s);
+        return [
+          'Детерминированная оценка по порогам (CR ≥5% / <2%, отказы ≥70%), прослеживается до данных:',
+          '',
+          '🟢 Что хорошо:',
+          ...rec.good.map((g) => `  • ${g}`),
+          '',
+          '🔴 Что плохо:',
+          ...rec.bad.map((b) => `  • ${b}`),
+        ];
+      })(),
     },
     {
       heading: 'Методология',
