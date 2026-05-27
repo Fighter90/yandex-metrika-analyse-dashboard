@@ -16,6 +16,7 @@ import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
 import { buildHypothesisUrl } from '../lib/hypothesis-prefill';
 import { shouldShowOnboarding, markOnboarded } from '../lib/onboarding';
 import { weeklyDigest } from '../lib/weekly-digest';
+import { formatGoalLabel, type GoalLabel } from '@pca/shared';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -195,6 +196,7 @@ export function OverviewView({
   stats,
   b2bDeals,
   primaryGoalName,
+  goalLabel,
   geoDevice,
   utm,
   entryPages,
@@ -204,6 +206,7 @@ export function OverviewView({
   stats: ChannelStat[];
   b2bDeals?: B2bDeal[];
   primaryGoalName?: string;
+  goalLabel?: GoalLabel;
   geoDevice?: GeoDeviceStat[];
   utm?: UtmStat[];
   entryPages?: PageStat[];
@@ -259,7 +262,11 @@ export function OverviewView({
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Цель (платных билетов)" value={formatInt(kpi.target)} />
-        <Kpi label="Заявок B2C" value={formatInt(kpi.applications)} hint="заявка ≠ оплата" />
+        <Kpi
+          label={goalLabel?.title ?? 'Заявок B2C'}
+          value={formatInt(kpi.applications)}
+          hint={goalLabel?.showApplicationsCaveat === false ? undefined : 'заявка ≠ оплата'}
+        />
         <Kpi label="Оплачено B2B" value={formatInt(kpi.b2bPaid)} />
         <Kpi
           label="Gap до цели"
@@ -516,6 +523,7 @@ export function Overview(): JSX.Element {
         stats={filteredChannels}
         b2bDeals={b2bDeals.data}
         primaryGoalName={goal.data?.name}
+        goalLabel={formatGoalLabel(goal.data)}
         geoDevice={geoDevice.data}
         utm={filteredUtm}
         entryPages={entryPages.data}

@@ -39,7 +39,8 @@ describe('<App>', () => {
     render(<App />);
     // Nav hamburger button should be present
     expect(screen.getByRole('button', { name: /открыть меню/i })).toBeInTheDocument();
-    // Overview resolves with data → KPI strip renders.
-    expect(await screen.findByText(/Заявок/)).toBeInTheDocument();
+    // Overview resolves with data → KPI strip renders. The mocked primary goal is a purchase goal
+    // («Ecommerce: покупка»), so the KPI is labelled «Оплат» (formatGoalLabel), not «Заявок».
+    expect(await screen.findByText(/Оплат/)).toBeInTheDocument();
   });
 });

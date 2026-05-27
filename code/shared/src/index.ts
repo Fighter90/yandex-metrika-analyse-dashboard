@@ -2,6 +2,7 @@ export * from './constants';
 export * from './validation';
 export * from './report-sections';
 export * from './goal-classifier';
+export * from './format-goal';
 export * from './period-totals';
 export * from './types/hypotheses';
 export * from './types/decisions';
