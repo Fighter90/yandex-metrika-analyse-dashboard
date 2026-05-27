@@ -8,8 +8,6 @@ const NAV = [
   ['/behavior', 'Поведение'],
   ['/funnel', 'Воронка'],
   ['/goals', 'Цели'],
-  ['/hypotheses', 'Гипотезы'],
-  ['/decisions', 'Решения'],
   ['/b2b', 'B2B'],
   ['/report', 'Отчёт'],
   ['/history', 'История'],
