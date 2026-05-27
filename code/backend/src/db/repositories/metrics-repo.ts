@@ -207,18 +207,25 @@ export class MetricsRepo {
     };
   }
 
+  /** Derived per-period stat tables — all re-fetched on each sync. */
+  private static readonly DERIVED_STAT_TABLES = [
+    'channel_stats',
+    'utm_stats',
+    'geo_device_stats',
+    'page_stats',
+    'exit_page_stats',
+  ] as const;
+
   /**
-   * Wipe all derived per-period stat tables (kept idempotent for re-sync — see syncAll). Does NOT
-   * touch raw_responses (audit trail), goals, B2B, hypotheses or decisions.
+   * Full wipe of everything a sync re-fetches: the derived stat tables PLUS `goals` and
+   * `raw_responses`. This guarantees a re-sync always produces a fresh, duplicate-free dataset
+   * (SQLite treats NULL as distinct in composite keys, so INSERT OR REPLACE alone can't dedupe).
+   *
+   * PRESERVES user-entered data — `b2b_manual`, `hypotheses`, `decisions`, `report_snapshots` —
+   * which is never sourced from Metrika and must survive a re-sync.
    */
-  clearDerivedStats(): void {
-    const tables = [
-      'channel_stats',
-      'utm_stats',
-      'geo_device_stats',
-      'page_stats',
-      'exit_page_stats',
-    ];
+  resetSyncedData(): void {
+    const tables = [...MetricsRepo.DERIVED_STAT_TABLES, 'goals', 'raw_responses'];
     const tx = this.db.transaction(() => {
       for (const t of tables) this.db.prepare(`DELETE FROM ${t}`).run();
     });

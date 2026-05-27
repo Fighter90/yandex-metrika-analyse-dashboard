@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import type { B2bDeal, ChannelStat } from '@pca/shared';
+import { periodTotals } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
-import { summarizeChannels } from '../lib/overview';
 
 type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -316,21 +316,21 @@ export function Goals(): JSX.Element {
 
   const data: ChannelStat[] = channelsQ.data ?? [];
   const deals: B2bDeal[] = b2bQ.data ?? [];
-  const kpi = summarizeChannels(data, deals);
+  // Headline Визиты/Заявки B2C/CR come from the single factsource so this page agrees with
+  // Overview and Funnel.
+  const totals = periodTotals(data);
   const b2bPaid = calcB2bPaid(deals);
   const b2bPipeline = calcB2bPipeline(deals);
-  const totalVisits = data.reduce((a, c) => a + c.visits, 0);
-  const overallCR = totalVisits > 0 ? kpi.applications / totalVisits : 0;
 
   return (
     <GoalsView
       status={status}
       target={300}
-      b2cApplications={kpi.applications}
+      b2cApplications={totals.applications}
       b2bPaid={b2bPaid}
       b2bPipeline={b2bPipeline}
-      totalVisits={totalVisits}
-      overallCR={overallCR}
+      totalVisits={totals.visits}
+      overallCR={totals.conversionRate}
       deals={deals}
     />
   );

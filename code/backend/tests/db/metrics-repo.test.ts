@@ -201,15 +201,54 @@ describe('MetricsRepo — exit-page stats', () => {
   });
 });
 
-describe('MetricsRepo — clearDerivedStats', () => {
-  it('wipes the 5 derived stat tables but keeps goals and raw_responses', () => {
+/** Count rows in a table directly (for asserting preserved user-entered data). */
+function count(table: string): number {
+  return (db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
+}
+
+/** Insert one row into each user-entered table so we can prove they survive a sync reset. */
+function seedUserEnteredData(): void {
+  db.prepare(
+    `INSERT INTO b2b_manual (company, tickets, stage, date_added)
+     VALUES ('Acme', 5, 'paid', '2025-01-01')`,
+  ).run();
+  const hypId = (
+    db
+      .prepare(
+        `INSERT INTO hypotheses
+           (diamond_phase, kind, subject, action, solution, condition, title,
+            hidden_assumptions, validation_methods, impact, confidence, ease,
+            impact_rationale, confidence_rationale, ease_rationale,
+            green_criteria, yellow_criteria, red_criteria, deadline_days, deadline_at,
+            created_at, updated_at)
+         VALUES ('define','problem','s','a','sol','cond','t','[]','[]',5,5,5,'r','r','r',
+                 'g','y','r',2,'2025-01-03','2025-01-01','2025-01-01')
+         RETURNING id`,
+      )
+      .get() as { id: number }
+  ).id;
+  db.prepare(
+    `INSERT INTO decisions
+       (number, hypothesis_id, date, method, scope, period_days, findings, evidence,
+        outcome, outcome_rationale, next_step, decided_by, created_at, updated_at)
+     VALUES ('DL-001', @hyp, '2025-01-02', 'quantitative', 'scope', 2, '[]', '[]',
+             'green', 'ok', 'next', 'me', '2025-01-02', '2025-01-02')`,
+  ).run({ hyp: hypId });
+  db.prepare(
+    `INSERT INTO report_snapshots (id, generated_at, date_from, date_to, payload)
+     VALUES ('snap1', '2025-01-02', '2025-01-01', '2025-01-02', '{}')`,
+  ).run();
+}
+
+describe('MetricsRepo — resetSyncedData', () => {
+  it('wipes synced data but preserves user-entered data', () => {
     repo.upsertChannelStats([stat('2025-01-01')]);
     repo.upsertUtmStats([utm('2025-01-01')]);
     repo.upsertGeoDeviceStats([geo('2025-01-01')]);
     repo.upsertPageStats([page('2025-01-01', { page: '/lp' })]);
     repo.upsertExitPageStats([page('2025-01-01', { page: '/checkout' })]);
     repo.upsertGoals([goal(100)]);
-    const rawId = repo.saveRawResponse({
+    repo.saveRawResponse({
       endpoint: '/stat/v1/data',
       queryHash: 'clr',
       dateFrom: '2025-01-01',
@@ -217,16 +256,23 @@ describe('MetricsRepo — clearDerivedStats', () => {
       payload: { ok: true },
       fetchedAt: 't1',
     });
+    seedUserEnteredData();
 
-    repo.clearDerivedStats();
+    repo.resetSyncedData();
 
+    // synced data is fully wiped: stat tables + goals + raw_responses
     expect(repo.listChannelStats()).toHaveLength(0);
     expect(repo.listUtmStats()).toHaveLength(0);
     expect(repo.listGeoDeviceStats()).toHaveLength(0);
     expect(repo.listPageStats()).toHaveLength(0);
     expect(repo.listExitPageStats()).toHaveLength(0);
-    // audit trail + goals are NOT cleared
-    expect(repo.listGoals()).toHaveLength(1);
-    expect(repo.getRawResponse(rawId)).toBeDefined();
+    expect(repo.listGoals(true)).toHaveLength(0);
+    expect(count('raw_responses')).toBe(0);
+
+    // user-entered data is preserved
+    expect(count('b2b_manual')).toBe(1);
+    expect(count('hypotheses')).toBe(1);
+    expect(count('decisions')).toBe(1);
+    expect(count('report_snapshots')).toBe(1);
   });
 });

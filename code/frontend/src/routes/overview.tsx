@@ -6,6 +6,7 @@ import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
 import { EmptyState } from '../components/EmptyState';
 import { channelMixOption, summarizeChannels, weakSpots } from '../lib/overview';
+import { utmCoverage } from '../lib/traffic';
 import { dailySeries, trendsOption } from '../lib/trends';
 import { byCountry, byDevice, audienceBarOption, deviceShareOption } from '../lib/audience';
 import { EChart } from '../components/charts/EChart';
@@ -92,13 +93,12 @@ function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
   return insights;
 }
 
-/** Compute UTM insights */
-function computeUtmInsights(utm: UtmStat[] | undefined): JSX.Element[] {
+/** Compute UTM insights from the single coverage factsource (utmCoverage over channel rows). */
+function computeUtmInsights(stats: ChannelStat[]): JSX.Element[] {
   const insights: JSX.Element[] = [];
-  if (!utm || utm.length === 0) return insights;
+  if (stats.length === 0) return insights;
 
-  const utmWithSource = utm.filter((u) => u.utmSource && u.utmSource !== '(none)');
-  const coverage = (utmWithSource.length / utm.length) * 100;
+  const coverage = utmCoverage(stats).ratio * 100;
 
   if (coverage >= 70) {
     insights.push(
@@ -220,11 +220,11 @@ export function OverviewView({
   const devRows = geoDevice ? byDevice(geoDevice) : [];
   const hasGeo = geoRows.length > 0 && devRows.length > 0;
 
-  // UTM coverage
-  const utmWithSource = utm?.filter((u) => u.utmSource && u.utmSource !== '(none)') ?? [];
-  const utmCoverage =
-    utm && utm.length > 0 ? ((utmWithSource.length / utm.length) * 100).toFixed(0) : '0';
-  const lowUtm = utm && utm.length > 0 && Number(utmCoverage) < 70;
+  // UTM coverage — single source: utmCoverage(channels) from lib/traffic (share of channel rows
+  // carrying a utm_source). Overview and Traffic now report the same number from the same source.
+  const utmCov = utmCoverage(stats);
+  const utmCoveragePct = (utmCov.ratio * 100).toFixed(0);
+  const lowUtm = utmCov.low;
 
   // Top entry pages
   const topEntry = (entryPages ?? []).sort((a, b) => b.visits - a.visits).slice(0, 5);
@@ -232,7 +232,7 @@ export function OverviewView({
 
   // Compute insights
   const channelInsights = computeChannelInsights(stats);
-  const utmInsights = computeUtmInsights(utm);
+  const utmInsights = computeUtmInsights(stats);
   const entryInsights = computePageInsights(entryPages, 'entry');
   const exitInsights = computePageInsights(exitPages, 'exit');
   const geoInsights = computeGeoInsights(geoDevice);
@@ -248,7 +248,7 @@ export function OverviewView({
 
       {lowUtm ? (
         <div role="status" className="rounded bg-amber-100 px-3 py-2 text-sm text-amber-800">
-          Низкое покрытие UTM: {utmCoverage}% (порог 70%) — часть трафика не атрибутирована.
+          Низкое покрытие UTM: {utmCoveragePct}% (порог 70%) — часть трафика не атрибутирована.
         </div>
       ) : null}
 
@@ -290,7 +290,7 @@ export function OverviewView({
 
       {/* UTM breakdown */}
       {utm && utm.length > 0 && (
-        <Card title={`UTM-разбивка (покрытие ${utmCoverage}%)`}>
+        <Card title={`UTM-разбивка (покрытие ${utmCoveragePct}%)`}>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-slate-500">

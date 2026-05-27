@@ -20,6 +20,19 @@ describe('Layout', () => {
     expect(navLinks.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('includes the methodology nav entries (Гипотезы, Решения, B2B)', () => {
+    renderWithProviders(
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<div>HOME CONTENT</div>} />
+        </Route>
+      </Routes>,
+    );
+    expect(screen.getAllByRole('link', { name: 'Гипотезы' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('link', { name: 'Решения' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('link', { name: 'B2B' }).length).toBeGreaterThanOrEqual(1);
+  });
+
   it('renders the hamburger button for mobile', () => {
     renderWithProviders(
       <Routes>

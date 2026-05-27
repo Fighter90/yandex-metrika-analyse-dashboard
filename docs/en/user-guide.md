@@ -4,7 +4,7 @@
 
 How to use the dashboard and generate reports. For the "Conversions & lead-gen" track team.
 
-> ✅ **Status: working product (v2.5.5).** A 9-page dashboard: Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product (v2.5.6).** A 9-page dashboard: Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help. Global filters up to 1 year, AI report analysis,
 > GOST-formatted DOCX/PDF. Run with `./setup.sh`.
 
