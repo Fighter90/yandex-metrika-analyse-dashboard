@@ -133,11 +133,11 @@ function computePageInsights(pages: PageStat[] | undefined, type: 'entry' | 'exi
   const insights: JSX.Element[] = [];
   if (!pages || pages.length === 0) return insights;
 
-  for (const p of pages.slice(0, 5)) {
+  pages.slice(0, 5).forEach((p, i) => {
     if (p.bounceRate > 0.7 && p.visits > 50) {
       insights.push(
         <InsightBadge
-          key={`bounce-${type}-${p.page}`}
+          key={`bounce-${type}-${p.page}-${i}`}
           type="warning"
           text={`Высокий bounce ${formatPercent(p.bounceRate)} на ${p.page} (${p.visits} визитов)`}
         />,
@@ -145,13 +145,13 @@ function computePageInsights(pages: PageStat[] | undefined, type: 'entry' | 'exi
     } else if (p.bounceRate < 0.3 && p.visits > 50) {
       insights.push(
         <InsightBadge
-          key={`good-${type}-${p.page}`}
+          key={`good-${type}-${p.page}-${i}`}
           type="good"
           text={`Низкий bounce ${formatPercent(p.bounceRate)} на ${p.page} — хорошо удерживает`}
         />,
       );
     }
-  }
+  });
 
   return insights;
 }
@@ -342,9 +342,9 @@ export function OverviewView({
                 {utm
                   .sort((a, b) => b.visits - a.visits)
                   .slice(0, 10)
-                  .map((u) => (
+                  .map((u, i) => (
                     <tr
-                      key={`${u.utmSource}-${u.utmMedium}-${u.utmCampaign}`}
+                      key={`${u.utmSource}-${u.utmMedium}-${u.utmCampaign}-${i}`}
                       className="border-t border-slate-100"
                     >
                       <td className="py-1">{u.utmSource ?? '(none)'}</td>
@@ -376,8 +376,8 @@ export function OverviewView({
                 </tr>
               </thead>
               <tbody>
-                {topEntry.map((p) => (
-                  <tr key={p.page} className="border-t border-slate-100">
+                {topEntry.map((p, i) => (
+                  <tr key={`${p.page}-${i}`} className="border-t border-slate-100">
                     <td className="py-1">{p.page}</td>
                     <td>{formatInt(p.visits)}</td>
                     <td>{formatPercent(p.bounceRate)}</td>
@@ -407,8 +407,8 @@ export function OverviewView({
                 </tr>
               </thead>
               <tbody>
-                {topExit.map((p) => (
-                  <tr key={p.page} className="border-t border-slate-100">
+                {topExit.map((p, i) => (
+                  <tr key={`${p.page}-${i}`} className="border-t border-slate-100">
                     <td className="py-1">{p.page}</td>
                     <td>{formatInt(p.visits)}</td>
                     <td>{formatPercent(p.bounceRate)}</td>

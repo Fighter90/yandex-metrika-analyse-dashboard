@@ -3,7 +3,7 @@
 > Дата прогона: **2026-05-27**
 > Тип: полный регресс A–H + сверка данных + форматирование отчётов + ревью документации
 > Тестировал: AI QA-инженер (Claude)
-> Окружение: backend `:4000` (counterId=54280963, metrikaTokenPresent=true), frontend `:5173`, primary goal автоопределена = `Ecommerce: покупка` (id=328425726)
+> Окружение: backend `:4000` (counterId=<COUNTER_ID>, metrikaTokenPresent=true), frontend `:5173`, primary goal автоопределена = `Ecommerce: покупка` (id=328425726)
 
 ---
 
@@ -33,7 +33,7 @@
 | D. Фильтры                    | пресеты 7д/14д/30д/90д/1г присутствуют, кастомные «Даты», сегмент B2C+B2B, тогл архивных                                           | не проверял лимит 365 дней end-to-end, мобильное меню (требует resize) | 🟡          |
 | E. Отчёты DOCX/PDF            | снапшот строится, экспорт работает                                                                                                 | форматирование убогое, дубли строк, ноль рекомендаций после графиков   | 🔴          |
 | F. AI-анализ                  | endpoint /api/report/insights отвечает, есть кнопка «Сгенерировать AI-анализ»                                                      | не проверял live (требует расход токенов)                              | 🟡          |
-| G. Settings                   | COUNTER_ID показан (54280963), маски секретов на месте, GOAL_ID select работает, прогресс-бар видим                                | (не проверял live sync с прогрессом)                                   | 🟢          |
+| G. Settings                   | COUNTER_ID показан (<COUNTER_ID>), маски секретов на месте, GOAL_ID select работает, прогресс-бар видим                            | (не проверял live sync с прогрессом)                                   | 🟢          |
 | H. Граничные случаи           | базовая работа без падений                                                                                                         | не проверял COUNTER_ID=0 (демо), date end<start                        | 🟡          |
 | Доп. Сверка данных            | primary-goal API сходится с UI Goals                                                                                               | визиты Behavior(4925) ≠ Funnel(57034), CR 200%                         | 🔴          |
 | Доп. Документация             | архитектура есть, ADR частично                                                                                                     | 5 разных версий в шапках доков, битые ADR-ссылки, EN-зеркала отстают   | 🔴          |
@@ -229,9 +229,9 @@
 
 ## Источники данных (для воспроизведения)
 
-- API health: `{counterId:54280963, metrikaTokenPresent:true, timestamp:"2026-05-27T04:14:34.933Z"}`
+- API health: `{counterId:<COUNTER_ID>, metrikaTokenPresent:true, timestamp:"2026-05-27T04:14:34.933Z"}`
 - API primary-goal: `{id:328425726, name:"Ecommerce: покупка", type:"e_purchase", isB2b:false, isArchived:false}`
-- API settings: `{YANDEX_OAUTH_TOKEN:"y0__****DE", COUNTER_ID:54280963, GOAL_ID:0, ANTHROPIC_API_KEY:"sk-a****AA"}`
+- API settings: `{YANDEX_OAUTH_TOKEN:"y0__****DE", COUNTER_ID:<COUNTER_ID>, GOAL_ID:0, ANTHROPIC_API_KEY:"sk-a****AA"}`
 - Snapshot тест: `81f80a4b-8776-4341-ae0a-b31b2f850d80`, период 2026-05-14 — 2026-05-27, генерирован 2026-05-27T03:55:17.677Z.
 - 20+ снапшотов в `/api/report/snapshots`.
 

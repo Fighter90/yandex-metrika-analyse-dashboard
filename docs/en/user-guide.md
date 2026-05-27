@@ -4,9 +4,11 @@
 
 How to use the dashboard and generate reports. For the "Conversions & lead-gen" track team.
 
-> ✅ **Status: working product (v2.7.1).** A 9-page dashboard: Overview, Traffic, Behavior, Funnel,
-> Goals, Report, History, Settings, Help. Global filters up to 1 year, AI report analysis
-> (including AI-generated hypotheses and AI Decision Log), GOST-formatted DOCX/PDF. Run with `./setup.sh`.
+> ✅ **Status: working product (v2.8.1).** A 9-page dashboard: Overview, Traffic, Behavior, Funnel,
+> Goals, Report, History, Settings, Help. Global filters up to 1 year (mobile: bottom-sheet),
+> AI report analysis (including AI-generated hypotheses and AI Decision Log), GOST-formatted DOCX/PDF
+> **with embedded chart images** (channel bar, funnel, channel mix) and a 🟢/🔴 block per chart.
+> B2B pipeline (kanban + drawer) lives in Settings. WCAG AA accessibility. Run with `./setup.sh`.
 
 ## 1. What it is and why
 

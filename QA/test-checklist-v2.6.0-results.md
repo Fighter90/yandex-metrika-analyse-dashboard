@@ -46,7 +46,7 @@
 
 ### §1 API (19/27 🟢)
 
-- 🟢 1.1.1 GET /api/health → 200 (counterId=54280963, metrikaTokenPresent=true)
+- 🟢 1.1.1 GET /api/health → 200 (counterId=<COUNTER_ID>, metrikaTokenPresent=true)
 - 🟢 1.1.2 GET /api/settings → 200 (маски + COUNTER_ID не маскирован)
 - 🟢 1.2.1 GET /api/metrics/primary-goal → 200 (e_purchase, Ecommerce: покупка)
 - 🟢 1.2.2 GET /api/metrics/goals → 200 (~129 целей)

@@ -25,7 +25,7 @@ describe('SettingsView', () => {
   const baseProps = {
     status: 'success' as const,
     settings: sampleSettings,
-    healthCounterId: 54280963,
+    healthCounterId: 12345678,
     goals: [],
     archivedGoals: [],
     onSave: vi.fn(),

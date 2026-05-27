@@ -360,8 +360,8 @@ export function FunnelView({
             <div>
               <p className="font-medium text-red-700">Высокий bounce rate (&gt; 40%):</p>
               <ul className="mt-1 list-inside list-disc">
-                {highBouncePages.slice(0, 5).map((p) => (
-                  <li key={p.page}>
+                {highBouncePages.slice(0, 5).map((p, i) => (
+                  <li key={`${p.page}-${i}`}>
                     {p.page} — {formatPercent(p.bounceRate)} при {formatInt(p.visits)} визитах
                   </li>
                 ))}
@@ -374,8 +374,8 @@ export function FunnelView({
             <div>
               <p className="mt-2 font-medium text-amber-700">Низкий CR (&lt; 0.5%):</p>
               <ul className="mt-1 list-inside list-disc">
-                {lowCrPages.slice(0, 5).map((p) => (
-                  <li key={p.page}>
+                {lowCrPages.slice(0, 5).map((p, i) => (
+                  <li key={`${p.page}-${i}`}>
                     {p.page} — {formatPercent(p.conversionRate)} при {formatInt(p.visits)} визитах
                   </li>
                 ))}

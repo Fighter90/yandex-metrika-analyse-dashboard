@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.8.1.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.8.2.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to, max
@@ -294,7 +294,8 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 | Version                                                                              | Date       | Description                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2.8.1** (Latest)                                                                  | 2026-05-28 | WCAG AA accessibility: text contrast ≥4.5:1, keyboard-accessible tables — 0 axe violations across 9 pages                                                                   |
+| **v2.8.2** (Latest)                                                                  | 2026-05-28 | Browser E2E audit: fixed duplicate React keys (Overview/Funnel), favicon; refreshed docs + full regression prompt; scrubbed the live COUNTER_ID from the repo               |
+| [v2.8.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.1) | 2026-05-28 | WCAG AA accessibility: text contrast ≥4.5:1, keyboard-accessible tables — 0 axe violations across 9 pages                                                                   |
 | [v2.8.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.0) | 2026-05-28 | Chart images in DOCX/PDF (bar/funnel/mix) + per-chart 🟢/🔴 block (spec 014); mobile filter bottom-sheet; B2B kanban+drawer; sync-versions + pre-commit hook                |
 | [v2.7.1](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.1) | 2026-05-27 | Sync uses filter period, bar-chart axes, formatGoalLabel in report/Goals, visits invariant test, mobile e2e, report 🟢/🔴 block; full Metrika reconciliation (0 mismatches) |
 | [v2.7.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.7.0) | 2026-05-27 | Navigation → 9 pages; AI hypotheses + AI Decision Log in report; B2B pipeline in Settings; formatGoalLabel; centralised channel palette                                     |
