@@ -319,18 +319,18 @@ export function Goals(): JSX.Element {
         : 'success';
 
   const data: ChannelStat[] = channelsQ.data ?? [];
-  const kpi = summarizeChannels(data);
   const deals: B2bDeal[] = b2bQ.data ?? [];
+  const kpi = summarizeChannels(data, deals);
   const b2bPaid = calcB2bPaid(deals);
   const b2bPipeline = calcB2bPipeline(deals);
   const totalVisits = data.reduce((a, c) => a + c.visits, 0);
-  const overallCR = totalVisits > 0 ? kpi.reaches / totalVisits : 0;
+  const overallCR = totalVisits > 0 ? kpi.applications / totalVisits : 0;
 
   return (
     <GoalsView
       status={status}
       target={300}
-      b2cApplications={kpi.reaches}
+      b2cApplications={kpi.applications}
       b2bPaid={b2bPaid}
       b2bPipeline={b2bPipeline}
       totalVisits={totalVisits}
