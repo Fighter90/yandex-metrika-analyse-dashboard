@@ -11,6 +11,7 @@ import {
   utmCoverage,
   utmRows,
 } from '../lib/traffic';
+import { utmSankeyOption } from '../lib/sankey';
 import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
@@ -171,6 +172,15 @@ export function TrafficView({
           Каналы — визиты vs заявки (какой трафик конвертит)
         </h2>
         <EChart option={channelVisitsVsReachesOption(rows)} />
+      </div>
+
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="mb-2 text-lg font-semibold">Поток: источник → кампания → заявки</h2>
+        <EChart option={utmSankeyOption(utm)} />
+        <p className="mt-2 text-xs text-slate-500">
+          Толщина связей: источник→кампания — по визитам, кампания→«Заявки» — по достижениям целей.
+          Видно, какие UTM-источники и кампании реально доводят трафик до заявок.
+        </p>
       </div>
 
       <div className="space-y-2">

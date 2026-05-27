@@ -8,6 +8,7 @@ import { combineStatus, type QueryStatus } from '../lib/query-status';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
 import { channelRows } from '../lib/traffic';
+import { funnelByChannelOption } from '../lib/funnel-by-channel';
 import { byCountry, audienceBarOption } from '../lib/audience';
 
 /** Insight badge with green/red indicator */
@@ -286,6 +287,16 @@ export function FunnelView({
       {/* Channel conversion chart */}
       <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <EChart option={channelCrOption(stats)} />
+      </div>
+
+      {/* Funnel by channel: visits vs applications */}
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="mb-2 text-lg font-semibold">Воронка по каналам: визиты vs заявки</h3>
+        <EChart option={funnelByChannelOption(stats)} />
+        <p className="mt-2 text-xs text-slate-500">
+          Топ-каналы по визитам: рядом стоят столбцы визитов и заявок — видно, какой канал доводит
+          посетителя до заявки, а какой даёт трафик «вхолостую».
+        </p>
       </div>
 
       {/* Geo breakdown */}

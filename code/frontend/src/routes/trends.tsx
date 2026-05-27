@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
 import { dailySeries, weekOverWeek, trendsOption } from '../lib/trends';
+import { visitsHeatmapOption } from '../lib/heatmap';
 import { EChart } from '../components/charts/EChart';
 import { EmptyState } from '../components/EmptyState';
 import type { QueryStatus } from '../lib/query-status';
@@ -58,6 +59,15 @@ export function TrendsView({
       <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <h2 className="mb-2 text-lg font-semibold">Динамика по дням</h2>
         <EChart option={trendsOption(series)} />
+      </div>
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <h2 className="mb-2 text-lg font-semibold">Тепловая карта визитов (канал × дата)</h2>
+        <EChart option={visitsHeatmapOption(stats)} />
+        <p className="mt-2 text-xs text-slate-500">
+          Цвет ячейки — число визитов канала в этот день (когортный retention недоступен: Метрика
+          отдаёт только дневные агрегаты без возвратов по пользователям/сессиям). Видно всплески и
+          провалы трафика по каналам во времени.
+        </p>
       </div>
     </section>
   );
