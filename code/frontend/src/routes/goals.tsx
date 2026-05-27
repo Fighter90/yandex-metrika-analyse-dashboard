@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { B2bDeal, ChannelStat } from '@pca/shared';
 import { periodTotals } from '@pca/shared';
 import { api } from '../lib/api';
 import { useFilters } from '../store/filters';
 import { formatInt, formatPercent } from '../lib/format';
+import { simulatePayments } from '../lib/what-if';
 
 type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -60,6 +62,97 @@ function calcB2bPaid(deals: B2bDeal[]): number {
 /** Calculate total B2B pipeline tickets (not yet paid) */
 function calcB2bPipeline(deals: B2bDeal[]): number {
   return deals.filter((d) => d.stage !== 'paid').reduce((sum, d) => sum + d.tickets, 0);
+}
+
+/**
+ * «Что если» — interactive simulator card. Thin UI: all math lives in lib/what-if. Two range
+ * sliders (extra traffic %, CR uplift %) recompute projected applications / payments / gap live.
+ */
+function WhatIfCard({
+  visits,
+  applications,
+  b2bPaid,
+  target,
+}: {
+  visits: number;
+  applications: number;
+  b2bPaid: number;
+  target: number;
+}): JSX.Element {
+  const [extraVisitsPct, setExtraVisitsPct] = useState(0);
+  const [crUpliftPct, setCrUpliftPct] = useState(0);
+  const sim = simulatePayments({
+    visits,
+    applications,
+    b2bPaid,
+    target,
+    extraVisitsPct,
+    crUpliftPct,
+  });
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <h3 className="mb-1 text-lg font-semibold">Что если</h3>
+      <p className="mb-4 text-xs text-slate-500">
+        Прикидка эффекта от роста трафика и конверсии. Оценка, не факт: Метрика не покрывает шаг
+        заявка→оплата.
+      </p>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <label className="block text-sm">
+          <span className="text-slate-600">
+            Доп. трафик: <b>+{extraVisitsPct}%</b>
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={200}
+            step={5}
+            value={extraVisitsPct}
+            onChange={(e) => setExtraVisitsPct(Number(e.target.value))}
+            className="mt-1 w-full"
+            aria-label="Дополнительный трафик в процентах"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="text-slate-600">
+            Рост CR: <b>+{crUpliftPct}%</b>
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={200}
+            step={5}
+            value={crUpliftPct}
+            onChange={(e) => setCrUpliftPct(Number(e.target.value))}
+            className="mt-1 w-full"
+            aria-label="Рост конверсии в процентах"
+          />
+        </label>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+        <div className="rounded bg-slate-50 px-3 py-2">
+          <div className="text-xs text-slate-500">Заявки</div>
+          <div className="text-xl font-bold">{formatInt(sim.projectedApplications)}</div>
+          <div className="text-xs text-slate-400">
+            {sim.addedVsNow >= 0 ? '+' : ''}
+            {formatInt(sim.addedVsNow)} к текущему
+          </div>
+        </div>
+        <div className="rounded bg-slate-50 px-3 py-2">
+          <div className="text-xs text-slate-500">Оценка оплат</div>
+          <div className="text-xl font-bold">{formatInt(sim.projectedPayments)}</div>
+        </div>
+        <div className="rounded bg-slate-50 px-3 py-2">
+          <div className="text-xs text-slate-500">Gap до цели</div>
+          <div
+            className={`text-xl font-bold ${sim.gapAfter === 0 ? 'text-green-600' : 'text-red-600'}`}
+          >
+            {formatInt(sim.gapAfter)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Pure presentational Goals view. */
@@ -241,6 +334,14 @@ export function GoalsView({
           </p>
         </div>
       </div>
+
+      {/* What-if simulator */}
+      <WhatIfCard
+        visits={totalVisits}
+        applications={b2cApplications}
+        b2bPaid={b2bPaid}
+        target={target}
+      />
 
       {/* Recommendations */}
       <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">

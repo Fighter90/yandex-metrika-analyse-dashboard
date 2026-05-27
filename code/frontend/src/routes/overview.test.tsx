@@ -81,7 +81,7 @@ describe('OverviewView', () => {
   });
 
   it('lists weak spots when a channel converts below the overall rate', () => {
-    render(
+    renderWithProviders(
       <OverviewView
         status="success"
         stats={[
@@ -93,6 +93,11 @@ describe('OverviewView', () => {
     expect(screen.getByText('podcast')).toBeInTheDocument();
     expect(screen.getByText(/100 визитов · CR/)).toBeInTheDocument();
     expect(screen.queryByText(/Нет слабых мест/)).not.toBeInTheDocument();
+    // Deep-link to a prefilled hypothesis from the weak spot.
+    expect(screen.getByRole('link', { name: /гипотеза/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/hypotheses?'),
+    );
   });
 });
 

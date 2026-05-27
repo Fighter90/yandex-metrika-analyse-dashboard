@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { ChannelStat, GeoDeviceStat, UtmStat, PageStat, B2bDeal } from '@pca/shared';
 import { api } from '../lib/api';
@@ -11,6 +12,8 @@ import { dailySeries, trendsOption } from '../lib/trends';
 import { byCountry, byDevice, audienceBarOption, deviceShareOption } from '../lib/audience';
 import { EChart } from '../components/charts/EChart';
 import { filterBySegment, filterUtmBySegment } from '../lib/segment-filter';
+import { buildHypothesisUrl } from '../lib/hypothesis-prefill';
+import { shouldShowOnboarding, markOnboarded } from '../lib/onboarding';
 
 export type QueryStatus = 'pending' | 'error' | 'success';
 
@@ -391,8 +394,20 @@ export function OverviewView({
             {weak.map((w) => (
               <li key={w.channel} className="flex justify-between border-b border-slate-100 py-1">
                 <span>{w.channel}</span>
-                <span className="text-slate-500">
-                  {formatInt(w.visits)} визитов · CR {formatPercent(w.conversionRate)}
+                <span className="flex items-center gap-3">
+                  <span className="text-slate-500">
+                    {formatInt(w.visits)} визитов · CR {formatPercent(w.conversionRate)}
+                  </span>
+                  <Link
+                    to={buildHypothesisUrl({
+                      segment: w.channel,
+                      trouble: 'низкая конверсия',
+                      evidence: `CR ${formatPercent(w.conversionRate)} при ${formatInt(w.visits)} визитах`,
+                    })}
+                    className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100"
+                  >
+                    → гипотеза
+                  </Link>
                 </span>
               </li>
             ))}
@@ -400,6 +415,37 @@ export function OverviewView({
         )}
       </Card>
     </section>
+  );
+}
+
+/**
+ * Dismissible first-visit onboarding card (3 quick steps). Thin UI over lib/onboarding +
+ * localStorage; hidden once dismissed.
+ */
+function OnboardingCard(): JSX.Element | null {
+  const [visible, setVisible] = useState(() => shouldShowOnboarding(localStorage));
+  if (!visible) return null;
+  const dismiss = (): void => {
+    markOnboarded(localStorage);
+    setVisible(false);
+  };
+  return (
+    <div className="relative rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+      <button
+        type="button"
+        onClick={dismiss}
+        aria-label="Закрыть подсказку"
+        className="absolute right-3 top-3 text-indigo-400 hover:text-indigo-700"
+      >
+        ✕
+      </button>
+      <h2 className="mb-2 text-base font-semibold text-indigo-900">С чего начать</h2>
+      <ol className="list-decimal space-y-1 pl-5 text-sm text-indigo-800">
+        <li>Выберите период вверху страницы.</li>
+        <li>Посмотрите «Слабые места» — каналы с трафиком, но низкой конверсией.</li>
+        <li>Соберите отчёт со страницы «Отчёт» и зафиксируйте гипотезы.</li>
+      </ol>
+    </div>
   );
 }
 
@@ -439,16 +485,19 @@ export function Overview(): JSX.Element {
   const filteredUtm = filterUtmBySegment(utm.data ?? [], segment, allChannels);
 
   return (
-    <OverviewView
-      status={q.status}
-      stats={filteredChannels}
-      b2bDeals={b2bDeals.data}
-      primaryGoalName={goal.data?.name}
-      geoDevice={geoDevice.data}
-      utm={filteredUtm}
-      entryPages={entryPages.data}
-      exitPages={exitPages.data}
-    />
+    <div className="space-y-6">
+      <OnboardingCard />
+      <OverviewView
+        status={q.status}
+        stats={filteredChannels}
+        b2bDeals={b2bDeals.data}
+        primaryGoalName={goal.data?.name}
+        geoDevice={geoDevice.data}
+        utm={filteredUtm}
+        entryPages={entryPages.data}
+        exitPages={exitPages.data}
+      />
+    </div>
   );
 }
 
