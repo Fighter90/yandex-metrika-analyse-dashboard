@@ -55,14 +55,21 @@ describe('reportHtml', () => {
       "font-family:'Times New Roman',Times,serif;font-size:14pt;line-height:1.5",
     );
     expect(html).toContain('class="cover"');
+    expect(html).toContain('class="cover-title"');
     expect(html).toContain('Содержание');
-    expect(html).toContain('Период: 2025-01-01 — 2025-01-07');
+    expect(html).toContain('за период 2025-01-01 — 2025-01-07');
     expect(html).toContain('<h1>1. Краткие итоги</h1>');
     expect(html).toContain('<li>1. Краткие итоги</li>');
   });
 
   it('escapes &, < and > in content', () => {
     expect(reportHtml(snapshot)).toContain('a&lt;b&gt;&amp;c');
+  });
+
+  it('derives the title-page year from an ISO generatedAt', () => {
+    const html = reportHtml({ ...snapshot, generatedAt: '2026-05-28T10:00:00.000Z' });
+    expect(html).toContain('class="cover-meta"');
+    expect(html).toContain('2026');
   });
 
   it('embeds chart images as data URIs when the snapshot carries rendered charts (§6.4)', () => {

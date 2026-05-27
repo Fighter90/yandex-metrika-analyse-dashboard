@@ -187,10 +187,11 @@ export function GoalsView({
       </p>
     );
 
-  // Progress counts ONLY confirmed paid tickets (B2B paid) — заявка ≠ оплата, and the
-  // application→payment conversion is unknown, so we never fabricate "estimated paid" from
-  // applications. B2C applications are shown separately below as an upper-bound on potential.
-  const current = b2bPaid;
+  // Progress counts confirmed payments toward the 300-ticket goal. When the primary Metrika goal
+  // is a purchase/payment goal (goalLabel.isPaid), its reaches ARE payments and count too; for a
+  // plain application goal we count only B2B paid (заявка ≠ оплата — applications are not payments).
+  const metrikaPaid = goalLabel?.isPaid ? b2cApplications : 0;
+  const current = b2bPaid + metrikaPaid;
   const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0;
   const remaining = Math.max(0, target - current);
 

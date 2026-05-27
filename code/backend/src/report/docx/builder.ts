@@ -106,16 +106,59 @@ function parseTable(lines: string[], startIdx: number): { table: Table; consumed
  * Supports markdown tables, **bold**, *italic*, and `code` inline formatting.
  */
 export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
+  const sections = reportSections(snapshot);
+  const body = sections.slice(1); // section 0 is replaced by a proper GOST title page
   const children: (Paragraph | Table)[] = [];
-  reportSections(snapshot).forEach((section, i) => {
-    // The first section is the centered title page; the rest start on a new page and are numbered.
-    const heading = i === 0 ? section.heading : `${i}. ${section.heading}`;
+
+  const blanks = (n: number): Paragraph[] =>
+    Array.from({ length: n }, () => new Paragraph({ children: [] }));
+  const centered = (text: string, size: number, bold = false): Paragraph =>
+    new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [new TextRun({ text, size, bold })],
+    });
+  const year = /^\d{4}/.test(snapshot.generatedAt)
+    ? snapshot.generatedAt.slice(0, 4)
+    : snapshot.period.from.slice(0, 4);
+
+  // ---- ГОСТ title page (Р 7.32-2017): org on top, work title centred, snapshot id + year below ----
+  children.push(
+    centered('ProductCamp', 32, true),
+    centered('Трек «Конверсии и лидген»', 28),
+    ...blanks(6),
+    centered('Аналитический отчёт по конверсиям и лидгену', 36, true),
+    ...blanks(1),
+    centered(`за период ${snapshot.period.from} — ${snapshot.period.to}`, 28),
+    ...blanks(10),
+    centered(`Идентификатор среза данных: ${snapshot.id}`, 24),
+    centered(`Сформирован: ${snapshot.generatedAt}`, 24),
+    centered(`Цель: ${snapshot.kpi.target} оплаченных билетов`, 24),
+    ...blanks(2),
+    centered(year, 24),
+  );
+
+  // ---- Содержание (manual TOC of numbered sections) ----
+  children.push(
+    new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      pageBreakBefore: true,
+      children: [new TextRun('Содержание')],
+    }),
+  );
+  body.forEach((s, j) =>
+    children.push(new Paragraph({ children: [new TextRun(`${j + 1}. ${s.heading}`)] })),
+  );
+
+  // ---- Body sections (numbered, each on a new page) ----
+  body.forEach((section, j) => {
     children.push(
       new Paragraph({
-        heading: i === 0 ? HeadingLevel.TITLE : HeadingLevel.HEADING_1,
-        alignment: i === 0 ? AlignmentType.CENTER : AlignmentType.LEFT,
-        pageBreakBefore: i > 0,
-        children: [new TextRun(heading)],
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.LEFT,
+        pageBreakBefore: true,
+        spacing: { after: 120 },
+        children: [new TextRun(`${j + 1}. ${section.heading}`)],
       }),
     );
 
@@ -125,6 +168,7 @@ export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
       children.push(
         new Paragraph({
           alignment: AlignmentType.CENTER,
+          spacing: { after: 120 },
           children: [
             new ImageRun({
               type: 'png',
@@ -136,34 +180,44 @@ export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
       );
     }
 
-    // Process lines, detecting tables
+    // Process lines: tables, bullet lists, justified paragraphs. Collapse blank runs and trim
+    // leading/trailing blanks so the document has no empty filler blocks.
     const lines = section.lines;
     let lineIdx = 0;
+    let emittedInSection = false;
+    let pendingBlank = false;
     while (lineIdx < lines.length) {
       const line = lines[lineIdx]!;
 
-      // Try to parse a table
       if (isTableRow(line)) {
         const result = parseTable(lines, lineIdx);
         if (result) {
+          pendingBlank = false;
           children.push(result.table);
+          emittedInSection = true;
           lineIdx += result.consumed;
           continue;
         }
       }
 
-      // Detect list items (lines starting with - or *)
-      if (line.startsWith('- ') || line.startsWith('* ')) {
-        children.push(
-          new Paragraph({
-            children: parseInline(line.slice(2)),
-            bullet: { level: 0 },
-          }),
-        );
-      } else if (line === '') {
-        children.push(new Paragraph({ spacing: { after: 120 }, children: [] }));
+      if (line === '') {
+        // Defer blank lines; only emit a single spacer between real content (never leading/consecutive).
+        if (emittedInSection) pendingBlank = true;
       } else {
-        children.push(new Paragraph({ children: parseInline(line) }));
+        if (pendingBlank) {
+          children.push(new Paragraph({ spacing: { after: 120 }, children: [] }));
+          pendingBlank = false;
+        }
+        if (line.startsWith('- ') || line.startsWith('* ')) {
+          children.push(
+            new Paragraph({ children: parseInline(line.slice(2)), bullet: { level: 0 } }),
+          );
+        } else {
+          children.push(
+            new Paragraph({ alignment: AlignmentType.JUSTIFIED, children: parseInline(line) }),
+          );
+        }
+        emittedInSection = true;
       }
       lineIdx++;
     }

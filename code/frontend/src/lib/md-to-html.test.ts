@@ -102,4 +102,42 @@ describe('mdToHtml', () => {
     // ''.split('\n') = [''] → one empty line → <br/>
     expect(mdToHtml('')).toContain('<br/>');
   });
+
+  it('renders deep headings #### → h5 and ##### / ###### → h6 (no leaked #)', () => {
+    expect(mdToHtml('#### Sub')).toContain('<h5>Sub</h5>');
+    expect(mdToHtml('##### Deeper')).toContain('<h6>Deeper</h6>');
+    expect(mdToHtml('###### Deepest')).toContain('<h6>Deepest</h6>');
+    expect(mdToHtml('#### Sub')).not.toContain('#');
+  });
+
+  it('renders ordered lists (1. and 2)) as <ol>', () => {
+    const html = mdToHtml('1. first\n2) second');
+    expect(html).toContain('<ol>');
+    expect(html).toContain('<li>first</li>');
+    expect(html).toContain('<li>second</li>');
+    expect(html).toContain('</ol>');
+  });
+
+  it('switches list type when ul follows ol', () => {
+    const html = mdToHtml('1. ordered\n- unordered');
+    expect(html).toContain('</ol>');
+    expect(html).toContain('<ul>');
+    expect(html).toContain('<li>unordered</li>');
+  });
+
+  it('renders blockquotes', () => {
+    expect(mdToHtml('> quoted line')).toContain('<blockquote>quoted line</blockquote>');
+  });
+
+  it('renders ***bold-italic*** and the • bullet', () => {
+    expect(mdToHtml('***strong em***')).toContain('<strong><em>strong em</em></strong>');
+    expect(mdToHtml('• bullet')).toContain('<li>bullet</li>');
+  });
+
+  it('strips stray markdown markers so nothing leaks', () => {
+    // An unmatched ** and a mid-line ## must not survive in the output.
+    const html = mdToHtml('text with ** stray and ## marker');
+    expect(html).not.toContain('**');
+    expect(html).not.toContain('##');
+  });
 });

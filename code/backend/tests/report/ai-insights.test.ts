@@ -86,10 +86,10 @@ describe('generateInsights', () => {
       model: 'claude-sonnet-4-6',
       snapshot,
     });
-    // Should contain 5 sections joined together
+    // Should contain the joined sections (6 chunks incl. the final «Итоговый вывод»)
     expect(out).toContain('## Section');
     expect(out).toContain('анализ');
-    expect(doFetch).toHaveBeenCalledTimes(5);
+    expect(doFetch).toHaveBeenCalledTimes(6);
     const firstCall = doFetch.mock.calls[0];
     if (firstCall) {
       expect(firstCall[0]).toBe(ANTHROPIC_URL);

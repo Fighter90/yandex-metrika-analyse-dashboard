@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Dialog } from '@headlessui/react';
 import { Link } from 'react-router-dom';
 import type { ChannelStat, UtmStat } from '@pca/shared';
 import { api } from '../lib/api';
@@ -137,6 +139,7 @@ export function TrafficView({
   stats: ChannelStat[];
   utm: UtmStat[];
 }): JSX.Element {
+  const [sankeyOpen, setSankeyOpen] = useState(false);
   if (status === 'pending') return <p className="text-slate-500">Загрузка…</p>;
   if (status === 'error')
     return (
@@ -187,14 +190,50 @@ export function TrafficView({
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-2 text-lg font-semibold">Поток: источник → кампания → заявки</h2>
-        <EChart option={utmSankeyOption(utm)} />
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold">Поток: источник → кампания → заявки</h2>
+          <button
+            type="button"
+            onClick={() => setSankeyOpen(true)}
+            className="shrink-0 rounded border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100"
+          >
+            ⛶ Развернуть на весь экран
+          </button>
+        </div>
+        <EChart option={utmSankeyOption(utm)} height={460} />
         <ChartCaption
           correct="Толщина связей: источник→кампания — по визитам, кампания→«Заявки» — по достижениям целей (из utm_stats)."
           caveat="Трафик без UTM-меток («(none)») не атрибутируется и выпадает из потока."
           advice="Размечайте все кампании UTM-метками, чтобы покрытие было ≥70% и поток отражал реальную атрибуцию."
         />
       </div>
+
+      {/* Fullscreen Sankey — readable on a large canvas */}
+      <Dialog open={sankeyOpen} onClose={() => setSankeyOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/40" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="flex h-[90vh] w-[95vw] max-w-[1600px] flex-col rounded-lg bg-white p-4 shadow-xl">
+            <div className="mb-2 flex items-center justify-between">
+              <Dialog.Title className="text-lg font-semibold">
+                Поток: источник → кампания → заявки
+              </Dialog.Title>
+              <button
+                type="button"
+                onClick={() => setSankeyOpen(false)}
+                aria-label="Закрыть"
+                className="rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-100"
+              >
+                ✕ Закрыть
+              </button>
+            </div>
+            <div className="min-h-0 flex-1">
+              {sankeyOpen && (
+                <EChart option={utmSankeyOption(utm)} height={window.innerHeight * 0.78} />
+              )}
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
 
       <div className="space-y-2">
         <h2 className="text-lg font-semibold">Каналы — таблица</h2>

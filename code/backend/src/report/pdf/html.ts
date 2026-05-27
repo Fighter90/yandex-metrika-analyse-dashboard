@@ -62,15 +62,28 @@ function renderTable(lines: string[], startIdx: number): { html: string; consume
  */
 export function reportHtml(snapshot: ReportSnapshot): string {
   const all = reportSections(snapshot);
-  // The first section is the title page; the rest are numbered 1..N and listed in the TOC.
-  const toc = all
-    .slice(1)
-    .map((s, j) => `<li>${j + 1}. ${escapeHtml(s.heading)}</li>`)
-    .join('');
+  const body = all.slice(1); // section 0 is replaced by a proper GOST title page
+  const year = /^\d{4}/.test(snapshot.generatedAt)
+    ? snapshot.generatedAt.slice(0, 4)
+    : snapshot.period.from.slice(0, 4);
+  const toc = body.map((s, j) => `<li>${j + 1}. ${escapeHtml(s.heading)}</li>`).join('');
 
-  let body = '';
-  all.forEach((sec, i) => {
-    const heading = i === 0 ? sec.heading : `${i}. ${escapeHtml(sec.heading)}`;
+  // ГОСТ Р 7.32-2017 title page: org on top, work title centred, snapshot id + year below.
+  const cover =
+    `<section class="cover">` +
+    `<div class="cover-org">ProductCamp<br><span class="cover-track">Трек «Конверсии и лидген»</span></div>` +
+    `<div class="cover-title">Аналитический отчёт по конверсиям и лидгену</div>` +
+    `<div class="cover-sub">за период ${escapeHtml(snapshot.period.from)} — ${escapeHtml(snapshot.period.to)}</div>` +
+    `<div class="cover-meta">` +
+    `Идентификатор среза данных: ${escapeHtml(snapshot.id)}<br>` +
+    `Сформирован: ${escapeHtml(snapshot.generatedAt)}<br>` +
+    `Цель: ${snapshot.kpi.target} оплаченных билетов<br>${escapeHtml(year)}` +
+    `</div></section>` +
+    `<section class="toc"><h2>Содержание</h2><ol>${toc}</ol></section>`;
+
+  let sectionsHtml = '';
+  body.forEach((sec, j) => {
+    const heading = `${j + 1}. ${escapeHtml(sec.heading)}`;
     const lines = sec.lines;
     // Embed the section's chart PNG (FINAL §6.4), if rendered into the snapshot.
     const chartBase64 = sec.chartId ? snapshot.charts?.[sec.chartId] : undefined;
@@ -118,16 +131,16 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     );
     // Merge consecutive <ul> blocks
     content = content.replace(/<\/ul>\s*<ul>/g, '');
+    // Collapse runs of empty spacers and trim leading/trailing ones — no empty filler blocks.
+    content = content
+      .replace(/(<p class="sp"><\/p>\s*){2,}/g, '<p class="sp"></p>')
+      .replace(/^(<p class="sp"><\/p>\s*)+/, '')
+      .replace(/(<p class="sp"><\/p>\s*)+$/, '');
 
-    if (i === 0) {
-      body +=
-        `<section class="cover"><h1>${escapeHtml(heading)}</h1>${content}` +
-        `<p class="sub">Период: ${escapeHtml(snapshot.period.from)} — ${escapeHtml(snapshot.period.to)}</p></section>` +
-        `<section class="toc"><h2>Содержание</h2><ol>${toc}</ol></section>`;
-    } else {
-      body += `<section class="brk"><h1>${escapeHtml(heading)}</h1>${content}</section>`;
-    }
+    sectionsHtml += `<section class="brk"><h1>${heading}</h1>${content}</section>`;
   });
+
+  const bodyHtml = cover + sectionsHtml;
 
   return [
     '<!doctype html>',
@@ -136,8 +149,12 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     '<style>',
     '@page{size:A4;margin:20mm 15mm 20mm 30mm}',
     "body{font-family:'Times New Roman',Times,serif;font-size:14pt;line-height:1.5;color:#000;text-align:justify}",
-    '.cover{text-align:center;page-break-after:always;padding-top:60mm}',
-    '.cover h1{font-size:20pt;border:0;margin-bottom:10mm}.cover .sub{font-size:14pt;margin:4mm 0}',
+    '.cover{text-align:center;page-break-after:always;height:247mm;display:flex;flex-direction:column;align-items:center}',
+    '.cover-org{font-size:16pt;font-weight:bold;margin-top:25mm}',
+    '.cover-track{font-size:13pt;font-weight:normal}',
+    '.cover-title{font-size:20pt;font-weight:bold;margin-top:55mm;padding:0 10mm}',
+    '.cover-sub{font-size:14pt;margin-top:6mm}',
+    '.cover-meta{font-size:12pt;margin-top:auto;line-height:1.6}',
     '.toc{page-break-after:always}.toc h2{text-align:center;font-size:14pt}',
     '.toc ol{list-style:none;padding:0}.toc li{margin:2mm 0}',
     'h1{font-size:14pt;font-weight:bold;margin:0 0 4mm}',
@@ -152,7 +169,7 @@ export function reportHtml(snapshot: ReportSnapshot): string {
     'p.chart{text-align:center;margin:8pt 0}',
     'p.chart img{max-width:100%;height:auto}',
     '</style></head><body>',
-    body,
+    bodyHtml,
     '</body></html>',
   ].join('');
 }

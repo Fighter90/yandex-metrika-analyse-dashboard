@@ -137,6 +137,24 @@ describe('SnapshotBuilder', () => {
     expect(snap.funnel.b2bPaidTickets).toBe(20);
   });
 
+  it('counts purchase-goal reaches as payments in the gap (goalLabel.isPaid)', () => {
+    // Seed a purchase goal so the primary goal classifies as «purchase» → its reaches are payments.
+    metrics.upsertGoals([
+      {
+        id: 1,
+        name: 'Ecommerce: покупка',
+        type: 'e_purchase',
+        isB2b: false,
+        isArchived: false,
+        syncedAt: 'T',
+      },
+    ]);
+    const snap = builder.build({ id: 'p', generatedAt: 'T', from: '2025-01-01', to: '2025-01-07' });
+    expect(snap.goalLabel).toMatchObject({ title: 'Оплат', isPaid: true });
+    // gap = target 300 − B2B paid 20 − Metrika purchases 7 = 273.
+    expect(snap.kpi.gap).toBe(273);
+  });
+
   it('groups B2B deals by same stage (exercises the merge branch in computeB2bSummary)', () => {
     // Create a third deal with the same 'paid' stage to exercise the "key exists" ?? branch
     const b2b = new B2bRepo(db);

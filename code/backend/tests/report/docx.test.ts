@@ -98,6 +98,11 @@ describe('buildDocx', () => {
     expect(buf.subarray(0, 2).toString('latin1')).toBe('PK'); // zip magic
   });
 
+  it('builds a valid .docx with an ISO generatedAt (title-page year branch)', async () => {
+    const buf = await buildDocx({ ...snapshot, generatedAt: '2026-05-28T10:00:00.000Z' });
+    expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
+
   it('embeds chart PNGs (ImageRun) when the snapshot carries rendered charts (§6.4)', async () => {
     // 1x1 transparent PNG — enough to exercise the ImageRun embedding branch.
     const png =
