@@ -90,7 +90,9 @@ describe('OverviewView', () => {
         ]}
       />,
     );
-    expect(screen.getByText('podcast')).toBeInTheDocument();
+    // 'podcast' shows in both the weekly digest and the weak-spots list; the CR detail line is
+    // unique to the weak-spots item.
+    expect(screen.getAllByText('podcast').length).toBeGreaterThan(0);
     expect(screen.getByText(/100 визитов · CR/)).toBeInTheDocument();
     expect(screen.queryByText(/Нет слабых мест/)).not.toBeInTheDocument();
     // Deep-link to a prefilled hypothesis from the weak spot.
