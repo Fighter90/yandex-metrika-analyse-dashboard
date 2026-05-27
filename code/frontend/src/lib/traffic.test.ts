@@ -25,24 +25,54 @@ function stat(over: Partial<ChannelStat>): ChannelStat {
   };
 }
 
-describe('utmCoverage', () => {
+function ustat(over: Partial<UtmStat>): UtmStat {
+  return {
+    date: '2025-01-01',
+    utmSource: 'tg',
+    utmMedium: 'cpc',
+    utmCampaign: 'spring',
+    visits: 10,
+    users: 9,
+    goalReaches: 1,
+    conversionRate: 0.1,
+    ...over,
+  };
+}
+
+describe('utmCoverage (visit-weighted from utm_stats)', () => {
   it('is 0/low for an empty set', () => {
     expect(utmCoverage([])).toEqual({ withUtm: 0, withoutUtm: 0, ratio: 0, low: true });
   });
 
-  it('flags low coverage below 70%', () => {
-    const cov = utmCoverage([
-      stat({ utmSource: 'x' }),
-      stat({ utmSource: null }),
-      stat({ utmSource: null }),
-    ]);
-    expect(cov.withUtm).toBe(1);
-    expect(cov.withoutUtm).toBe(2);
+  it('counts UTM-tagged visits against total channel visits (M-004 fix)', () => {
+    // 100 total channel visits; 40 visits carry a real UTM source → 40% coverage (low).
+    const cov = utmCoverage(
+      [stat({ visits: 100, utmSource: null })],
+      [ustat({ utmSource: 'tg', visits: 40 })],
+    );
+    expect(cov.withUtm).toBe(40);
+    expect(cov.withoutUtm).toBe(60);
+    expect(cov.ratio).toBeCloseTo(0.4, 5);
     expect(cov.low).toBe(true);
   });
 
-  it('does not flag when coverage is high', () => {
-    const cov = utmCoverage([stat({ utmSource: 'a' }), stat({ utmSource: 'b' })]);
+  it('excludes the «(none)» source bucket from the numerator', () => {
+    const cov = utmCoverage(
+      [stat({ visits: 100, utmSource: null })],
+      [ustat({ utmSource: '(none)', visits: 90 }), ustat({ utmSource: 'tg', visits: 80 })],
+    );
+    expect(cov.withUtm).toBe(80); // only the real source counts
+    expect(cov.ratio).toBeCloseTo(0.8, 5);
+    expect(cov.low).toBe(false);
+  });
+
+  it('clamps coverage to 100% when tagged visits exceed channel visits', () => {
+    const cov = utmCoverage(
+      [stat({ visits: 50, utmSource: null })],
+      [ustat({ utmSource: 'tg', visits: 90 })],
+    );
+    expect(cov.withUtm).toBe(50);
+    expect(cov.withoutUtm).toBe(0);
     expect(cov.ratio).toBe(1);
     expect(cov.low).toBe(false);
   });

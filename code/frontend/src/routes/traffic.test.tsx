@@ -53,8 +53,13 @@ describe('TrafficView', () => {
   });
 
   it('shows the low-UTM badge, channel table, and the UTM-breakdown table', () => {
+    // 100 channel visits, only 10 UTM-tagged → 10% coverage (< 70% → low badge shown).
     render(
-      <TrafficView status="success" stats={[stat({ utmSource: null })]} utm={[utmStat({})]} />,
+      <TrafficView
+        status="success"
+        stats={[stat({ utmSource: null, visits: 100 })]}
+        utm={[utmStat({ visits: 10 })]}
+      />,
     );
     expect(screen.getByRole('status')).toHaveTextContent(/Низкое покрытие UTM/);
     expect(screen.getByText('Каналы — визиты')).toBeInTheDocument();
@@ -69,7 +74,14 @@ describe('TrafficView', () => {
   });
 
   it('hides the badge when UTM coverage is high', () => {
-    render(<TrafficView status="success" stats={[stat({ utmSource: 'podcast' })]} utm={[]} />);
+    // 100 channel visits, 80 UTM-tagged → 80% coverage (≥ 70% → no low badge).
+    render(
+      <TrafficView
+        status="success"
+        stats={[stat({ visits: 100 })]}
+        utm={[utmStat({ utmSource: 'vk', visits: 80 })]}
+      />,
+    );
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 });

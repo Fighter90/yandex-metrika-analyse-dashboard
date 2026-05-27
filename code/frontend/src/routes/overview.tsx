@@ -100,12 +100,12 @@ function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
   return insights;
 }
 
-/** Compute UTM insights from the single coverage factsource (utmCoverage over channel rows). */
-function computeUtmInsights(stats: ChannelStat[]): JSX.Element[] {
+/** Compute UTM insights from the single coverage factsource (visit-weighted utmCoverage). */
+function computeUtmInsights(stats: ChannelStat[], utm: UtmStat[]): JSX.Element[] {
   const insights: JSX.Element[] = [];
   if (stats.length === 0) return insights;
 
-  const coverage = utmCoverage(stats).ratio * 100;
+  const coverage = utmCoverage(stats, utm).ratio * 100;
 
   if (coverage >= 70) {
     insights.push(
@@ -229,9 +229,9 @@ export function OverviewView({
   const devRows = geoDevice ? byDevice(geoDevice) : [];
   const hasGeo = geoRows.length > 0 && devRows.length > 0;
 
-  // UTM coverage — single source: utmCoverage(channels) from lib/traffic (share of channel rows
-  // carrying a utm_source). Overview and Traffic now report the same number from the same source.
-  const utmCov = utmCoverage(stats);
+  // UTM coverage — single source: visit-weighted utmCoverage(channels, utm) from lib/traffic
+  // (UTM-tagged visits / total visits). Overview and Traffic report the same number.
+  const utmCov = utmCoverage(stats, utm ?? []);
   const utmCoveragePct = (utmCov.ratio * 100).toFixed(0);
   const lowUtm = utmCov.low;
 
@@ -241,7 +241,7 @@ export function OverviewView({
 
   // Compute insights
   const channelInsights = computeChannelInsights(stats);
-  const utmInsights = computeUtmInsights(stats);
+  const utmInsights = computeUtmInsights(stats, utm ?? []);
   const entryInsights = computePageInsights(entryPages, 'entry');
   const exitInsights = computePageInsights(exitPages, 'exit');
   const geoInsights = computeGeoInsights(geoDevice);

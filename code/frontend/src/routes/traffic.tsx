@@ -91,7 +91,7 @@ function computeChannelInsights(stats: ChannelStat[]): JSX.Element[] {
 /** Compute UTM insights */
 function computeUtmInsights(utm: UtmStat[], stats: ChannelStat[]): JSX.Element[] {
   const insights: JSX.Element[] = [];
-  const cov = utmCoverage(stats);
+  const cov = utmCoverage(stats, utm);
 
   if (cov.ratio >= 0.7) {
     insights.push(
@@ -150,7 +150,7 @@ export function TrafficView({
 
   if (stats.length === 0 && utm.length === 0) return <EmptyState />;
 
-  const cov = utmCoverage(stats);
+  const cov = utmCoverage(stats, utm);
   const rows = channelRows(stats);
   const utmTable = utmRows(utm);
   const channelInsights = computeChannelInsights(stats);
