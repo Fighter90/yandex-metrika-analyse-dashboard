@@ -303,8 +303,11 @@ KPI-математику) проходят через **спеку** до код
 
 ## Релизы
 
-- [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) — Full Dashboard Overhaul (latest)
-- [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) — AI HTML, Help Page, Funnel Rework, Sync Progress
+| Версия | Дата | Описание |
+|--------|------|----------|
+| **v2.1.0** (Latest) | 2026-05-27 | Фильтры до 1 года, GOAL_ID select, PDF авто-поиск, руководство пользователя, QA обновлены |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Полная переработка дашборда (9 страниц, AI HTML, мобильное меню, Help page) |
+| [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) | 2026-05-26 | AI-анализ HTML, Help page, переработка воронки, прогресс-бар синхронизации |
 
 ## License · Authors · Credits
 

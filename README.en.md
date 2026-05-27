@@ -283,8 +283,11 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 ## Releases
 
-- [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) — Full Dashboard Overhaul (latest)
-- [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) — AI HTML, Help Page, Funnel Rework, Sync Progress
+| Version | Date | Description |
+|---------|------|-------------|
+| **v2.1.0** (Latest) | 2026-05-27 | Extended filters (up to 1 year), GOAL_ID select, PDF auto-detect, user guide, QA updated |
+| [v2.0.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.0.0) | 2026-05-26 | Full Dashboard Overhaul (9 pages, AI HTML, mobile menu, Help page) |
+| [v0.13.0](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v0.13.0) | 2026-05-26 | AI analysis HTML, Help page, funnel rework, sync progress bar |
 
 ## License · Authors · Credits
 
