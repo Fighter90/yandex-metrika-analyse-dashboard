@@ -22,8 +22,6 @@ export default defineConfig({
         'src/routes/audience.tsx',
         'src/routes/trends.tsx',
         'src/routes/b2b.tsx',
-        'src/routes/hypotheses.tsx',
-        'src/routes/decisions.tsx',
         // Settings — stateful UI with setInterval progress simulation + mutation glue;
         // SettingsView is unit-tested, the wrapper is covered by the e2e smoke spec.
         'src/routes/settings.tsx',

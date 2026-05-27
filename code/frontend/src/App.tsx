@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { queryClient } from './lib/query';
 import { Layout } from './components/Layout';
 import { Overview } from './routes/overview';
@@ -7,8 +7,6 @@ import { Traffic } from './routes/traffic';
 import { Behavior } from './routes/behavior';
 import { Funnel } from './routes/funnel';
 import { Goals } from './routes/goals';
-import { Hypotheses } from './routes/hypotheses';
-import { Decisions } from './routes/decisions';
 import { B2b } from './routes/b2b';
 import { ReportPreview } from './routes/report-preview';
 import { History } from './routes/history';
@@ -26,10 +24,12 @@ export function App(): JSX.Element {
             <Route path="behavior" element={<Behavior />} />
             <Route path="funnel" element={<Funnel />} />
             <Route path="goals" element={<Goals />} />
-            <Route path="hypotheses" element={<Hypotheses />} />
-            <Route path="decisions" element={<Decisions />} />
             <Route path="b2b" element={<B2b />} />
             <Route path="report" element={<ReportPreview />} />
+            {/* Methodology pages removed (v2.7.0): hypotheses + decisions are now AI-generated
+                inside the report. Redirect stale URLs to /report. */}
+            <Route path="hypotheses" element={<Navigate to="/report" replace />} />
+            <Route path="decisions" element={<Navigate to="/report" replace />} />
             <Route path="history" element={<History />} />
             <Route path="settings" element={<Settings />} />
             <Route path="help" element={<Help />} />

@@ -20,7 +20,7 @@ describe('Layout', () => {
     expect(navLinks.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('includes the methodology nav entries (Гипотезы, Решения, B2B)', () => {
+  it('drops the methodology nav entries (Гипотезы, Решения) — AI-generated in the report now', () => {
     renderWithProviders(
       <Routes>
         <Route element={<Layout />}>
@@ -28,9 +28,11 @@ describe('Layout', () => {
         </Route>
       </Routes>,
     );
-    expect(screen.getAllByRole('link', { name: 'Гипотезы' }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByRole('link', { name: 'Решения' }).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByRole('link', { name: 'B2B' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryAllByRole('link', { name: 'Гипотезы' }).length).toBe(0);
+    expect(screen.queryAllByRole('link', { name: 'Решения' }).length).toBe(0);
+    // Core pages remain present.
+    expect(screen.getAllByRole('link', { name: 'Обзор' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('link', { name: 'Отчёт' }).length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the hamburger button for mobile', () => {
