@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Dialog } from '@headlessui/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { B2bDeal, B2bStage, NewB2bDeal } from '@pca/shared';
 import { api } from '../lib/api';
@@ -22,6 +23,13 @@ export function B2bView({
   const [company, setCompany] = useState('');
   const [tickets, setTickets] = useState('');
   const [stage, setStage] = useState<B2bStage>('lead');
+  const [tableOpen, setTableOpen] = useState(false);
+
+  // Per-stage totals for the kanban — every stage shown (0 if empty).
+  const byStage = B2B_STAGES.map((s) => {
+    const ds = deals.filter((d) => d.stage === s);
+    return { stage: s, tickets: ds.reduce((a, d) => a + d.tickets, 0), deals: ds.length };
+  });
 
   const submit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -37,11 +45,12 @@ export function B2bView({
   };
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-4">
+      {/* Kanban — all 4 stages always shown */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {summary.byStage.map((s) => (
-          <div key={s.stage} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-            <div className="text-xs uppercase text-slate-500">{s.stage}</div>
+        {byStage.map((s) => (
+          <div key={s.stage} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-semibold uppercase text-slate-500">{s.stage}</div>
             <div className="text-lg font-bold">{formatInt(s.tickets)} билетов</div>
             <div className="text-xs text-slate-500">{s.deals} сделок</div>
           </div>
@@ -92,48 +101,76 @@ export function B2bView({
         </button>
       </form>
 
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-slate-500">
-            <th className="py-1">Компания</th>
-            <th>Билеты</th>
-            <th>Этап</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {deals.map((d) => (
-            <tr key={d.id} className="border-t border-slate-100">
-              <td className="py-1">{d.company}</td>
-              <td>{formatInt(d.tickets)}</td>
-              <td>
-                <select
-                  aria-label={`Этап ${d.company}`}
-                  value={d.stage}
-                  onChange={(e) => onStageChange({ id: d.id, stage: e.target.value as B2bStage })}
-                  className="rounded border border-slate-300 px-1"
-                >
-                  {B2B_STAGES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <button
-                  type="button"
-                  aria-label={`Удалить ${d.company}`}
-                  onClick={() => onRemove(d.id)}
-                  className="text-red-600"
-                >
-                  ✕
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <button
+        type="button"
+        onClick={() => setTableOpen(true)}
+        className="rounded border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-50"
+      >
+        Развернуть полную таблицу ({deals.length})
+      </button>
+
+      <Dialog open={tableOpen} onClose={() => setTableOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-y-0 right-0 flex max-w-full">
+          <Dialog.Panel className="w-screen max-w-lg overflow-y-auto bg-white p-4 shadow-xl">
+            <div className="mb-3 flex items-center justify-between">
+              <Dialog.Title className="text-lg font-semibold">B2B-сделки</Dialog.Title>
+              <button
+                type="button"
+                aria-label="Закрыть"
+                onClick={() => setTableOpen(false)}
+                className="rounded p-1 text-slate-500 hover:bg-slate-100"
+              >
+                ✕
+              </button>
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-slate-500">
+                  <th className="py-1">Компания</th>
+                  <th>Билеты</th>
+                  <th>Этап</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {deals.map((d) => (
+                  <tr key={d.id} className="border-t border-slate-100">
+                    <td className="py-1">{d.company}</td>
+                    <td>{formatInt(d.tickets)}</td>
+                    <td>
+                      <select
+                        aria-label={`Этап ${d.company}`}
+                        value={d.stage}
+                        onChange={(e) =>
+                          onStageChange({ id: d.id, stage: e.target.value as B2bStage })
+                        }
+                        className="rounded border border-slate-300 px-1"
+                      >
+                        {B2B_STAGES.map((s) => (
+                          <option key={s} value={s}>
+                            {s}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        aria-label={`Удалить ${d.company}`}
+                        onClick={() => onRemove(d.id)}
+                        className="text-red-600"
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </section>
   );
 }
