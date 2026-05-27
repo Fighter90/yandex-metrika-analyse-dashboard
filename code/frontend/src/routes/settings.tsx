@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Goal } from '@pca/shared';
 import { api } from '../lib/api';
 import { errorMessage } from '../lib/error-message';
+import { useFilters } from '../store/filters';
 import { B2b } from './b2b';
 
 interface SettingsForm {
@@ -23,10 +24,6 @@ function emptyForm(): SettingsForm {
     GOAL_ID: '',
     ANTHROPIC_API_KEY: '',
   };
-}
-
-function isoDaysAgo(days: number): string {
-  return new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 }
 
 /** Progress bar with detailed step descriptions for Metrika sync */
@@ -121,6 +118,7 @@ export function SettingsView({
   isRefreshing,
   refreshResult,
   b2bSlot,
+  syncPeriod,
 }: {
   status: 'pending' | 'error' | 'success';
   settings: SettingsForm | undefined;
@@ -138,6 +136,8 @@ export function SettingsView({
   /** B2B pipeline manager, injected by the data wrapper (self-fetching). Optional so the pure view
    *  stays testable without the b2b query. */
   b2bSlot?: React.ReactNode;
+  /** Period the «Обновить данные» button syncs (from the global filter). */
+  syncPeriod?: { from: string; to: string };
 }): JSX.Element {
   const [form, setForm] = useState<SettingsForm>(settings ?? emptyForm());
   const [syncProgress, setSyncProgress] = useState(0);
@@ -276,7 +276,9 @@ export function SettingsView({
           </div>
         ) : null}
         <p className="mt-2 text-xs text-indigo-400">
-          Последние 14 дней → SQLite → перегенерация отчётов
+          {syncPeriod
+            ? `Период из текущего фильтра (${syncPeriod.from} — ${syncPeriod.to}) → SQLite → перегенерация отчётов`
+            : 'Период из текущего фильтра → SQLite → перегенерация отчётов'}
         </p>
       </div>
 
@@ -416,6 +418,7 @@ function Field({
 /** Data wrapper. */
 export function Settings(): JSX.Element {
   const qc = useQueryClient();
+  const { from, to } = useFilters();
   const q = useQuery({ queryKey: ['settings'], queryFn: api.getSettings });
   const healthQ = useQuery({ queryKey: ['health'], queryFn: api.health });
   const goalsQ = useQuery({ queryKey: ['goals'], queryFn: () => api.goals(false) });
@@ -441,11 +444,7 @@ export function Settings(): JSX.Element {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['settings'] }),
   });
   const refreshMut = useMutation({
-    mutationFn: async () => {
-      const from = isoDaysAgo(13);
-      const to = isoDaysAgo(0);
-      return api.sync({ from, to });
-    },
+    mutationFn: async () => api.sync({ from, to }),
     onSuccess: () => {
       // Invalidate all metric queries so pages re-fetch
       void qc.invalidateQueries({ queryKey: ['channels'] });
@@ -522,6 +521,7 @@ export function Settings(): JSX.Element {
       isRefreshing={refreshMut.isPending}
       refreshResult={refreshMut.data}
       b2bSlot={<B2b />}
+      syncPeriod={{ from, to }}
     />
   );
 }

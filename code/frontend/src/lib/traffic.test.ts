@@ -105,12 +105,16 @@ describe('utmRows', () => {
 describe('channelBarOption', () => {
   it('maps channels to a bar series', () => {
     const o = channelBarOption(channelRows([stat({ channel: 'podcast', visits: 10 })])) as {
-      xAxis: { data: string[] };
+      xAxis: { data: string[]; axisLabel: { rotate: number; formatter: (v: string) => string } };
       series: { data: { value: number; itemStyle: { color: string } }[] }[];
     };
     expect(o.xAxis.data).toEqual(['podcast']);
     expect(o.series[0]?.data[0]?.value).toBe(10);
     expect(o.series[0]?.data[0]?.itemStyle.color).toMatch(/^#[0-9A-F]{6}$/i);
+    // x labels are rotated and long names truncated; short names pass through unchanged.
+    expect(o.xAxis.axisLabel.rotate).toBe(30);
+    expect(o.xAxis.axisLabel.formatter('короткий')).toBe('короткий');
+    expect(o.xAxis.axisLabel.formatter('очень длинное название канала')).toMatch(/…$/);
   });
 });
 
