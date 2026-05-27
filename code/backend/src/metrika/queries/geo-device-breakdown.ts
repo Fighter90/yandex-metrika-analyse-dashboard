@@ -56,6 +56,7 @@ export async function geoDeviceBreakdown(
       metrics: geoDeviceMetrics(opts.goalId),
       date1: opts.from,
       date2: opts.to,
+      attribution: 'lastsign',
     },
     StatDataResponseSchema,
   );

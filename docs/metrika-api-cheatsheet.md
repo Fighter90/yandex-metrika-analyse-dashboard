@@ -36,6 +36,14 @@ Base URL: `https://api-metrika.yandex.net`
 - UTM: `ym:s:UTMSource,ym:s:UTMMedium,ym:s:UTMCampaign,ym:s:UTMContent`.
 - Поведение: `ym:s:startURL,ym:s:exitURL`.
 - Период: `date1`, `date2` (формат `YYYY-MM-DD`).
+- Атрибуция: все запросы передают `attribution=lastsign` (последний значимый источник) — чтобы цифры
+  совпадали с интерфейсом Метрики, где по умолчанию выбрана модель «LastSign».
+
+> **Атрибуция и cross-device.** Запросы фиксируют `attribution=lastsign`, поэтому визиты/заявки по
+> каналам совпадают с отчётом Метрики в режиме «LastSign». Интерфейс Метрики дополнительно умеет
+> межсессионную склейку устройств (`isCrossDevice`), которой в Stat API без cross-device-модели нет;
+> из-за этого возможны небольшие расхождения по уникальным пользователям. Это ожидаемо: для точной
+> сверки выбирайте в Метрике LastSign **без** cross-device.
 
 > **Известное ограничение — страницы выхода (`ym:s:exitURL`).** Для счётчика ProductCamp
 > Stat API отклоняет запросы с измерением `ym:s:exitURL` (400 invalid attribute), поэтому
