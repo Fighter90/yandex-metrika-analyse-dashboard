@@ -326,36 +326,38 @@ export function OverviewView({
       {/* UTM breakdown */}
       {utm && utm.length > 0 && (
         <Card title={`UTM-разбивка (покрытие ${utmCoveragePct}%)`}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-500">
-                <th className="py-1">Source</th>
-                <th>Medium</th>
-                <th>Campaign</th>
-                <th>Визиты</th>
-                <th>Заявки</th>
-                <th>CR</th>
-              </tr>
-            </thead>
-            <tbody>
-              {utm
-                .sort((a, b) => b.visits - a.visits)
-                .slice(0, 10)
-                .map((u) => (
-                  <tr
-                    key={`${u.utmSource}-${u.utmMedium}-${u.utmCampaign}`}
-                    className="border-t border-slate-100"
-                  >
-                    <td className="py-1">{u.utmSource ?? '(none)'}</td>
-                    <td>{u.utmMedium ?? '(none)'}</td>
-                    <td>{u.utmCampaign ?? '(none)'}</td>
-                    <td>{formatInt(u.visits)}</td>
-                    <td>{formatInt(u.goalReaches)}</td>
-                    <td>{formatPercent(u.conversionRate)}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[36rem] text-sm">
+              <thead>
+                <tr className="text-left text-slate-500">
+                  <th className="py-1">Source</th>
+                  <th>Medium</th>
+                  <th>Campaign</th>
+                  <th>Визиты</th>
+                  <th>Заявки</th>
+                  <th>CR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {utm
+                  .sort((a, b) => b.visits - a.visits)
+                  .slice(0, 10)
+                  .map((u) => (
+                    <tr
+                      key={`${u.utmSource}-${u.utmMedium}-${u.utmCampaign}`}
+                      className="border-t border-slate-100"
+                    >
+                      <td className="py-1">{u.utmSource ?? '(none)'}</td>
+                      <td>{u.utmMedium ?? '(none)'}</td>
+                      <td>{u.utmCampaign ?? '(none)'}</td>
+                      <td>{formatInt(u.visits)}</td>
+                      <td>{formatInt(u.goalReaches)}</td>
+                      <td>{formatPercent(u.conversionRate)}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
           {utmInsights.length > 0 && <div className="mt-3 flex flex-wrap gap-2">{utmInsights}</div>}
         </Card>
       )}
@@ -363,26 +365,28 @@ export function OverviewView({
       {/* Entry pages */}
       {topEntry.length > 0 && (
         <Card title="Топ страниц входа">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-500">
-                <th className="py-1">Страница</th>
-                <th>Визиты</th>
-                <th>Отказы</th>
-                <th>Заявки</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topEntry.map((p) => (
-                <tr key={p.page} className="border-t border-slate-100">
-                  <td className="py-1">{p.page}</td>
-                  <td>{formatInt(p.visits)}</td>
-                  <td>{formatPercent(p.bounceRate)}</td>
-                  <td>{formatInt(p.goalReaches)}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[28rem] text-sm">
+              <thead>
+                <tr className="text-left text-slate-500">
+                  <th className="py-1">Страница</th>
+                  <th>Визиты</th>
+                  <th>Отказы</th>
+                  <th>Заявки</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {topEntry.map((p) => (
+                  <tr key={p.page} className="border-t border-slate-100">
+                    <td className="py-1">{p.page}</td>
+                    <td>{formatInt(p.visits)}</td>
+                    <td>{formatPercent(p.bounceRate)}</td>
+                    <td>{formatInt(p.goalReaches)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {entryInsights.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">{entryInsights}</div>
           )}
@@ -392,26 +396,28 @@ export function OverviewView({
       {/* Exit pages */}
       {topExit.length > 0 && (
         <Card title="Топ страниц выхода">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-slate-500">
-                <th className="py-1">Страница</th>
-                <th>Визиты</th>
-                <th>Отказы</th>
-                <th>Заявки</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topExit.map((p) => (
-                <tr key={p.page} className="border-t border-slate-100">
-                  <td className="py-1">{p.page}</td>
-                  <td>{formatInt(p.visits)}</td>
-                  <td>{formatPercent(p.bounceRate)}</td>
-                  <td>{formatInt(p.goalReaches)}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[28rem] text-sm">
+              <thead>
+                <tr className="text-left text-slate-500">
+                  <th className="py-1">Страница</th>
+                  <th>Визиты</th>
+                  <th>Отказы</th>
+                  <th>Заявки</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {topExit.map((p) => (
+                  <tr key={p.page} className="border-t border-slate-100">
+                    <td className="py-1">{p.page}</td>
+                    <td>{formatInt(p.visits)}</td>
+                    <td>{formatPercent(p.bounceRate)}</td>
+                    <td>{formatInt(p.goalReaches)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {exitInsights.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">{exitInsights}</div>
           )}

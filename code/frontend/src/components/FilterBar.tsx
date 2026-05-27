@@ -19,6 +19,8 @@ export function FilterBar(): JSX.Element {
   const [customFrom, setCustomFrom] = useState(from);
   const [customTo, setCustomTo] = useState(to);
   const [dateError, setDateError] = useState('');
+  // On <768px the controls collapse into a bottom-sheet toggled by «Фильтры».
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleCustomApply = () => {
     const days = daysBetween(customFrom, customTo);
@@ -42,127 +44,163 @@ export function FilterBar(): JSX.Element {
         {formatDateLabel(from)} — {formatDateLabel(to)}
       </span>
 
-      {/* Preset buttons */}
-      {PRESETS.map((d) => (
-        <button
-          key={d}
-          type="button"
-          onClick={() => {
-            setShowCustom(false);
-            setDateError('');
-            preset(d);
-          }}
-          className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
-          title={
-            d === 365
-              ? 'Показать данные за последний год'
-              : `Показать данные за последние ${d} дней`
-          }
-        >
-          {d === 365 ? '1г' : `${d}д`}
-        </button>
-      ))}
-
-      {/* Custom date picker */}
+      {/* Mobile trigger: opens the controls as a bottom-sheet (<768px only) */}
       <button
         type="button"
-        onClick={() => {
-          setShowCustom(!showCustom);
-          setDateError('');
-        }}
-        className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
-        title="Выбрать произвольный период (макс. 365 дней)"
+        onClick={() => setSheetOpen(true)}
+        aria-expanded={sheetOpen}
+        className="ml-auto rounded border border-slate-300 px-3 py-1 text-sm md:hidden"
       >
-        📅 Даты
+        Фильтры
       </button>
-      {showCustom && (
-        <div className="flex w-full flex-col gap-2 rounded border border-indigo-200 bg-indigo-50 px-3 py-2 sm:w-auto sm:flex-row sm:items-center">
-          <div className="flex items-center gap-2">
-            <label htmlFor="custom-date-from" className="text-xs text-indigo-700">
-              От:
-            </label>
-            <input
-              id="custom-date-from"
-              type="date"
-              value={customFrom}
-              onChange={(e) => {
-                setCustomFrom(e.target.value);
-                setDateError('');
-              }}
-              className="rounded border border-indigo-300 px-2 py-1 text-sm"
-            />
-            <label htmlFor="custom-date-to" className="text-xs text-indigo-700">
-              До:
-            </label>
-            <input
-              id="custom-date-to"
-              type="date"
-              value={customTo}
-              onChange={(e) => {
-                setCustomTo(e.target.value);
-                setDateError('');
-              }}
-              className="rounded border border-indigo-300 px-2 py-1 text-sm"
-            />
-            <button
-              type="button"
-              onClick={handleCustomApply}
-              className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-700"
-            >
-              Применить
-            </button>
-          </div>
-          {dateError && <p className="text-xs text-red-600">{dateError}</p>}
-          <p className="text-xs text-indigo-400">Макс. период: 365 дней (1 год)</p>
-          <button
-            type="button"
-            onClick={() => setShowCustom(false)}
-            className="rounded border border-slate-300 px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
-          >
-            ✕
-          </button>
-        </div>
+
+      {/* Backdrop behind the mobile sheet */}
+      {sheetOpen && (
+        <button
+          type="button"
+          aria-label="Закрыть фильтры"
+          onClick={() => setSheetOpen(false)}
+          className="fixed inset-0 z-20 bg-black/30 md:hidden"
+        />
       )}
 
-      {/* Segment selector with tooltip */}
-      <div className="group relative">
-        <select
-          aria-label="Сегмент"
-          value={segment}
-          onChange={(e) => setSegment(e.target.value as Segment)}
-          className="rounded border border-slate-300 px-2 py-1 text-sm"
-        >
-          <option value="b2c">B2C</option>
-          <option value="b2c_b2b">B2C+B2B</option>
-          <option value="b2b">B2B</option>
-        </select>
-        {/* Tooltip */}
-        <div className="absolute left-0 top-full z-20 mt-1 hidden w-64 rounded border border-slate-200 bg-white p-2 text-xs text-slate-600 shadow group-hover:block">
-          <p>
-            <b>B2C:</b> только потребительские каналы (Direct, Search, Social и др.)
-          </p>
-          <p className="mt-1">
-            <b>B2C+B2B:</b> все каналы (по умолчанию)
-          </p>
-          <p className="mt-1">
-            <b>B2B:</b> только B2B-каналы (если настроены)
-          </p>
-        </div>
-      </div>
+      {/* Controls: inline on ≥768px, bottom-sheet on mobile */}
+      <div
+        className={`${
+          sheetOpen ? 'flex' : 'hidden'
+        } fixed inset-x-0 bottom-0 z-30 max-h-[80vh] flex-col gap-2 overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white p-4 shadow-2xl md:static md:z-auto md:flex md:max-h-none md:flex-row md:flex-wrap md:items-center md:overflow-visible md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none`}
+      >
+        {/* Preset buttons */}
+        {PRESETS.map((d) => (
+          <button
+            key={d}
+            type="button"
+            onClick={() => {
+              setShowCustom(false);
+              setDateError('');
+              preset(d);
+            }}
+            className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
+            title={
+              d === 365
+                ? 'Показать данные за последний год'
+                : `Показать данные за последние ${d} дней`
+            }
+          >
+            {d === 365 ? '1г' : `${d}д`}
+          </button>
+        ))}
 
-      {/* Archived goals checkbox with tooltip */}
-      <div className="group relative">
-        <label className="flex cursor-pointer items-center gap-1 text-sm text-slate-600">
-          <input type="checkbox" checked={showArchived} onChange={toggleArchived} />
-          Архивные цели
-        </label>
-        {/* Tooltip */}
-        <div className="absolute left-0 top-full z-20 mt-1 hidden w-64 rounded border border-slate-200 bg-white p-2 text-xs text-slate-600 shadow group-hover:block">
-          <p>
-            Показывать цели Метрики, которые были удалены или заархивированы. По умолчанию — только
-            активные цели.
-          </p>
+        {/* Custom date picker */}
+        <button
+          type="button"
+          onClick={() => {
+            setShowCustom(!showCustom);
+            setDateError('');
+          }}
+          className="rounded border border-slate-300 px-2 py-1 text-sm hover:bg-slate-100"
+          title="Выбрать произвольный период (макс. 365 дней)"
+        >
+          📅 Даты
+        </button>
+        {showCustom && (
+          <div className="flex w-full flex-col gap-2 rounded border border-indigo-200 bg-indigo-50 px-3 py-2 sm:w-auto sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2">
+              <label htmlFor="custom-date-from" className="text-xs text-indigo-700">
+                От:
+              </label>
+              <input
+                id="custom-date-from"
+                type="date"
+                value={customFrom}
+                onChange={(e) => {
+                  setCustomFrom(e.target.value);
+                  setDateError('');
+                }}
+                className="rounded border border-indigo-300 px-2 py-1 text-sm"
+              />
+              <label htmlFor="custom-date-to" className="text-xs text-indigo-700">
+                До:
+              </label>
+              <input
+                id="custom-date-to"
+                type="date"
+                value={customTo}
+                onChange={(e) => {
+                  setCustomTo(e.target.value);
+                  setDateError('');
+                }}
+                className="rounded border border-indigo-300 px-2 py-1 text-sm"
+              />
+              <button
+                type="button"
+                onClick={handleCustomApply}
+                className="rounded bg-indigo-600 px-3 py-1 text-sm text-white hover:bg-indigo-700"
+              >
+                Применить
+              </button>
+            </div>
+            {dateError && <p className="text-xs text-red-600">{dateError}</p>}
+            <p className="text-xs text-indigo-400">Макс. период: 365 дней (1 год)</p>
+            <button
+              type="button"
+              onClick={() => setShowCustom(false)}
+              className="rounded border border-slate-300 px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Segment selector with tooltip */}
+        <div className="group relative">
+          <select
+            aria-label="Сегмент"
+            value={segment}
+            onChange={(e) => setSegment(e.target.value as Segment)}
+            className="rounded border border-slate-300 px-2 py-1 text-sm"
+          >
+            <option value="b2c">B2C</option>
+            <option value="b2c_b2b">B2C+B2B</option>
+            <option value="b2b">B2B</option>
+          </select>
+          {/* Tooltip */}
+          <div className="absolute left-0 top-full z-20 mt-1 hidden w-64 rounded border border-slate-200 bg-white p-2 text-xs text-slate-600 shadow group-hover:block">
+            <p>
+              <b>B2C:</b> только потребительские каналы (Direct, Search, Social и др.)
+            </p>
+            <p className="mt-1">
+              <b>B2C+B2B:</b> все каналы (по умолчанию)
+            </p>
+            <p className="mt-1">
+              <b>B2B:</b> только B2B-каналы (если настроены)
+            </p>
+          </div>
         </div>
+
+        {/* Archived goals checkbox with tooltip */}
+        <div className="group relative">
+          <label className="flex cursor-pointer items-center gap-1 text-sm text-slate-600">
+            <input type="checkbox" checked={showArchived} onChange={toggleArchived} />
+            Архивные цели
+          </label>
+          {/* Tooltip */}
+          <div className="absolute left-0 top-full z-20 mt-1 hidden w-64 rounded border border-slate-200 bg-white p-2 text-xs text-slate-600 shadow group-hover:block">
+            <p>
+              Показывать цели Метрики, которые были удалены или заархивированы. По умолчанию —
+              только активные цели.
+            </p>
+          </div>
+        </div>
+
+        {/* Mobile-only sheet close button */}
+        <button
+          type="button"
+          onClick={() => setSheetOpen(false)}
+          className="mt-2 rounded bg-indigo-600 px-3 py-2 text-sm text-white md:hidden"
+        >
+          Готово
+        </button>
       </div>
     </header>
   );

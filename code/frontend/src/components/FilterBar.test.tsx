@@ -73,6 +73,26 @@ describe('FilterBar', () => {
     expect(screen.queryByLabelText('От:')).not.toBeInTheDocument();
   });
 
+  it('opens the mobile filter sheet and closes it via «Готово»', () => {
+    render(<FilterBar />);
+    const trigger = screen.getByRole('button', { name: 'Фильтры' });
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.click(screen.getByText('Готово'));
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('closes the mobile filter sheet via the backdrop', () => {
+    render(<FilterBar />);
+    fireEvent.click(screen.getByRole('button', { name: 'Фильтры' }));
+    fireEvent.click(screen.getByLabelText('Закрыть фильтры'));
+    expect(screen.getByRole('button', { name: 'Фильтры' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  });
+
   it('clears dateError when date input changes', () => {
     render(<FilterBar />);
     fireEvent.click(screen.getByText(/Даты/));
