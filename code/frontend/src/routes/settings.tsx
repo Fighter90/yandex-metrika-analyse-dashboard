@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Goal } from '@pca/shared';
 import { api } from '../lib/api';
 import { errorMessage } from '../lib/error-message';
+import { B2b } from './b2b';
 
 interface SettingsForm {
   YANDEX_OAUTH_TOKEN: string;
@@ -119,6 +120,7 @@ export function SettingsView({
   onRefreshError,
   isRefreshing,
   refreshResult,
+  b2bSlot,
 }: {
   status: 'pending' | 'error' | 'success';
   settings: SettingsForm | undefined;
@@ -133,6 +135,9 @@ export function SettingsView({
   onRefreshError: string | undefined;
   isRefreshing: boolean;
   refreshResult: { goals: number; days: number; channelRows: number } | undefined;
+  /** B2B pipeline manager, injected by the data wrapper (self-fetching). Optional so the pure view
+   *  stays testable without the b2b query. */
+  b2bSlot?: React.ReactNode;
 }): JSX.Element {
   const [form, setForm] = useState<SettingsForm>(settings ?? emptyForm());
   const [syncProgress, setSyncProgress] = useState(0);
@@ -361,6 +366,19 @@ export function SettingsView({
       <p className="text-xs text-slate-500">
         После сохранения перезапустите сервер ({'`'}./run.sh{'`'}), чтобы настройки применились.
       </p>
+
+      {b2bSlot ? (
+        <details className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+            B2B-пайплайн (ручной ввод сделок)
+          </summary>
+          <p className="mt-1 text-xs text-slate-500">
+            Метрика не покрывает B2B-продажи. Оплаченные (paid) сделки засчитываются в прогресс к
+            цели 300 платных билетов и в воронку.
+          </p>
+          <div className="mt-3">{b2bSlot}</div>
+        </details>
+      ) : null}
     </section>
   );
 }
@@ -503,6 +521,7 @@ export function Settings(): JSX.Element {
       onRefreshError={errorMessage(refreshMut.error)}
       isRefreshing={refreshMut.isPending}
       refreshResult={refreshMut.data}
+      b2bSlot={<B2b />}
     />
   );
 }

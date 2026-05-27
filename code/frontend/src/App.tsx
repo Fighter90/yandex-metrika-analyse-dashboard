@@ -7,7 +7,6 @@ import { Traffic } from './routes/traffic';
 import { Behavior } from './routes/behavior';
 import { Funnel } from './routes/funnel';
 import { Goals } from './routes/goals';
-import { B2b } from './routes/b2b';
 import { ReportPreview } from './routes/report-preview';
 import { History } from './routes/history';
 import { Settings } from './routes/settings';
@@ -24,12 +23,12 @@ export function App(): JSX.Element {
             <Route path="behavior" element={<Behavior />} />
             <Route path="funnel" element={<Funnel />} />
             <Route path="goals" element={<Goals />} />
-            <Route path="b2b" element={<B2b />} />
             <Route path="report" element={<ReportPreview />} />
-            {/* Methodology pages removed (v2.7.0): hypotheses + decisions are now AI-generated
-                inside the report. Redirect stale URLs to /report. */}
+            {/* Methodology pages removed (v2.7.0): hypotheses + decisions are AI-generated inside
+                the report; B2B input moved to Settings. Redirect stale URLs. */}
             <Route path="hypotheses" element={<Navigate to="/report" replace />} />
             <Route path="decisions" element={<Navigate to="/report" replace />} />
+            <Route path="b2b" element={<Navigate to="/settings" replace />} />
             <Route path="history" element={<History />} />
             <Route path="settings" element={<Settings />} />
             <Route path="help" element={<Help />} />
