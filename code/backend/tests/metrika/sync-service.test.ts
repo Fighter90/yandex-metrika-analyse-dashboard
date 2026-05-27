@@ -173,4 +173,31 @@ describe('SyncService.syncAll', () => {
     // User-entered B2B data survives the reset.
     expect((db.prepare('SELECT COUNT(*) AS n FROM b2b_manual').get() as { n: number }).n).toBe(1);
   });
+
+  it('aborts without wiping existing data when the goals call fails (e.g. expired token)', async () => {
+    // Seed a prior successful sync.
+    await svc.syncAll('2025-01-01', '2025-01-07', 80);
+    expect(metrics.listChannelStats().length).toBeGreaterThan(0);
+    expect(metrics.listGoals(true).length).toBeGreaterThan(0);
+
+    // Next sync's auth fails on the (first) goals call.
+    const failing = {
+      get: vi.fn(async (path: string) => {
+        if (path.includes('/goals')) throw new Error('Metrika 401: token expired');
+        return statFixture;
+      }),
+    } as unknown as MetrikaClient;
+    const svc2 = new SyncService({
+      client: failing,
+      metrics,
+      counterId: 1,
+      archivedThreshold: 77,
+      now: () => 'T',
+    });
+
+    await expect(svc2.syncAll('2025-01-01', '2025-01-07', 80)).rejects.toThrow('token expired');
+    // Existing dataset is untouched — reset only runs after the goals call succeeds.
+    expect(metrics.listChannelStats().length).toBeGreaterThan(0);
+    expect(metrics.listGoals(true).length).toBeGreaterThan(0);
+  });
 });

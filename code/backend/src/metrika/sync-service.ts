@@ -41,13 +41,14 @@ export interface SyncSummary {
 export class SyncService {
   constructor(private readonly deps: SyncDeps) {}
 
-  async syncGoals(): Promise<Goal[]> {
+  /** Fetch + map goals from the API without persisting — lets callers validate auth before any write. */
+  private async fetchGoals(): Promise<Goal[]> {
     const res = await this.deps.client.get(
       ENDPOINTS.goals(this.deps.counterId),
       {},
       GoalsResponseSchema,
     );
-    const goals: Goal[] = res.goals.map((g) => ({
+    return res.goals.map((g) => ({
       id: g.id,
       name: g.name,
       type: g.type,
@@ -55,6 +56,10 @@ export class SyncService {
       isArchived: g.id < this.deps.archivedThreshold,
       syncedAt: this.deps.now(),
     }));
+  }
+
+  async syncGoals(): Promise<Goal[]> {
+    const goals = await this.fetchGoals();
     this.deps.metrics.upsertGoals(goals);
     return goals;
   }
@@ -201,13 +206,16 @@ export class SyncService {
   }
 
   async syncAll(from: string, to: string, goalId?: number): Promise<SyncSummary> {
+    // Validate connectivity + auth with the (required) goals call BEFORE wiping anything, so a
+    // failed sync (e.g. expired token) leaves the existing dataset intact instead of an empty DB.
+    const goals = await this.fetchGoals();
     // Full wipe of all synced data (stat tables + goals + raw_responses) before reloading so a
     // re-sync always yields a fresh, duplicate-free dataset. SQLite treats NULL as distinct in the
     // (date, channel, utm_*) primary key, so INSERT OR REPLACE cannot dedupe rows with NULL UTM —
     // a full wipe+reload is the reliable guarantee. User-entered data (b2b/hypotheses/decisions/
     // snapshots) is preserved.
     this.deps.metrics.resetSyncedData();
-    const goals = await this.syncGoals();
+    this.deps.metrics.upsertGoals(goals);
     // Auto-detect the KPI goal when the caller didn't pin one — so the user never hand-picks a
     // GOAL_ID. An explicit goalId always wins; otherwise pick the payment/purchase goal.
     const resolvedGoalId = goalId ?? selectPrimaryGoal(goals)?.id;
