@@ -421,9 +421,10 @@ describe('reportSections — breakdowns, AI and empty states', () => {
 
   it('includes the AI-анализ section only when aiNarrative is present', () => {
     expect(reportSections(baseSnapshot).some((s) => s.heading.startsWith('AI-анализ'))).toBe(false);
+    // Without ## headings, parseChunkedNarrative creates "Результирующий вывод"
     const withAi = reportSections({ ...baseSnapshot, aiNarrative: 'Итог: рост.\n\nРиски: отвал.' });
-    const ai = withAi.find((s) => s.heading.startsWith('AI-анализ'));
-    expect(ai?.lines).toEqual(['Итог: рост.', 'Риски: отвал.']);
+    const итог = withAi.find((s) => s.heading === 'Результирующий вывод');
+    expect(итог?.lines).toEqual(['Итог: рост.', 'Риски: отвал.']);
   });
 });
 

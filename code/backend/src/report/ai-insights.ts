@@ -210,7 +210,7 @@ async function generateChunk(
 ): Promise<string> {
   const req: AnthropicRequest = {
     model,
-    max_tokens: 2000,
+    max_tokens: 4000,
     system: chunk.systemPrompt,
     messages: [{ role: 'user', content: chunk.userPrompt(facts) }],
   };

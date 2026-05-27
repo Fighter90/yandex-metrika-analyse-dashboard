@@ -34,7 +34,8 @@ export interface ReportSection {
   readonly lines: string[];
 }
 
-/** Parse markdown-style chunked AI narrative into report sections. */
+/** Parse markdown-style chunked AI narrative into report sections.
+ * Ensures NO truncation: all text including trailing lines without headings is preserved. */
 function parseChunkedNarrative(narrative: string): ReportSection[] {
   const sections: ReportSection[] = [];
   const lines = narrative.split('\n');
@@ -66,9 +67,16 @@ function parseChunkedNarrative(narrative: string): ReportSection[] {
       currentLines.push(line);
     }
   }
+  // CRITICAL: push any remaining content, even without a heading
   if (currentHeading) {
     sections.push({
       heading: currentHeading,
+      lines: currentLines.filter((l) => l.trim() !== ''),
+    });
+  } else if (currentLines.length > 0) {
+    // Trailing text without any heading — add as "Итог"
+    sections.push({
+      heading: 'Результирующий вывод',
       lines: currentLines.filter((l) => l.trim() !== ''),
     });
   }
@@ -464,8 +472,10 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
   if (s.aiNarrative) {
     const aiSections = parseChunkedNarrative(s.aiNarrative);
     if (aiSections.length > 0) {
+      // Push parsed sections directly — they already have proper headings from ## markers
       sections.push(...aiSections);
     } else {
+      // Fallback: no ## headings found, use generic AI-анализ heading
       sections.push({
         heading: 'AI-анализ (интерпретация, проверяйте по данным)',
         lines: s.aiNarrative.split('\n').filter((l) => l.trim() !== ''),
