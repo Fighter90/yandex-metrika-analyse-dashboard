@@ -68,6 +68,16 @@ export interface IceBreakdown {
   readonly score: number;
 }
 
+/** Traffic-light verification criteria: what outcome counts as green / yellow / red. */
+export interface HypothesisTrafficLight {
+  /** Условие зелёного света (продолжать/масштабировать). */
+  readonly green: string;
+  /** Условие жёлтого света (доработать). */
+  readonly yellow: string;
+  /** Условие красного света (отказаться). */
+  readonly red: string;
+}
+
 /** A solution hypothesis referencing a problem and fully prioritised by ICE. */
 export interface SolutionHypothesis {
   /** Stable identifier assigned by the AI (e.g. "S01"). */
@@ -88,6 +98,10 @@ export interface SolutionHypothesis {
   readonly validation: ValidationPlan;
   /** ICE scores with rationales; score is computed deterministically by parseHypotheses(). */
   readonly ice: IceBreakdown;
+  /** Traffic-light verification criteria (🟢/🟡/🔴). */
+  readonly trafficLight: HypothesisTrafficLight;
+  /** Verification deadline (ISO date YYYY-MM-DD). */
+  readonly deadline: string;
 }
 
 /** Root output type returned by generateHypotheses() and stored in the snapshot. */

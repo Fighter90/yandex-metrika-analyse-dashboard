@@ -186,6 +186,12 @@ export function aiSolutionSection(s: SolutionHypothesis, ordinal: number): AiRep
     `  Confidence ${s.ice.confidence}/10 — ${s.ice.confidenceRationale}`,
     `  Ease ${s.ice.ease}/10 — ${s.ice.easeRationale}`,
     `  Score: ${s.ice.impact} × ${s.ice.confidence} × ${s.ice.ease} = ${s.ice.score}`,
+    '',
+    'Светофор:',
+    `  🟢 ${s.trafficLight.green}`,
+    `  🟡 ${s.trafficLight.yellow}`,
+    `  🔴 ${s.trafficLight.red}`,
+    `Дедлайн проверки: ${s.deadline}`,
   ];
   return { heading: `${ordinal}. ${s.id}`, lines };
 }

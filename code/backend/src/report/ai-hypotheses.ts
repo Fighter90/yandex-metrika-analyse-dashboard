@@ -54,6 +54,9 @@ export function buildHypothesesRequest(
     '"channel":"...","successCriteria":"..."}; минимум 2 метода. ' +
     'ice — объект {"impact":N,"confidence":N,"ease":N,"impactRationale":"...","confidenceRationale":"...",' +
     '"easeRationale":"..."} где N — целое 1–10; НЕ включай поле score (оно вычисляется детерминированно). ' +
+    'trafficLight — объект {"green":"...","yellow":"...","red":"..."}: критерии исхода проверки ' +
+    '(🟢 если ... / 🟡 если ... / 🔴 если ...) с конкретными порогами. ' +
+    'deadline — дата проверки в формате YYYY-MM-DD. ' +
     'Все строки — на русском языке. Ответ должен быть валидным JSON без markdown-обёртки.';
 
   const user =
@@ -103,6 +106,12 @@ const ProblemHypothesisSchema = z.object({
   evidence: z.string().min(1),
 });
 
+const TrafficLightSchema = z.object({
+  green: z.string().min(1),
+  yellow: z.string().min(1),
+  red: z.string().min(1),
+});
+
 const SolutionHypothesisSchema = z.object({
   id: z.string().min(1),
   problemId: z.string().min(1),
@@ -113,6 +122,8 @@ const SolutionHypothesisSchema = z.object({
   risks: z.array(SolutionRiskSchema).length(5),
   validation: ValidationPlanSchema,
   ice: IceInputSchema,
+  trafficLight: TrafficLightSchema,
+  deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
 const RawHypothesesSchema = z.object({

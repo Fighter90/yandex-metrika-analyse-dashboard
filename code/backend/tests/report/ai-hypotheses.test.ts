@@ -73,6 +73,12 @@ function makeSolution(id: string, problemId: string) {
       confidenceRationale: 'данные из Метрики подтверждают проблему',
       easeRationale: 'стандартная адаптация формы',
     },
+    trafficLight: {
+      green: 'CR с мобильных ≥ 10% за 2 недели',
+      yellow: 'CR 5–10%',
+      red: 'CR < 5%',
+    },
+    deadline: '2025-02-15',
   };
 }
 
@@ -197,6 +203,20 @@ describe('parseHypotheses', () => {
     expect(s.risks).toHaveLength(5);
     expect(s.validation.methods.length).toBeGreaterThanOrEqual(2);
     expect(s.validation.successCriteria).toBeTruthy();
+    // §1.3: traffic-light criteria + deadline are preserved.
+    expect(s.trafficLight.green).toBeTruthy();
+    expect(s.trafficLight.yellow).toBeTruthy();
+    expect(s.trafficLight.red).toBeTruthy();
+    expect(s.deadline).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('rejects a solution missing the traffic light or with a malformed deadline', () => {
+    const payload = JSON.parse(JSON.stringify(makeRawPayload(10, 10)));
+    delete payload.solutions[0].trafficLight;
+    expect(() => parseHypotheses(JSON.stringify(payload))).toThrow(/schema/);
+    const payload2 = JSON.parse(JSON.stringify(makeRawPayload(10, 10)));
+    payload2.solutions[0].deadline = '15.02.2025';
+    expect(() => parseHypotheses(JSON.stringify(payload2))).toThrow(/schema/);
   });
 
   it('accepts more than 10 problems and solutions', () => {

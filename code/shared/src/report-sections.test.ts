@@ -50,6 +50,8 @@ const genSolution = (over: Partial<SolutionHypothesis> = {}): SolutionHypothesis
     easeRationale: 'простая правка',
     score: 336,
   },
+  trafficLight: { green: 'CR +10%', yellow: 'CR +3–10%', red: 'CR <3%' },
+  deadline: '2025-02-01',
   ...over,
 });
 
