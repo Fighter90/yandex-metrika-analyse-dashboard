@@ -215,9 +215,9 @@ async function generateChunk(
     messages: [{ role: 'user', content: chunk.userPrompt(facts) }],
   };
 
-  // Timeout: 45 seconds per chunk
+  // Timeout: 120 seconds per chunk (needed for max_tokens: 6000)
   const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error(`Chunk "${chunk.section}" timed out after 45s`)), 45_000),
+    setTimeout(() => reject(new Error(`Chunk "${chunk.section}" timed out after 120s`)), 120_000),
   );
 
   const fetchPromise = doFetch(ANTHROPIC_URL, {
