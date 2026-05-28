@@ -151,6 +151,17 @@ interface AnalysisChunk {
   readonly userPrompt: (facts: string) => string;
 }
 
+/**
+ * Output-format rules appended to every chunk's system prompt so the narrative renders cleanly into
+ * the ГОСТ DOCX/PDF: no Markdown headings, no self-numbering (the report adds section numbers), no
+ * leading emoji on heading-like lines, no HTML. Defends against the markdown-leak defect (v2.9.0).
+ */
+export const AI_FORMAT_RULES =
+  'ФОРМАТ ВЫВОДА (строго): пиши обычным текстом, абзацами. НЕ используй Markdown-заголовки (#, ##, ###, ####). ' +
+  'НЕ нумеруй собственные подзаголовки («1.», «2.» как заголовки) — сквозную нумерацию разделов добавляет сам отчёт. ' +
+  'НЕ начинай строки с эмодзи. Для перечислений используй строки, начинающиеся с «— ». ' +
+  'Жирный — **двойными звёздочками**. Никаких HTML-тегов (<p>, <br> и т.п.).';
+
 const ANALYSIS_CHUNKS: AnalysisChunk[] = [
   {
     section: 'Итог',
@@ -226,7 +237,7 @@ async function generateChunk(
   const req: AnthropicRequest = {
     model,
     max_tokens: 6000,
-    system: chunk.systemPrompt,
+    system: `${chunk.systemPrompt}\n\n${AI_FORMAT_RULES}`,
     messages: [{ role: 'user', content: chunk.userPrompt(facts) }],
   };
 

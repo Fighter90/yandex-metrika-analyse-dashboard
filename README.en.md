@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.8.5.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.9.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to, max
@@ -294,7 +294,8 @@ Versioning: SemVer + Conventional Commits + `CHANGELOG.md`.
 
 | Version                                                                              | Date       | Description                                                                                                                                                                       |
 | ------------------------------------------------------------------------------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2.8.5** (Latest)                                                                  | 2026-05-28 | QA regression prompt refreshed (M-004 closed) + doc version sync                                                                                                                  |
+| **v2.9.0** (Latest)                                                                  | 2026-05-28 | DOCX/PDF report rework: de-duplicated channel sections, AI-narrative markdown sanitised, compact appendix, AI prompt without self-numbering, AI button locks after generation     |
+| [v2.8.5](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.5) | 2026-05-28 | QA regression prompt refreshed (M-004 closed) + doc version sync                                                                                                                  |
 | [v2.8.4](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.4) | 2026-05-28 | UTM-coverage fix (visit-weighted from utm_stats, was 0%); detailed docs (user-guide, quickstart, data-model)                                                                      |
 | [v2.8.3](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.3) | 2026-05-28 | Goals progress fix (counts purchase payments), Executive Summary in full HTML + «Final conclusion» section, full-screen UTM-Sankey, GOST DOCX/PDF title page without empty blocks |
 | [v2.8.2](https://github.com/Fighter90/metrika_analyse_dashboard/releases/tag/v2.8.2) | 2026-05-28 | Browser E2E audit: fixed duplicate React keys (Overview/Funnel), favicon; refreshed docs + full regression prompt; scrubbed the live COUNTER_ID from the repo                     |

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { Decision, Hypothesis, ReportSnapshot } from '@pca/shared';
 import { reportSections } from '../../src/report/docx/sections';
-import { buildDocx } from '../../src/report/docx/builder';
+import { buildDocx, parseInline } from '../../src/report/docx/builder';
 
 const hyp = (over: Partial<Hypothesis>): Hypothesis => ({
   id: 1,
@@ -151,6 +151,12 @@ describe('buildDocx', () => {
     const buf = await buildDocx(singleRowSnapshot);
     expect(buf.length).toBeGreaterThan(0);
     expect(buf.subarray(0, 2).toString('latin1')).toBe('PK');
+  });
+
+  it('parseInline returns a single run for empty text (defensive fallback)', () => {
+    // Callers never pass '' (empty lines are deferred, table cells filtered), but the fallback
+    // must stay correct: zero matches + empty text → one empty TextRun.
+    expect(parseInline('')).toHaveLength(1);
   });
 
   it('handles parseInline with no markup (plain-text fallback run)', async () => {
