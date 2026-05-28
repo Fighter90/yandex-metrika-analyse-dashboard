@@ -297,16 +297,18 @@ export function ReportPreviewView({
               <div className="space-y-2">
                 <AIProgress progress={aiProgress} stage={aiStage} />
                 <p className="text-xs text-violet-500">
-                  Генерация AI-анализа: 5 разделов (по 6000 токенов), обычно занимает 5–10 минут.
+                  Генерация AI-анализа: 6 разделов (по 6000 токенов), обычно занимает 5–10 минут.
                 </p>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => onInsights(snapshot.id)}
-                className="rounded bg-violet-600 px-3 py-1 text-sm text-white"
+                disabled={!!narrative}
+                title={narrative ? 'AI-анализ уже сгенерирован для этого среза' : ''}
+                className="rounded bg-violet-600 px-3 py-1 text-sm text-white disabled:opacity-40"
               >
-                Сгенерировать AI-анализ
+                {narrative ? 'AI-анализ сгенерирован' : 'Сгенерировать AI-анализ'}
               </button>
             )}
             {insightsError ? (

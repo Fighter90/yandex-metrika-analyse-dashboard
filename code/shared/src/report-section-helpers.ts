@@ -75,11 +75,6 @@ export function pageLine(p: PageBreakdownRow): string {
   return `${p.page}: визитов ${p.visits}, отказы ${(p.bounceRate * 100).toFixed(1)}%, заявок ${p.goalReaches}`;
 }
 
-export function channelLine(c: ReportSnapshot['channels'][number]): string {
-  const cr = c.visits > 0 ? ((c.goalReaches / c.visits) * 100).toFixed(1) : '0.0';
-  return `${c.date} · ${c.channel}: визитов ${c.visits}, заявок ${c.goalReaches} (CR ${cr}%), отказы ${(c.bounceRate * 100).toFixed(1)}%`;
-}
-
 export function pct(numerator: number, denominator: number): string {
   return denominator > 0 ? `${((numerator / denominator) * 100).toFixed(1)}%` : '0.0%';
 }

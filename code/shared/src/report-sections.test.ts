@@ -209,7 +209,7 @@ describe('reportSections — structure', () => {
         { ...ch, channel: 'direct', visits: 50, goalReaches: 10 },
       ],
     };
-    const lines = findSection(s, (h) => h === 'Анализ по каналам');
+    const lines = findSection(s, (h) => h === 'Каналы: структура трафика');
     expect(lines[2]).toContain('podcast: визитов 200, заявок 10 (CR 5.0%)'); // summed across days
     // direct and zeta tie on visits (50) → alphabetical tie-break puts direct before zeta
     expect(lines[3]).toContain('direct: визитов 50, заявок 10 (CR 20.0%)');
@@ -407,7 +407,7 @@ describe('reportSections — breakdowns, AI and empty states', () => {
       funnel: { visits: 0, b2cApplications: 0, b2bPipelineTickets: 0, b2bPaidTickets: 0 },
       breakdowns: { utm: [], geoDevice: [], entryPages: [], exitPages: [] },
     };
-    expect(findSection(empty, (h) => h === 'Анализ по каналам')[0]).toContain(
+    expect(findSection(empty, (h) => h === 'Каналы: структура трафика')[0]).toContain(
       'Нет данных по каналам',
     );
     expect(findSection(empty, (h) => h === 'Топ источников UTM')[0]).toContain('Нет данных UTM');
@@ -528,7 +528,7 @@ describe('reportSections — new sections', () => {
   it('renders detailed channel analysis section', () => {
     const lines =
       reportSections(baseSnapshot)
-        .find((sec) => sec.heading === 'Анализ по каналам (детальный)')
+        .find((sec) => sec.heading === 'Каналы: трафик и конверсия')
         ?.lines.join('\n') ?? '';
     expect(lines).toContain('podcast');
     expect(lines).toContain('Визиты: 100');
@@ -548,6 +548,21 @@ describe('reportSections — new sections', () => {
     expect(testSec?.lines.join(' ')).toContain('Some content');
     expect(anotherSec).toBeDefined();
     expect(anotherSec?.lines.join(' ')).toContain('More content');
+  });
+
+  it('sanitizes markdown leaks (###, blockquote, -bullet) in AI narrative lines (v2.9.0)', () => {
+    const s: ReportSnapshot = {
+      ...baseSnapshot,
+      aiNarrative:
+        '## Каналы\n\n#### Где мы сейчас\n> Цитата\n- Первый пункт\nОбычный абзац с **жирным**',
+    };
+    const sec = reportSections(s).find((x) => x.heading === 'Каналы');
+    const text = sec?.lines.join('\n') ?? '';
+    expect(text).not.toMatch(/####/); // markdown heading marker stripped
+    expect(text).toContain('Где мы сейчас'); // text preserved
+    expect(text).not.toMatch(/^>/m); // blockquote marker stripped
+    expect(text).toContain('- Первый пункт'); // bullet kept — renderers convert it to a list
+    expect(text).toContain('**жирным**'); // bold marker kept for the renderer
   });
 });
 

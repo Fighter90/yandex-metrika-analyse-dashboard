@@ -17,8 +17,9 @@ import {
 import type { ReportSnapshot } from '@pca/shared';
 import { reportSections } from './sections';
 
-/** Parse inline markdown: **bold**, *italic*, `code`. */
-function parseInline(text: string): TextRun[] {
+/** Parse inline markdown: **bold**, *italic*, `code`. Exported for unit coverage of the
+ * empty-string fallback (callers normally pass non-empty text). */
+export function parseInline(text: string): TextRun[] {
   const runs: TextRun[] = [];
   const regex = /\*\*(.+?)\*\*|`(.+?)`|\*(.+?)\*/g;
   let lastIndex = 0;

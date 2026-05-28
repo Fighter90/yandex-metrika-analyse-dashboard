@@ -20,7 +20,6 @@ import {
   KIND_LABEL,
   METHOD_LABEL,
   STATUS_LABEL,
-  channelLine,
   channelTotals,
   geoLine,
   pageLine,
@@ -65,8 +64,8 @@ function parseChunkedNarrative(narrative: string): ReportSection[] {
     if (headingMatch && headingMatch[1]) {
       if (currentHeading) {
         sections.push({
-          heading: currentHeading,
-          lines: currentLines.filter((l) => l.trim() !== ''),
+          heading: sanitizeAiLine(currentHeading),
+          lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
         });
         currentLines.length = 0;
       }
@@ -75,8 +74,8 @@ function parseChunkedNarrative(narrative: string): ReportSection[] {
       // Section separator — push current section
       if (currentHeading) {
         sections.push({
-          heading: currentHeading,
-          lines: currentLines.filter((l) => l.trim() !== ''),
+          heading: sanitizeAiLine(currentHeading),
+          lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
         });
         currentHeading = '';
         currentLines.length = 0;
@@ -88,14 +87,14 @@ function parseChunkedNarrative(narrative: string): ReportSection[] {
   // CRITICAL: push any remaining content, even without a heading
   if (currentHeading) {
     sections.push({
-      heading: currentHeading,
-      lines: currentLines.filter((l) => l.trim() !== ''),
+      heading: sanitizeAiLine(currentHeading),
+      lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
     });
   } else if (currentLines.length > 0) {
     // Trailing text without any heading — add as "Итог"
     sections.push({
       heading: 'Результирующий вывод',
-      lines: currentLines.filter((l) => l.trim() !== ''),
+      lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
     });
   }
   return sections;
@@ -323,7 +322,22 @@ function channelAnalysisSection(s: ReportSnapshot): ReportSection {
   }
 
   lines.push(...chartBlock(s, 'channelBar'));
-  return { heading: 'Анализ по каналам (детальный)', lines, chartId: 'channelBar' };
+  return { heading: 'Каналы: трафик и конверсия', lines, chartId: 'channelBar' };
+}
+
+/**
+ * Strip markdown/heading noise from a single AI-narrative line so no raw `##`/`####`/`***` or a
+ * leading bullet-emoji heading leaks into DOCX/PDF. `**bold**` is left intact — the DOCX/HTML
+ * renderers convert it. The AI prompt also forbids these markers (defence in depth).
+ */
+function sanitizeAiLine(line: string): string {
+  // Strip markdown heading markers and blockquote prefixes so no raw `##`/`####`/`>` leaks into the
+  // ГОСТ document. Markdown bullets («- »/«* ») are intentionally left intact — the DOCX/PDF
+  // renderers convert them into proper lists. `**bold**` is also preserved for the renderers.
+  return line
+    .replace(/^\s*#{1,6}\s+/, '')
+    .replace(/^\s*>\s?/, '')
+    .trimEnd();
 }
 
 /**
@@ -439,7 +453,7 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
   });
 
   sections.push({
-    heading: 'Анализ по каналам',
+    heading: 'Каналы: структура трафика',
     chartId: 'channelMix',
     lines:
       channelTotals(s.channels).length === 0
@@ -584,10 +598,17 @@ export function reportSections(s: ReportSnapshot): ReportSection[] {
     {
       heading: 'Приложение с данными',
       lines: [
-        `Каналов в выборке: ${s.channels.length}`,
-        ...s.channels.map(channelLine),
+        `Каналов в выборке: ${channelTotals(s.channels).length} (агрегировано по каналу за период;`,
+        `строк-срезов по дням в выборке: ${s.channels.length})`,
         '',
-        'Прослеживаемость: каждая строка восстановима из raw_responses по (query_hash, date_from, date_to).',
+        'Итоги по каналам (визиты · заявки · CR):',
+        ...channelTotals(s.channels).map(
+          (t) =>
+            `  • ${t.channel}: визитов ${t.visits}, заявок ${t.goalReaches} (CR ${pct(t.goalReaches, t.visits)})`,
+        ),
+        '',
+        'Полная посуточная разбивка не дублируется в отчёте во избежание шума: каждая строка',
+        'восстановима из raw_responses по (query_hash, date_from, date_to) — это и есть источник правды.',
       ],
     },
   );
