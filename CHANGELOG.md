@@ -6,6 +6,16 @@
 
 ## [Unreleased]
 
+## [2.9.2] - 2026-05-29
+
+### Changed
+
+- **chore(deps):** обновлены зависимости (dependabot, влиты PR #126–#130):
+  `docx` 9.6.1 → 9.7.1, `@tanstack/react-query` 5.100.11 → 5.100.14, `zustand` 5.0.13 → 5.0.14,
+  `lucide-react` 1.16.0 → 1.17.0, `typescript-eslint` 8.59.4 → 8.60.0 (dev).
+  Полная проверка после бампов: typecheck / lint / format / coverage 100% / build / e2e 28/28 — зелёные;
+  генерация DOCX на `docx@9.7.1` подтверждена тестами.
+
 ## [2.9.1] - 2026-05-29
 
 ### Fixed
