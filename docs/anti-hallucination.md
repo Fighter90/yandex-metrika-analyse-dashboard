@@ -7,8 +7,10 @@
 1. **Прослеживаемость.** Любое число в дашборде/отчёте сводится к строке `raw_responses` в SQLite.
    Сырой ответ сохраняется при каждом `sync` (`MetricsRepo.saveRawResponse`). В UI — debug-панель
    «Where does this number come from?» (итерации 4+).
-2. **Воспроизводимость.** Отчёт строится из immutable `ReportSnapshot`; один `snapshotId` →
-   идентичный **контент** DOCX и PDF (zip/pdf-таймстемпы — known limitation).
+2. **Воспроизводимость (content-determinism).** Отчёт строится из immutable `ReportSnapshot`; один
+   `snapshotId` → идентичный **контент**: совпадают `word/document.xml` и PNG-графики (имена файлов =
+   SHA1 содержимого). ⚠️ Файловый SHA-256 контейнера DOCX/PDF может отличаться между генерациями —
+   zip/pdf-метаданные содержат таймстемпы (known limitation `docx`/`puppeteer-core`), это не дефект.
 3. **Никакого `Date.now()` в render-пути** отчёта — только `snapshot.generatedAt`. AI-нарратив
    генерится один раз и сохраняется в снапшот — в render-пути LLM не вызывается.
 4. **Никаких LLM-вызовов на проде** в пути генерации отчёта. AI используется только на стороне

@@ -73,12 +73,28 @@ describe('ReportPreviewView', () => {
     render(<ReportPreviewView {...baseProps} snapshot={snapshot} onExport={onExport} />);
     // Use getAllByText since "Срез данных: snap-1" appears in both header and full report
     expect(screen.getAllByText(/Срез данных: snap-1/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Заявки B2C')).toBeInTheDocument();
+    // No goalLabel on the fixture → KPI falls back to «Заявок B2C».
+    expect(screen.getByText('Заявок B2C')).toBeInTheDocument();
     expect(screen.getByText(/не сгенерированы/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Export DOCX' }));
     expect(onExport).toHaveBeenCalledWith('snap-1', 'docx');
     fireEvent.click(screen.getByRole('button', { name: 'Export PDF' }));
     expect(onExport).toHaveBeenCalledWith('snap-1', 'pdf');
+  });
+
+  it('KPI label follows the snapshot goalLabel (Оплат for a purchase goal)', () => {
+    const paidSnapshot = {
+      ...snapshot,
+      goalLabel: {
+        title: 'Оплат',
+        isPaid: true,
+        showApplicationsCaveat: false,
+        showEstimate: false,
+      },
+    };
+    render(<ReportPreviewView {...baseProps} snapshot={paidSnapshot} />);
+    expect(screen.getByText('Оплат')).toBeInTheDocument();
+    expect(screen.queryByText('Заявок B2C')).not.toBeInTheDocument();
   });
 
   it('rebuilds the report and reflects pending state', () => {

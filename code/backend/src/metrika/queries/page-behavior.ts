@@ -4,6 +4,7 @@ import type { MetrikaClient } from '../client';
 import { ENDPOINTS } from '../endpoints';
 import { StatDataResponseSchema, type StatDataResponse } from '../schemas';
 import { ratio } from './ratio';
+import { aggregatePages } from './normalize-page';
 
 export interface PageQueryOptions {
   readonly counterId: number;
@@ -55,5 +56,5 @@ export async function pageBehavior(
     },
     StatDataResponseSchema,
   );
-  return { raw, stats: raw.data.map((row) => mapRow(row, opts)) };
+  return { raw, stats: aggregatePages(raw.data.map((row) => mapRow(row, opts))) };
 }

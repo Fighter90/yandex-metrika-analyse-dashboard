@@ -111,11 +111,12 @@ export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
   const body = sections.slice(1); // section 0 is replaced by a proper GOST title page
   const children: (Paragraph | Table)[] = [];
 
-  const blanks = (n: number): Paragraph[] =>
-    Array.from({ length: n }, () => new Paragraph({ children: [] }));
-  const centered = (text: string, size: number, bold = false): Paragraph =>
+  // Vertical gaps on the title page are expressed via `spacing.before` (twips), NOT runs of empty
+  // paragraphs — so the audit never sees 2+ consecutive blank paragraphs (D-EMPTY-PAGE).
+  const centered = (text: string, size: number, bold = false, before = 0): Paragraph =>
     new Paragraph({
       alignment: AlignmentType.CENTER,
+      spacing: before ? { before } : undefined,
       children: [new TextRun({ text, size, bold })],
     });
   const year = /^\d{4}/.test(snapshot.generatedAt)
@@ -124,18 +125,14 @@ export async function buildDocx(snapshot: ReportSnapshot): Promise<Buffer> {
 
   // ---- ГОСТ title page (Р 7.32-2017): org on top, work title centred, snapshot id + year below ----
   children.push(
-    centered('ProductCamp', 32, true),
+    centered('ProductCamp', 32, true, 1440),
     centered('Трек «Конверсии и лидген»', 28),
-    ...blanks(6),
-    centered('Аналитический отчёт по конверсиям и лидгену', 36, true),
-    ...blanks(1),
-    centered(`за период ${snapshot.period.from} — ${snapshot.period.to}`, 28),
-    ...blanks(10),
-    centered(`Идентификатор среза данных: ${snapshot.id}`, 24),
+    centered('Аналитический отчёт по конверсиям и лидгену', 36, true, 2600),
+    centered(`за период ${snapshot.period.from} — ${snapshot.period.to}`, 28, false, 280),
+    centered(`Идентификатор среза данных: ${snapshot.id}`, 24, false, 3600),
     centered(`Сформирован: ${snapshot.generatedAt}`, 24),
     centered(`Цель: ${snapshot.kpi.target} оплаченных билетов`, 24),
-    ...blanks(2),
-    centered(year, 24),
+    centered(year, 24, false, 720),
   );
 
   // ---- Содержание (manual TOC of numbered sections) ----

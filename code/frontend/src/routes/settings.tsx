@@ -199,6 +199,7 @@ export function SettingsView({
   status,
   settings,
   healthCounterId,
+  apiKeyMask,
   goals,
   archivedGoals,
   onSave,
@@ -215,6 +216,8 @@ export function SettingsView({
   status: 'pending' | 'error' | 'success';
   settings: SettingsForm | undefined;
   healthCounterId: number | undefined;
+  /** Masked current Anthropic key (e.g. «sk-a****AA») so the UI shows a key is set without leaking it. */
+  apiKeyMask?: string;
   goals: Goal[] | undefined;
   archivedGoals: Goal[] | undefined;
   onSave: (form: SettingsForm) => void;
@@ -421,9 +424,13 @@ export function SettingsView({
           label="Anthropic API Key"
           value={form.ANTHROPIC_API_KEY}
           onChange={(v) => set('ANTHROPIC_API_KEY', v)}
-          placeholder="sk-ant-..."
+          placeholder={apiKeyMask ?? 'sk-ant-...'}
           type="password"
-          hint="Для AI-анализа и генерации гипотез (можно пропустить)"
+          hint={
+            apiKeyMask && !form.ANTHROPIC_API_KEY
+              ? `Текущий ключ: ${apiKeyMask}. Оставьте поле пустым, чтобы не менять.`
+              : 'Для AI-анализа и генерации гипотез (можно пропустить)'
+          }
         />
       </div>
 
@@ -567,6 +574,7 @@ export function Settings(): JSX.Element {
       status={q.status}
       settings={settings}
       healthCounterId={healthQ.data?.counterId}
+      apiKeyMask={q.data?.ANTHROPIC_API_KEY.includes('****') ? q.data.ANTHROPIC_API_KEY : undefined}
       goals={goalsQ.data}
       archivedGoals={archivedGoalsQ.data}
       onSave={(form) => {

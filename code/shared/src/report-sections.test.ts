@@ -564,6 +564,29 @@ describe('reportSections — new sections', () => {
     expect(text).toContain('- Первый пункт'); // bullet kept — renderers convert it to a list
     expect(text).toContain('**жирным**'); // bold marker kept for the renderer
   });
+
+  it('strips leading emoji and self-numbering from AI headings (v2.9.1 D-EMOJI/D-DOUBLE-NUM)', () => {
+    const s: ReportSnapshot = {
+      ...baseSnapshot,
+      aiNarrative:
+        '## 🔴 1. Где мы сейчас\n\nТекст с акцентом 🔴 внутри абзаца.\n\n---\n\n## Шаг 2. Анализ\n\nещё',
+    };
+    const secs = reportSections(s);
+    const first = secs.find((x) => x.heading === 'Где мы сейчас');
+    expect(first).toBeTruthy(); // emoji + «1.» stripped from heading
+    expect(first?.lines.join(' ')).toContain('🔴'); // emoji inside paragraph preserved
+    expect(secs.find((x) => x.heading === 'Анализ')).toBeTruthy(); // «Шаг 2.» prefix stripped
+  });
+
+  it('caps an AI section body at the line limit with a truncation note (v2.9.1 D-VERBOSE)', () => {
+    const manyLines = Array.from({ length: 60 }, (_, i) => `Абзац номер ${i + 1}.`).join('\n');
+    const s: ReportSnapshot = { ...baseSnapshot, aiNarrative: `## Длинный раздел\n\n${manyLines}` };
+    const sec = reportSections(s).find((x) => x.heading === 'Длинный раздел');
+    expect(sec).toBeTruthy();
+    // 35 lines + '' spacer + truncation note = 37
+    expect(sec!.lines.length).toBeLessThanOrEqual(37);
+    expect(sec!.lines.join('\n')).toContain('сокращён по лимиту');
+  });
 });
 
 describe('aiHypothesisSections — direct unit tests', () => {

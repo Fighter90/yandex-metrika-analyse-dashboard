@@ -205,13 +205,15 @@ export function ReportPreviewView({
             сформирован {snapshot.generatedAt}
           </p>
 
-          {/* KPI strip */}
+          {/* KPI strip — primary-goal label follows the snapshot (Оплат for a purchase goal). */}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Stat label="Цель" value={formatInt(snapshot.kpi.target)} />
             <Stat
-              label="Заявки B2C"
+              label={snapshot.goalLabel?.title ?? 'Заявок B2C'}
               value={formatInt(snapshot.kpi.b2cApplications)}
-              hint="заявка ≠ оплата"
+              hint={
+                snapshot.goalLabel?.showApplicationsCaveat === false ? undefined : 'заявка ≠ оплата'
+              }
             />
             <Stat label="Оплачено B2B" value={formatInt(snapshot.kpi.b2bPaidTickets)} />
             <Stat label="Gap" value={formatInt(snapshot.kpi.gap)} />

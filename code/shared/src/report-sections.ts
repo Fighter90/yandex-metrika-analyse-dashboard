@@ -59,43 +59,31 @@ function parseChunkedNarrative(narrative: string): ReportSection[] {
   let currentHeading = '';
   const currentLines: string[] = [];
 
+  const flush = (fallbackHeading?: string): void => {
+    const heading = currentHeading ? sanitizeAiLine(currentHeading) : fallbackHeading;
+    if (!heading) return;
+    const body = applyAiLineLimit(currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''));
+    sections.push({ heading, lines: body });
+    currentLines.length = 0;
+  };
+
   for (const line of lines) {
     const headingMatch = line.match(/^## (.+)$/);
     if (headingMatch && headingMatch[1]) {
-      if (currentHeading) {
-        sections.push({
-          heading: sanitizeAiLine(currentHeading),
-          lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
-        });
-        currentLines.length = 0;
-      }
+      flush();
       currentHeading = headingMatch[1];
     } else if (line.startsWith('---')) {
-      // Section separator — push current section
-      if (currentHeading) {
-        sections.push({
-          heading: sanitizeAiLine(currentHeading),
-          lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
-        });
-        currentHeading = '';
-        currentLines.length = 0;
-      }
+      flush();
+      currentHeading = '';
     } else {
       currentLines.push(line);
     }
   }
-  // CRITICAL: push any remaining content, even without a heading
+  // Push any remaining content; trailing text without a heading gets a generic heading.
   if (currentHeading) {
-    sections.push({
-      heading: sanitizeAiLine(currentHeading),
-      lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
-    });
+    flush();
   } else if (currentLines.length > 0) {
-    // Trailing text without any heading — add as "Итог"
-    sections.push({
-      heading: 'Результирующий вывод',
-      lines: currentLines.map(sanitizeAiLine).filter((l) => l.trim() !== ''),
-    });
+    flush('Результирующий вывод');
   }
   return sections;
 }
@@ -330,14 +318,34 @@ function channelAnalysisSection(s: ReportSnapshot): ReportSection {
  * leading bullet-emoji heading leaks into DOCX/PDF. `**bold**` is left intact — the DOCX/HTML
  * renderers convert it. The AI prompt also forbids these markers (defence in depth).
  */
+/** Leading emoji (pictographs, dingbats) + variation selector / ZWJ at the very start of a line.
+ * Alternation (not a combined character class) to satisfy no-misleading-character-class. */
+const LEADING_EMOJI_RE =
+  /^(?:[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]|\u{FE0F}|\u{200D})+\s*/u;
+/** Leading self-numbering the AI sometimes prefixes to headings («1.», «2)», «Шаг 1.», «Раздел 1.»). */
+const LEADING_NUM_RE = /^(?:\d+[.)]|Шаг\s+\d+\.|Раздел\s+\d+\.)\s*/iu;
+
 function sanitizeAiLine(line: string): string {
-  // Strip markdown heading markers and blockquote prefixes so no raw `##`/`####`/`>` leaks into the
-  // ГОСТ document. Markdown bullets («- »/«* ») are intentionally left intact — the DOCX/PDF
-  // renderers convert them into proper lists. `**bold**` is also preserved for the renderers.
+  // Strip markdown heading/blockquote markers, leading emoji and self-numbering so no raw
+  // `##`/`####`/`>`/«🔴»/«1.» leaks into the ГОСТ document (D-EMOJI, D-DOUBLE-NUM). Markdown bullets
+  // («- »/«* ») are intentionally left intact — the DOCX/PDF renderers convert them into proper lists.
+  // `**bold**` is preserved for the renderers; emoji INSIDE a line (as an accent) are kept.
   return line
     .replace(/^\s*#{1,6}\s+/, '')
     .replace(/^\s*>\s?/, '')
+    .replace(LEADING_EMOJI_RE, '')
+    .replace(LEADING_NUM_RE, '')
     .trimEnd();
+}
+
+/** Cap an AI section's body so a single chunk can't dominate the report (D-VERBOSE). */
+const AI_MAX_LINES_PER_SECTION = 35;
+const AI_TRUNCATION_NOTE =
+  '…[раздел сокращён по лимиту объёма; полная версия — в snapshot.aiNarrative]';
+
+function applyAiLineLimit(lines: string[]): string[] {
+  if (lines.length <= AI_MAX_LINES_PER_SECTION) return lines;
+  return [...lines.slice(0, AI_MAX_LINES_PER_SECTION), '', AI_TRUNCATION_NOTE];
 }
 
 /**

@@ -5,6 +5,7 @@ import { ENDPOINTS } from '../endpoints';
 import { StatDataResponseSchema, type StatDataResponse } from '../schemas';
 import { pageMetrics, type PageQueryOptions } from './page-behavior';
 import { ratio } from './ratio';
+import { aggregatePages } from './normalize-page';
 
 type Row = StatDataResponse['data'][number];
 
@@ -39,5 +40,5 @@ export async function exitPageBehavior(
     },
     StatDataResponseSchema,
   );
-  return { raw, stats: raw.data.map((row) => mapRow(row, opts)) };
+  return { raw, stats: aggregatePages(raw.data.map((row) => mapRow(row, opts))) };
 }
