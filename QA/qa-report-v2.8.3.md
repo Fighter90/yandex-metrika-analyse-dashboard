@@ -1,6 +1,6 @@
 # QA-отчёт N2N v2.8.3 — финальный регресс
 
-> Дата: 2026-05-28. Commit: **a6785ca** (fix(report+goals): GOST title page, HTML Executive Summary, Goals payment progress). Окружение: backend :4000, frontend :5173, counterId=54280963, токен Метрики ✓.
+> Дата: 2026-05-28. Commit: **a6785ca** (fix(report+goals): GOST title page, HTML Executive Summary, Goals payment progress). Окружение: backend :4000, frontend :5173, counterId=<COUNTER_ID>, токен Метрики ✓.
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### §1 API — 8/8 🟢
 
-- `/api/health` → 200, counterId=54280963, metrikaTokenPresent=true
+- `/api/health` → 200, counterId=<COUNTER_ID>, metrikaTokenPresent=true
 - `/api/settings` → маски + COUNTER_ID не маскирован
 - `/api/metrics/primary-goal` → `{id:328425726, type:'e_purchase', name:'Ecommerce: покупка'}`
 - `/api/metrics/goals` → 129 целей
