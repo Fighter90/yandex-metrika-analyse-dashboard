@@ -128,7 +128,7 @@
 - `data/` — SQLite + отчёты + экспорт DL (gitignored, кроме `.gitkeep`).
 
 Поток: `./run.sh` → миграции → `pnpm sync` (Метрика → SQLite) → Fastify API (`/api/*`, Swagger
-`/docs`) → React-дашборд (TanStack Query) → SnapshotBuilder → DOCX/PDF. Текущий релиз — **v2.9.3**.
+`/docs`) → React-дашборд (TanStack Query) → SnapshotBuilder → DOCX/PDF. Текущий релиз — **v2.9.4**.
 
 ## Как работать в этом репозитории (для AI-агентов)
 

@@ -3,13 +3,16 @@ import { reportSections } from '../docx/sections';
 
 /** Parse inline markdown to HTML: **bold**, *italic*, `code`. */
 function inlineToHtml(text: string): string {
+  // Escape FIRST, then apply markdown → real tags. Escaping after would also escape the `<strong>`
+  // we insert, leaking literal «<strong>…</strong>» into the PDF (the tag-leak bug). AI lines already
+  // had their raw HTML converted to markdown by sanitizeAiLine, so by here only `**`/`*`/`` ` `` remain.
   return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 
 /** Detect if a line is a table row (starts and ends with |). */

@@ -577,14 +577,13 @@ describe('reportSections — new sections', () => {
     expect(secs.find((x) => x.heading === 'Анализ')).toBeTruthy(); // «Шаг 2.» prefix stripped
   });
 
-  it('caps an AI section body at the line limit with a truncation note (v2.9.1 D-VERBOSE)', () => {
+  it('caps an AI section body at the line limit, silently — no truncation note (v2.9.3 D-VERBOSE)', () => {
     const manyLines = Array.from({ length: 60 }, (_, i) => `Абзац номер ${i + 1}.`).join('\n');
     const s: ReportSnapshot = { ...baseSnapshot, aiNarrative: `## Длинный раздел\n\n${manyLines}` };
     const sec = reportSections(s).find((x) => x.heading === 'Длинный раздел');
     expect(sec).toBeTruthy();
-    // 35 lines + '' spacer + truncation note = 37
-    expect(sec!.lines.length).toBeLessThanOrEqual(37);
-    expect(sec!.lines.join('\n')).toContain('сокращён по лимиту');
+    expect(sec!.lines.length).toBe(35); // hard cap, no extra note line
+    expect(sec!.lines.join('\n')).not.toContain('сокращён'); // note removed (v2.9.3)
   });
 
   it('converts/strips HTML tags so none leak into DOCX/PDF (v2.9.3)', () => {
