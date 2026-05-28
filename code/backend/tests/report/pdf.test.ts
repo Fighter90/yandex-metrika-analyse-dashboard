@@ -106,11 +106,12 @@ describe('reportHtml', () => {
     expect(html).toContain('<table>');
     expect(html).toContain('<th>');
     expect(html).toContain('<td>');
-    // inlineToHtml applies bold/italic/code replacements then escapes < and > characters,
-    // so the resulting tags appear escaped in the final output — coverage is still exercised.
-    expect(html).toContain('bold text');
-    expect(html).toContain('italic text');
-    expect(html).toContain('code snippet');
+    // inlineToHtml escapes text FIRST, then emits REAL emphasis tags — so bold/italic render as
+    // actual <strong>/<em> (not escaped «&lt;strong&gt;» literals in the PDF). (v2.9.3 tag-leak fix)
+    expect(html).toContain('<strong>bold text</strong>');
+    expect(html).toContain('<em>italic text</em>');
+    expect(html).toContain('<code>code snippet</code>');
+    expect(html).not.toContain('&lt;strong&gt;'); // no escaped/leaked tags
     expect(html).toContain('<li>');
     expect(html).toContain('<ul>');
   });

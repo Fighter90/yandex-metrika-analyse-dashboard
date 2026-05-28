@@ -342,14 +342,14 @@ function sanitizeAiLine(line: string): string {
     .trimEnd();
 }
 
-/** Cap an AI section's body so a single chunk can't dominate the report (D-VERBOSE). */
+/** Cap an AI section's body so a single chunk can't dominate the report (D-VERBOSE). The cut is
+ * silent — no «раздел сокращён…» note clutters the document; the full narrative stays in the snapshot. */
 const AI_MAX_LINES_PER_SECTION = 35;
-const AI_TRUNCATION_NOTE =
-  '…[раздел сокращён по лимиту объёма; полная версия — в snapshot.aiNarrative]';
 
 function applyAiLineLimit(lines: string[]): string[] {
-  if (lines.length <= AI_MAX_LINES_PER_SECTION) return lines;
-  return [...lines.slice(0, AI_MAX_LINES_PER_SECTION), '', AI_TRUNCATION_NOTE];
+  return lines.length <= AI_MAX_LINES_PER_SECTION
+    ? lines
+    : lines.slice(0, AI_MAX_LINES_PER_SECTION);
 }
 
 /**
