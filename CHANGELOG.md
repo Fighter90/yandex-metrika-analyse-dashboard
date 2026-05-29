@@ -6,6 +6,17 @@
 
 ## [Unreleased]
 
+## [2.10.0] - 2026-05-29
+
+### Added
+
+- **`./init.sh` собирает OAuth-доступы Яндекс.Метрики.** Раньше инициализация спрашивала только
+  Anthropic key, `COUNTER_ID` и `GOAL_ID`, но **не** `YANDEX_CLIENT_ID` / `YANDEX_CLIENT_SECRET` —
+  они оставались плейсхолдерами, и `pnpm auth` падал с `invalid_client: Client not found`. Теперь
+  init спрашивает **ClientID** и **Client secret** OAuth-приложения и пишет их в `.env` через
+  `applyInitValues`. Полный флоу за один проход: ввод доступов → `.env` → ссылка авторизации → код
+  подтверждения → токен → `pnpm sync`.
+
 ## [2.9.5] - 2026-05-29
 
 ### Fixed

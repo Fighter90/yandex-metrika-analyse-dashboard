@@ -9,7 +9,7 @@ methodology (Double Diamond + ICE = I × C × E) with DOCX/PDF report generation
 
 > **Campaign KPI:** 300+ **paid** tickets. Throughout the tool: **an application ≠ a payment**.
 
-> ✅ **Status: working product v2.9.5.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
+> ✅ **Status: working product v2.10.0.** A 9-page dashboard (Overview, Traffic, Behavior, Funnel,
 > Goals, Report, History, Settings, Help), mobile hamburger menu, AI analysis in 5 sections with
 > a progress bar (HTML rendering), sync with detailed progress (10 stages with descriptions),
 > analytical insights on every page (green/yellow/red badges), custom date picker (from/to, max
