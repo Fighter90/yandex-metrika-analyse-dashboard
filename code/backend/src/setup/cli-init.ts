@@ -6,8 +6,9 @@ import { applyInitValues } from './init-env';
 
 /**
  * CLI for `./init.sh` (`pnpm --filter @pca/backend configure`). Interactively collects the Anthropic
- * key + Metrika launch params and writes them into .env (preserving other lines). Excluded from
- * coverage (interactive IO); applyInitValues is the tested pure part. OAuth is handled by `pnpm auth`.
+ * key, the Yandex OAuth app credentials (ClientID/Client secret) and Metrika launch params, then
+ * writes them into .env (preserving other lines). Excluded from coverage (interactive IO);
+ * applyInitValues is the tested pure part. The token exchange itself is handled by `pnpm auth`.
  */
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const ENV_PATH = join(ROOT, '.env');
@@ -28,12 +29,18 @@ console.log('\n=== Инициализация ProductCamp Analytics ===');
 console.log('Пустой ввод оставляет текущее значение.\n');
 
 const anthropicKey = await ask('Anthropic API key (для AI-анализа; можно пропустить)');
+console.log('\nOAuth-приложение Яндекс.Метрики (https://oauth.yandex.ru, scope metrika:read).');
+console.log('ClientID и Client secret берутся из карточки приложения.');
+const clientId = await ask('Yandex OAuth ClientID (обязательно для живого sync)');
+const clientSecret = await ask('Yandex OAuth Client secret (обязательно для живого sync)');
 const counterId = await ask('ID счётчика Яндекс.Метрики (обязательно для живого sync)');
 const goalId = await ask('ID цели KPI (0 = авто-определение основной цели оплаты)', '0');
 rl.close();
 
 const updated = applyInitValues(readFileSync(ENV_PATH, 'utf8'), {
   anthropicKey,
+  clientId,
+  clientSecret,
   counterId,
   goalId,
 });

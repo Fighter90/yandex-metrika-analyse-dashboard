@@ -3,6 +3,8 @@ import { upsertEnvVar } from '../metrika/oauth';
 /** Values `./init.sh` collects. Empty/undefined fields are left untouched in `.env`. */
 export interface InitValues {
   readonly anthropicKey?: string;
+  readonly clientId?: string;
+  readonly clientSecret?: string;
   readonly counterId?: string;
   readonly goalId?: string;
 }
@@ -15,6 +17,8 @@ export interface InitValues {
 export function applyInitValues(envContent: string, values: InitValues): string {
   let out = envContent;
   if (values.anthropicKey) out = upsertEnvVar(out, 'ANTHROPIC_API_KEY', values.anthropicKey);
+  if (values.clientId) out = upsertEnvVar(out, 'YANDEX_CLIENT_ID', values.clientId);
+  if (values.clientSecret) out = upsertEnvVar(out, 'YANDEX_CLIENT_SECRET', values.clientSecret);
   if (values.counterId) out = upsertEnvVar(out, 'COUNTER_ID', values.counterId);
   if (values.goalId) out = upsertEnvVar(out, 'GOAL_ID', values.goalId);
   return out;
