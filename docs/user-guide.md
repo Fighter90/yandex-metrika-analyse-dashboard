@@ -37,8 +37,8 @@
 Подробно — в [quickstart.md](quickstart.md). Самый короткий путь:
 
 ```bash
-git clone git@github.com:Fighter90/metrika_analyse_dashboard.git
-cd metrika_analyse_dashboard
+git clone git@github.com:Fighter90/yandex-metrika-analyse-dashboard.git
+cd yandex-metrika-analyse-dashboard
 ./setup.sh          # install → init → start
 ```
 
@@ -311,6 +311,6 @@ notes, dateAdded, datePaid. Полная модель — в [data-model.md](dat
 
 ## 11. Поддержка
 
-- **Репозиторий:** <https://github.com/Fighter90/metrika_analyse_dashboard>
-- **Issues:** <https://github.com/Fighter90/metrika_analyse_dashboard/issues>
+- **Репозиторий:** <https://github.com/Fighter90/yandex-metrika-analyse-dashboard>
+- **Issues:** <https://github.com/Fighter90/yandex-metrika-analyse-dashboard/issues>
 - **Встроенная справка:** страница «Справка» (`http://localhost:5173/help`).

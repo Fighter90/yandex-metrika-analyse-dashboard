@@ -13,7 +13,7 @@ A detailed "how to run the project" guide, including for a volunteer with no bac
 ## 2. First run (one command)
 
 ```bash
-cd metrika_analyse_dashboard
+cd yandex-metrika-analyse-dashboard
 ./run.sh
 ```
 

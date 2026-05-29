@@ -14,7 +14,7 @@
 ## 2. Первый запуск (одной командой)
 
 ```bash
-cd metrika_analyse_dashboard
+cd yandex-metrika-analyse-dashboard
 ./run.sh
 ```
 

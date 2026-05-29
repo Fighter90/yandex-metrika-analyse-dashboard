@@ -7,7 +7,7 @@
 
 ## 1. Проблема и контекст
 
-Итерация 35 ([#54](https://github.com/Fighter90/metrika_analyse_dashboard/pull/54)) ввела
+Итерация 35 ([#54](https://github.com/Fighter90/yandex-metrika-analyse-dashboard/pull/54)) ввела
 авто-определение **одной** основной KPI-цели: классификатор `classifyGoal`/`selectPrimaryGoal`
 (`code/shared/src/goal-classifier.ts`) **предпочитает цель-покупку** (`purchase`) цели-заявке
 (`application`). Но снапшот (`code/backend/src/report/snapshot-builder.ts`) помечает достижения
