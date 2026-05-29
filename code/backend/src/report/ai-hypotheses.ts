@@ -54,6 +54,8 @@ export function buildHypothesesRequest(
     '"channel":"...","successCriteria":"..."}; минимум 2 метода. ' +
     'ice — объект {"impact":N,"confidence":N,"ease":N,"impactRationale":"...","confidenceRationale":"...",' +
     '"easeRationale":"..."} где N — целое 1–10; НЕ включай поле score (оно вычисляется детерминированно). ' +
+    'ВАЖНО: итоговый ICE = Impact × Confidence × Ease (ПРОИЗВЕДЕНИЕ трёх оценок, шкала 1–1000), ' +
+    'НЕ среднее арифметическое. Выбирай impact/confidence/ease с учётом того, что они перемножаются. ' +
     'trafficLight — объект {"green":"...","yellow":"...","red":"..."}: критерии исхода проверки ' +
     '(🟢 если ... / 🟡 если ... / 🔴 если ...) с конкретными порогами. ' +
     'deadline — дата проверки в формате YYYY-MM-DD. ' +

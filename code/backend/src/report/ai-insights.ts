@@ -156,6 +156,16 @@ interface AnalysisChunk {
  * the ГОСТ DOCX/PDF: no Markdown headings, no self-numbering (the report adds section numbers), no
  * leading emoji on heading-like lines, no HTML. Defends against the markdown-leak defect (v2.9.0).
  */
+/**
+ * Methodology rule appended to every chunk so the narrative explains ICE as a PRODUCT, not a mean.
+ * The structured `generatedHypotheses` already store the product score (iceScore = i×c×e), but the
+ * free-text narrative would otherwise describe ICE as the arithmetic average of impact/confidence/ease.
+ */
+export const ICE_RULE =
+  'ПРИОРИТИЗАЦИЯ ICE: считай и объясняй ICE строго как ПРОИЗВЕДЕНИЕ — ' +
+  'ICE = Impact × Confidence × Ease (три оценки 1–10, итоговая шкала 1–1000). ' +
+  'НЕ используй среднее арифметическое ((I+C+E)/3) — это запрещено.';
+
 export const AI_FORMAT_RULES =
   'ФОРМАТ ВЫВОДА (строго):\n' +
   '1. Пиши обычным текстом, абзацами. НЕ используй Markdown-заголовки (#, ##, ###, ####).\n' +
@@ -242,7 +252,7 @@ async function generateChunk(
   const req: AnthropicRequest = {
     model,
     max_tokens: 6000,
-    system: `${chunk.systemPrompt}\n\n${AI_FORMAT_RULES}`,
+    system: `${chunk.systemPrompt}\n\n${AI_FORMAT_RULES}\n\n${ICE_RULE}`,
     messages: [{ role: 'user', content: chunk.userPrompt(facts) }],
   };
 
