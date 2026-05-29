@@ -42,3 +42,6 @@ code/backend/data/
 
 # qwen worktrees / local agent settings
 .qwen/
+
+# Generated report exports (not source)
+outputs/

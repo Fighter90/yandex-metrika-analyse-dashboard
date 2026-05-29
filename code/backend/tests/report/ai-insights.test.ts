@@ -95,6 +95,11 @@ describe('generateInsights', () => {
       expect(firstCall[0]).toBe(ANTHROPIC_URL);
       expect(firstCall[1].headers['x-api-key']).toBe('sk-test');
       expect(firstCall[1].headers['anthropic-version']).toBeTruthy();
+      // Every chunk's system prompt instructs ICE as a PRODUCT, not a mean.
+      const sys = JSON.parse(firstCall[1].body).system as string;
+      expect(sys).toContain('Impact × Confidence × Ease');
+      expect(sys).toMatch(/ПРОИЗВЕДЕНИЕ|произведение/);
+      expect(sys).toMatch(/НЕ.*средне/i);
     }
   });
 
